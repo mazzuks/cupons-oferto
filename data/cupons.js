@@ -1,7 +1,7 @@
 window.OFERTO_COUPONS = [
   {
     id: "pizza-hut-familia",
-    categoria: "Alimentação",
+    categoria: "Alimentação e Bebidas",
     loja: "Pizza Hut",
     titulo: "Pizza grande com desconto para dividir",
     descricao: "Cupom para economizar no pedido de pizza do fim de semana.",
@@ -10,6 +10,7 @@ window.OFERTO_COUPONS = [
     banner: "https://oferto.digital/wp-content/uploads/2024/08/1-1.jpg",
     inicio: "2026-08-10",
     fim: "2026-08-22",
+    status: "ativo",
     destaque: true,
     regra: "Confira disponibilidade, lojas participantes e pedido mínimo antes de finalizar."
   },
@@ -24,6 +25,7 @@ window.OFERTO_COUPONS = [
     banner: "https://oferto.digital/wp-content/uploads/2024/08/2-1.jpg",
     inicio: "2026-08-12",
     fim: "2026-08-19",
+    status: "ativo",
     destaque: true,
     regra: "Válido enquanto houver disponibilidade da campanha."
   },
@@ -38,6 +40,7 @@ window.OFERTO_COUPONS = [
     banner: "https://oferto.digital/wp-content/uploads/2024/08/3-1.jpg",
     inicio: "2026-08-14",
     fim: "2026-08-27",
+    status: "ativo",
     destaque: false,
     regra: "Pode variar conforme o valor do gift card escolhido."
   },
@@ -52,6 +55,7 @@ window.OFERTO_COUPONS = [
     banner: "https://oferto.digital/wp-content/uploads/2024/08/4-1.jpg",
     inicio: "2026-08-01",
     fim: "2026-08-30",
+    status: "ativo",
     destaque: false,
     regra: "Aplicável em cursos selecionados."
   },
@@ -66,8 +70,24 @@ window.OFERTO_COUPONS = [
     banner: "https://oferto.digital/wp-content/uploads/2024/08/5-1.jpg",
     inicio: "2026-08-15",
     fim: "2026-08-21",
+    status: "ativo",
     destaque: true,
     regra: "Válido para novas assinaturas."
+  },
+  {
+    id: "ruffles-lanche",
+    categoria: "Alimentação e Bebidas",
+    loja: "Ruffles",
+    titulo: "Salgadinho para o lanche com cupom",
+    descricao: "Oferta para economizar em snacks, bebidas e itens de conveniência.",
+    codigo: "RUFFLES10",
+    url: "https://oferto.digital/",
+    banner: "assets/ruffles-coupon.svg",
+    inicio: "2026-08-18",
+    fim: "2026-08-24",
+    status: "ativo",
+    destaque: false,
+    regra: "Produto alimentício: classificar sempre em Alimentação e Bebidas."
   },
   {
     id: "kids-volta-aula",
@@ -80,6 +100,7 @@ window.OFERTO_COUPONS = [
     banner: "assets/kids-coupon.svg",
     inicio: "2026-08-08",
     fim: "2026-08-25",
+    status: "ativo",
     destaque: false,
     regra: "Não acumulativo com outras promoções."
   }
@@ -87,7 +108,7 @@ window.OFERTO_COUPONS = [
 
 window.OFERTO_GUIDES = [
   {
-    categoria: "Alimentação",
+    categoria: "Alimentação e Bebidas",
     titulo: "Como economizar em uma bela pizza usando cupom",
     resumo: "Veja como comparar pedido mínimo, taxa de entrega e combos antes de aplicar o desconto."
   },

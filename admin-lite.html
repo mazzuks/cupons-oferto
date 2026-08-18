@@ -103,7 +103,7 @@
           <label class="field">
             Categoria
             <select name="categoria">
-              <option>Alimentação</option>
+              <option>Alimentação e Bebidas</option>
               <option>Compras</option>
               <option>Games</option>
               <option>Educação</option>
@@ -138,6 +138,14 @@
           <label class="field">
             Fim
             <input name="fim" value="2026-08-25" type="date" required />
+          </label>
+          <label class="field">
+            Status
+            <select name="status">
+              <option value="ativo">Ativo</option>
+              <option value="rascunho">Rascunho</option>
+              <option value="pausado">Pausado</option>
+            </select>
           </label>
           <label class="field">
             Regra
@@ -184,6 +192,7 @@
           banner: data.banner,
           inicio: data.inicio,
           fim: data.fim,
+          status: data.status,
           destaque: data.destaque === "true",
           regra: data.regra
         };

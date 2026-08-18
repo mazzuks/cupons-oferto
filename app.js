@@ -1,5 +1,6 @@
-const coupons = window.OFERTO_COUPONS || [];
+const fallbackCoupons = window.OFERTO_COUPONS || [];
 const guides = window.OFERTO_GUIDES || [];
+const config = window.OFERTO_CONFIG || {};
 
 const grid = document.querySelector("#coupon-grid");
 const template = document.querySelector("#coupon-template");
@@ -14,6 +15,7 @@ const expiringList = document.querySelector("#expiring-list");
 const guideGrid = document.querySelector("#guide-grid");
 
 let selectedCategory = "Todos";
+let coupons = fallbackCoupons;
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -37,11 +39,95 @@ function formatValidity(dateString) {
 }
 
 function isActive(coupon) {
-  return parseDate(coupon.inicio) <= today && parseDate(coupon.fim) >= today;
+  const published = !coupon.status || coupon.status === "ativo";
+  return published && parseDate(coupon.inicio) <= today && parseDate(coupon.fim) >= today;
 }
 
 function getActiveCoupons() {
   return coupons.filter(isActive);
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let value = "";
+  let quoted = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    const next = text[index + 1];
+
+    if (char === '"' && quoted && next === '"') {
+      value += '"';
+      index += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      row.push(value);
+      value = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") index += 1;
+      row.push(value);
+      if (row.some((cell) => cell.trim())) rows.push(row);
+      row = [];
+      value = "";
+    } else {
+      value += char;
+    }
+  }
+
+  row.push(value);
+  if (row.some((cell) => cell.trim())) rows.push(row);
+  return rows;
+}
+
+function normalizeKey(key) {
+  return key
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_|_$/g, "");
+}
+
+function normalizeCoupon(row, index) {
+  const coupon = Object.fromEntries(Object.entries(row).map(([key, value]) => [normalizeKey(key), value.trim()]));
+  const store = coupon.loja || coupon.marca || "";
+  const title = coupon.titulo || coupon.titulo_do_cupom || coupon.chamada || "";
+
+  return {
+    id: coupon.id || `${normalizeKey(store)}-${index}`,
+    categoria: coupon.categoria || coupon.segmento || "Outros",
+    loja: store,
+    titulo: title,
+    descricao: coupon.descricao || coupon.descricao_curta || "",
+    codigo: coupon.codigo || coupon.codigo_do_cupom || "",
+    url: coupon.url || coupon.link || coupon.url_do_cupom || "",
+    banner: coupon.banner || coupon.url_do_banner || coupon.imagem || "",
+    inicio: coupon.inicio || coupon.data_inicio || coupon.data_de_inicio || today.toISOString().slice(0, 10),
+    fim: coupon.fim || coupon.validade || coupon.data_fim || coupon.data_de_fim || "2099-12-31",
+    status: coupon.status || "ativo",
+    destaque: ["true", "sim", "1", "yes"].includes((coupon.destaque || "").toLowerCase()),
+    regra: coupon.regra || coupon.observacao || coupon.obs || ""
+  };
+}
+
+async function loadCoupons() {
+  if (!config.sheetCsvUrl) return fallbackCoupons;
+
+  try {
+    const response = await fetch(config.sheetCsvUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error("Planilha indisponível");
+    const rows = parseCsv(await response.text());
+    const headers = rows.shift() || [];
+    return rows
+      .map((cells, index) => normalizeCoupon(Object.fromEntries(headers.map((header, cellIndex) => [header, cells[cellIndex] || ""])), index))
+      .filter((coupon) => coupon.loja && coupon.titulo && coupon.url && coupon.banner);
+  } catch (error) {
+    console.warn("Usando cupons locais porque a planilha não carregou.", error);
+    return fallbackCoupons;
+  }
 }
 
 function matchesSearch(coupon, term) {
@@ -177,7 +263,12 @@ grid.addEventListener("click", async (event) => {
   }, 1800);
 });
 
-renderCategories();
-renderHighlights();
-renderGuides();
-renderCoupons();
+async function init() {
+  coupons = await loadCoupons();
+  renderCategories();
+  renderHighlights();
+  renderGuides();
+  renderCoupons();
+}
+
+init();

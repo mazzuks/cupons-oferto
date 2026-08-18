@@ -12,6 +12,8 @@ await Promise.all([
   cp("styles.css", "dist/styles.css"),
   cp("app.js", "dist/app.js"),
   cp("assets/kids-coupon.svg", "dist/assets/kids-coupon.svg"),
+  cp("assets/ruffles-coupon.svg", "dist/assets/ruffles-coupon.svg"),
+  cp("data/config.js", "dist/data/config.js"),
   cp("data/cupons.js", "dist/data/cupons.js"),
   cp(".openai/hosting.json", "dist/.openai/hosting.json")
 ]);
@@ -22,6 +24,8 @@ const staticFiles = [
   ["styles.css", "text/css; charset=utf-8"],
   ["app.js", "text/javascript; charset=utf-8"],
   ["assets/kids-coupon.svg", "image/svg+xml; charset=utf-8"],
+  ["assets/ruffles-coupon.svg", "image/svg+xml; charset=utf-8"],
+  ["data/config.js", "text/javascript; charset=utf-8"],
   ["data/cupons.js", "text/javascript; charset=utf-8"]
 ];
 

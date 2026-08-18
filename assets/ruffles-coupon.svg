@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="474" viewBox="0 0 900 474" role="img" aria-labelledby="title desc">
+  <title id="title">Cupom Ruffles</title>
+  <desc id="desc">Banner horizontal de cupom para salgadinho Ruffles.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ebf4ff"/>
+      <stop offset="0.56" stop-color="#fff3bd"/>
+      <stop offset="1" stop-color="#d8f7ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="15" flood-color="#162a4e" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect width="900" height="474" rx="38" fill="url(#bg)"/>
+  <circle cx="128" cy="96" r="76" fill="#1abae2" opacity="0.2"/>
+  <circle cx="760" cy="368" r="106" fill="#ffcb45" opacity="0.34"/>
+  <g filter="url(#shadow)">
+    <path d="M130 120h220l34 270H96l34-270z" fill="#194079"/>
+    <path d="M158 152h164l20 204H136l22-204z" fill="#ffcb45"/>
+    <path d="M156 234c32-34 73-46 122-38 26 4 47 14 64 28l9 90H146l10-80z" fill="#ffffff" opacity="0.82"/>
+    <text x="156" y="218" fill="#162a4e" font-family="Kanit, Arial, sans-serif" font-size="58" font-weight="800">Ruffles</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="416" y="94" width="392" height="286" rx="32" fill="#ffffff"/>
+    <path d="M416 174c27 0 48-21 48-48h296c0 27 21 48 48 48v126c-27 0-48 21-48 48H464c0-27-21-48-48-48V174z" fill="#ebf4ff" stroke="#194079" stroke-width="4" stroke-dasharray="12 12"/>
+    <text x="492" y="192" fill="#162a4e" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="800">Snack com cupom</text>
+    <text x="492" y="254" fill="#00a019" font-family="Kanit, Arial, sans-serif" font-size="66" font-weight="800">10% OFF</text>
+    <text x="492" y="312" fill="#3f444b" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">Cupom RUFFLES10</text>
+  </g>
+</svg>

@@ -1,4 +1,5 @@
 dist/
+*.zip
 includes/config.php
 uploads/cupons/*
 !uploads/cupons/.gitkeep

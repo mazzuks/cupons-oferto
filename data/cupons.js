@@ -77,7 +77,7 @@ window.OFERTO_COUPONS = [
     descricao: "Seleção de itens para rotina, escola e presentes.",
     codigo: "KIDS12",
     url: "https://oferto.digital/",
-    banner: "https://oferto.digital/wp-content/uploads/2024/08/promocoes.webp",
+    banner: "assets/kids-coupon.svg",
     inicio: "2026-08-08",
     fim: "2026-08-25",
     destaque: false,

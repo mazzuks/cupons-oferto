@@ -2,6 +2,7 @@ import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 
 await rm("dist", { recursive: true, force: true });
 await mkdir("dist/data", { recursive: true });
+await mkdir("dist/assets", { recursive: true });
 await mkdir("dist/.openai", { recursive: true });
 await mkdir("dist/server", { recursive: true });
 
@@ -10,6 +11,7 @@ await Promise.all([
   cp("admin-lite.html", "dist/admin-lite.html"),
   cp("styles.css", "dist/styles.css"),
   cp("app.js", "dist/app.js"),
+  cp("assets/kids-coupon.svg", "dist/assets/kids-coupon.svg"),
   cp("data/cupons.js", "dist/data/cupons.js"),
   cp(".openai/hosting.json", "dist/.openai/hosting.json")
 ]);
@@ -19,6 +21,7 @@ const staticFiles = [
   ["admin-lite.html", "text/html; charset=utf-8"],
   ["styles.css", "text/css; charset=utf-8"],
   ["app.js", "text/javascript; charset=utf-8"],
+  ["assets/kids-coupon.svg", "image/svg+xml; charset=utf-8"],
   ["data/cupons.js", "text/javascript; charset=utf-8"]
 ];
 

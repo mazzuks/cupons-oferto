@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="474" viewBox="0 0 900 474" role="img" aria-labelledby="title desc">
+  <title id="title">Cupom Mundo Kids</title>
+  <desc id="desc">Banner horizontal de cupom para produtos infantis com desconto.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ebf4ff"/>
+      <stop offset="0.58" stop-color="#d6edff"/>
+      <stop offset="1" stop-color="#fff5c7"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#162a4e" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="900" height="474" rx="38" fill="url(#bg)"/>
+  <circle cx="764" cy="92" r="74" fill="#ffcb45" opacity="0.95"/>
+  <circle cx="126" cy="390" r="90" fill="#1abae2" opacity="0.18"/>
+  <circle cx="710" cy="382" r="112" fill="#ffffff" opacity="0.5"/>
+  <g filter="url(#shadow)">
+    <rect x="78" y="112" width="194" height="242" rx="28" fill="#ffffff"/>
+    <rect x="102" y="140" width="146" height="72" rx="16" fill="#1abae2"/>
+    <rect x="102" y="230" width="68" height="86" rx="14" fill="#ffcb45"/>
+    <rect x="184" y="230" width="64" height="86" rx="14" fill="#00a019" opacity="0.88"/>
+    <path d="M126 176h98M136 270h16M204 270h18" stroke="#162a4e" stroke-width="14" stroke-linecap="round"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="330" y="94" width="492" height="286" rx="32" fill="#ffffff"/>
+    <path d="M330 176c28 0 50-22 50-50h392c0 28 22 50 50 50v122c-28 0-50 22-50 50H380c0-28-22-50-50-50V176z" fill="#ebf4ff" stroke="#194079" stroke-width="4" stroke-dasharray="12 12"/>
+    <text x="412" y="184" fill="#162a4e" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="800">Mundo Kids</text>
+    <text x="412" y="246" fill="#00a019" font-family="Kanit, Arial, sans-serif" font-size="70" font-weight="800">12% OFF</text>
+    <text x="412" y="304" fill="#3f444b" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="700">Cupom KIDS12</text>
+  </g>
+  <path d="M70 70h56M98 42v56M786 292h44M808 270v44" stroke="#194079" stroke-width="12" stroke-linecap="round" opacity="0.16"/>
+</svg>

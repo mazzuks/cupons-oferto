@@ -44,3 +44,15 @@ O site já está preparado para ler uma planilha publicada como CSV. Para ativar
 4. Faça um novo deploy.
 
 Enquanto `sheetCsvUrl` estiver vazio, o site usa os cupons locais de `data/cupons.js`.
+
+## Versao PHP/MySQL para cPanel
+
+Tambem existe uma versao simples para cPanel/Turbocloud:
+
+- `index.php`: site publico lendo cupons do MySQL.
+- `admin/`: login, setup inicial e CRUD de cupons.
+- `uploads/cupons/`: banners enviados pelo painel.
+- `install.sql`: tabelas MySQL e cupons iniciais.
+- `includes/config.example.php`: modelo de configuracao do banco.
+
+Veja o passo a passo em `docs/cpanel.md`.

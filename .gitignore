@@ -1,1 +1,5 @@
 dist/
+includes/config.php
+uploads/cupons/*
+!uploads/cupons/.gitkeep
+!uploads/cupons/.htaccess

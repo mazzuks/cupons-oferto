@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Adicionar cupom - Oferto Cupons</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .admin-page {
+        min-height: 100vh;
+        padding: clamp(24px, 6vw, 70px);
+        background: linear-gradient(110deg, #ffffff 0%, #ffffff 54%, #ebf4ff 54%, #ebf4ff 100%);
+      }
+
+      .admin-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+        gap: 28px;
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+
+      .admin-form,
+      .snippet-box {
+        padding: 24px;
+        background: #ffffff;
+        border: 1px solid #dde5f0;
+        border-radius: 8px;
+        box-shadow: 0 18px 45px rgba(22, 42, 78, 0.1);
+      }
+
+      .admin-form {
+        display: grid;
+        gap: 14px;
+      }
+
+      .field {
+        display: grid;
+        gap: 7px;
+        color: #162a4e;
+        font-weight: 800;
+      }
+
+      .field input,
+      .field textarea,
+      .field select {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 13px;
+        border: 1px solid #dde5f0;
+        border-radius: 8px;
+        color: #333333;
+        background: #ffffff;
+      }
+
+      .field textarea {
+        min-height: 86px;
+        resize: vertical;
+      }
+
+      .snippet-box pre {
+        overflow: auto;
+        min-height: 520px;
+        margin: 0;
+        padding: 18px;
+        color: #ebf4ff;
+        background: #162a4e;
+        border-radius: 8px;
+        white-space: pre-wrap;
+      }
+
+      @media (max-width: 820px) {
+        .admin-shell {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="admin-page">
+      <div class="admin-shell">
+        <section>
+          <a class="text-action" href="index.html">Voltar para o site</a>
+          <p class="eyebrow">Painel leve</p>
+          <h1>Adicionar um cupom novo.</h1>
+          <p class="hero-copy">
+            Preencha os campos, copie o bloco gerado e cole dentro de
+            <strong>data/cupons.js</strong>, na lista <strong>window.OFERTO_COUPONS</strong>.
+          </p>
+        </section>
+
+        <form class="admin-form" id="coupon-admin">
+          <label class="field">
+            Loja
+            <input name="loja" value="Pizza Hut" required />
+          </label>
+          <label class="field">
+            Categoria
+            <select name="categoria">
+              <option>Alimentação</option>
+              <option>Compras</option>
+              <option>Games</option>
+              <option>Educação</option>
+              <option>Entretenimento</option>
+              <option>Kids</option>
+            </select>
+          </label>
+          <label class="field">
+            Título
+            <input name="titulo" value="Pizza grande com desconto para dividir" required />
+          </label>
+          <label class="field">
+            Descrição curta
+            <textarea name="descricao">Cupom para economizar no pedido de pizza do fim de semana.</textarea>
+          </label>
+          <label class="field">
+            Código
+            <input name="codigo" value="PIZZAOFERTA" />
+          </label>
+          <label class="field">
+            URL do cupom
+            <input name="url" value="https://oferto.digital/" type="url" required />
+          </label>
+          <label class="field">
+            URL do banner
+            <input name="banner" value="https://oferto.digital/wp-content/uploads/2024/08/1-1.jpg" type="url" required />
+          </label>
+          <label class="field">
+            Início
+            <input name="inicio" value="2026-08-18" type="date" required />
+          </label>
+          <label class="field">
+            Fim
+            <input name="fim" value="2026-08-25" type="date" required />
+          </label>
+          <label class="field">
+            Regra
+            <textarea name="regra">Confira disponibilidade, lojas participantes e pedido mínimo antes de finalizar.</textarea>
+          </label>
+          <label class="field">
+            Destaque
+            <select name="destaque">
+              <option value="true">Sim</option>
+              <option value="false">Não</option>
+            </select>
+          </label>
+        </form>
+
+        <section class="snippet-box">
+          <p class="section-kicker">Bloco gerado</p>
+          <pre id="snippet"></pre>
+        </section>
+      </div>
+    </main>
+    <script>
+      const form = document.querySelector("#coupon-admin");
+      const snippet = document.querySelector("#snippet");
+
+      function slugify(value) {
+        return value
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "");
+      }
+
+      function updateSnippet() {
+        const data = Object.fromEntries(new FormData(form).entries());
+        const coupon = {
+          id: slugify(`${data.loja}-${data.titulo}`).slice(0, 48),
+          categoria: data.categoria,
+          loja: data.loja,
+          titulo: data.titulo,
+          descricao: data.descricao,
+          codigo: data.codigo,
+          url: data.url,
+          banner: data.banner,
+          inicio: data.inicio,
+          fim: data.fim,
+          destaque: data.destaque === "true",
+          regra: data.regra
+        };
+        snippet.textContent = `${JSON.stringify(coupon, null, 2)},`;
+      }
+
+      form.addEventListener("input", updateSnippet);
+      form.addEventListener("change", updateSnippet);
+      updateSnippet();
+    </script>
+  </body>
+</html>

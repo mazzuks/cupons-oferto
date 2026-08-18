@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Oferto Cupons - Cupons por categoria</title>
+    <meta
+      name="description"
+      content="Encontre cupons ativos por categoria, veja ofertas que vencem em breve e economize em alimentação, compras, games, educação e mais."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Oferto Cupons">
+        <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
+        <span>Cupons</span>
+      </a>
+      <nav class="nav-links" aria-label="Navegação principal">
+        <a href="#categorias">Categorias</a>
+        <a href="#vencendo">Vencendo hoje</a>
+        <a href="#guias">Guias de economia</a>
+      </nav>
+      <a class="header-cta" href="#alertas">Receber alertas</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Cupons ativos, separados por categoria</p>
+          <h1>Economize melhor, sem caçar cupom vencido.</h1>
+          <p>
+            Uma vitrine simples para encontrar descontos de alimentação, compras, games,
+            educação e serviços, com validade clara e atualização fácil.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#cupons">Ver cupons</a>
+            <a class="text-action" href="admin-lite.html">Adicionar cupom</a>
+          </div>
+        </div>
+        <div class="hero-panel" aria-label="Resumo dos cupons">
+          <div class="hero-panel-top">
+            <span class="live-dot"></span>
+            <span>Atualizado automaticamente pelos dados</span>
+          </div>
+          <div class="hero-stat">
+            <strong id="active-count">0</strong>
+            <span>cupons ativos</span>
+          </div>
+          <div class="mini-coupons" id="hero-coupons"></div>
+        </div>
+      </section>
+
+      <section class="search-band" aria-label="Buscar cupons">
+        <div>
+          <p class="section-kicker">Busca rápida</p>
+          <h2>O desconto certo, na hora certa.</h2>
+        </div>
+        <label class="search-box">
+          <span>Buscar</span>
+          <input id="coupon-search" type="search" placeholder="Pizza, mercado, games..." />
+        </label>
+      </section>
+
+      <section class="category-strip" id="categorias" aria-label="Categorias de cupons">
+        <button class="category-chip is-active" data-category="Todos">Todos</button>
+      </section>
+
+      <section class="content-grid" id="cupons">
+        <aside class="side-rail">
+          <section class="rail-block" id="vencendo">
+            <p class="section-kicker">Urgência boa</p>
+            <h2>Vencem em breve</h2>
+            <div id="expiring-list" class="expiring-list"></div>
+          </section>
+          <section class="rail-block" id="alertas">
+            <p class="section-kicker">Fidelização</p>
+            <h2>Receba só o que combina com você</h2>
+            <p>
+              Escolha suas categorias favoritas e receba uma seleção enxuta de cupons novos.
+            </p>
+            <form class="alert-form">
+              <input type="email" placeholder="seu@email.com" aria-label="E-mail" />
+              <button type="button">Quero receber</button>
+            </form>
+          </section>
+        </aside>
+
+        <section class="coupon-section" aria-live="polite">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Selecionados para hoje</p>
+              <h2 id="coupon-title">Todos os cupons</h2>
+            </div>
+            <span id="result-count">0 encontrados</span>
+          </div>
+          <div class="coupon-grid" id="coupon-grid"></div>
+          <p class="empty-state" id="empty-state" hidden>
+            Nenhum cupom ativo encontrado para esse filtro.
+          </p>
+        </section>
+      </section>
+
+      <section class="guides-section" id="guias">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">SEO que ajuda de verdade</p>
+            <h2>Guias para economizar sem complicar</h2>
+          </div>
+          <a class="text-action" href="#cupons">Explorar cupons</a>
+        </div>
+        <div class="guide-grid" id="guide-grid"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <strong>Oferto Cupons</strong>
+      <span>Compras inteligentes, ofertas imperdíveis.</span>
+    </footer>
+
+    <template id="coupon-template">
+      <article class="coupon-card">
+        <div class="coupon-media">
+          <img alt="" />
+          <span class="coupon-badge"></span>
+          <span class="validity"></span>
+        </div>
+        <div class="coupon-body">
+          <div class="coupon-meta">
+            <span class="store"></span>
+            <span class="coupon-type">Cupom verificado</span>
+          </div>
+          <h3></h3>
+          <p></p>
+          <div class="coupon-code-box">
+            <span class="code-label">Código</span>
+            <strong class="code-value"></strong>
+          </div>
+          <div class="coupon-actions">
+            <button class="copy-button" type="button">Copiar código</button>
+            <a class="use-button" target="_blank" rel="noopener">Usar cupom</a>
+          </div>
+          <small class="coupon-note"></small>
+        </div>
+      </article>
+    </template>
+
+    <script src="data/cupons.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -10,7 +10,7 @@ No cPanel:
 2. Crie um banco, por exemplo `usuario_cupons`.
 3. Crie um usuario MySQL.
 4. Dê permissao total desse usuario para o banco.
-5. Abra o **phpMyAdmin** e importe o arquivo `install.sql`.
+5. As tabelas sao criadas automaticamente no primeiro acesso depois que `includes/config.php` estiver configurado. O arquivo `install.sql` fica como apoio manual, se precisar.
 
 ## 2. Configurar o site
 

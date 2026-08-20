@@ -97,6 +97,12 @@ $guides = [
         <?php endforeach; ?>
       </section>
 
+      <aside class="ad-band" aria-label="Publicidade">
+        <div class="ad-slot ad-slot-wide" data-ad-slot="cupons_topo_responsivo">
+          <span>Publicidade</span>
+        </div>
+      </aside>
+
       <section class="content-grid" id="cupons">
         <aside class="side-rail">
           <section class="rail-block" id="vencendo">
@@ -120,6 +126,9 @@ $guides = [
               <button type="button">Quero receber</button>
             </form>
           </section>
+          <aside class="ad-slot ad-slot-rectangle" aria-label="Publicidade" data-ad-slot="cupons_lateral_300x250">
+            <span>Publicidade</span>
+          </aside>
         </aside>
 
         <section class="coupon-section" aria-live="polite">
@@ -161,6 +170,12 @@ $guides = [
           <p class="empty-state" id="empty-state" hidden>Nenhum cupom ativo encontrado para esse filtro.</p>
         </section>
       </section>
+
+      <aside class="ad-band ad-band-before-guides" aria-label="Publicidade">
+        <div class="ad-slot ad-slot-wide" data-ad-slot="cupons_entre_lista_e_guias">
+          <span>Publicidade</span>
+        </div>
+      </aside>
 
       <section class="guides-section" id="guias">
         <div class="section-heading">

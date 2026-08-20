@@ -323,6 +323,51 @@ h3 {
   border-color: var(--blue);
 }
 
+.ad-band {
+  padding: 26px clamp(18px, 5vw, 72px);
+  background: var(--soft);
+}
+
+.ad-band-before-guides {
+  padding-top: 0;
+}
+
+.ad-slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: rgba(25, 64, 121, 0.58);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(235, 244, 255, 0.92)),
+    repeating-linear-gradient(135deg, rgba(25, 64, 121, 0.05) 0 10px, transparent 10px 20px);
+  border: 1px solid rgba(25, 64, 121, 0.12);
+  border-radius: 8px;
+}
+
+.ad-slot span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ad-slot-wide {
+  width: min(100%, 970px);
+  min-height: 112px;
+  margin-inline: auto;
+}
+
+.ad-slot-rectangle {
+  min-height: 250px;
+}
+
+.ad-slot[data-filled="true"] {
+  display: block;
+  background: transparent;
+  border: 0;
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: minmax(260px, 330px) 1fr;
@@ -674,6 +719,10 @@ h3 {
     position: static;
   }
 
+  .ad-slot-rectangle {
+    min-height: 100px;
+  }
+
   .coupon-section {
     order: -1;
   }
@@ -691,8 +740,18 @@ h3 {
 
   .content-grid,
   .guides-section,
-  .search-band {
+  .search-band,
+  .ad-band {
     padding-block: 36px;
+  }
+
+  .ad-band-before-guides {
+    padding-top: 0;
+  }
+
+  .ad-slot-wide,
+  .ad-slot-rectangle {
+    min-height: 96px;
   }
 
   .category-strip {

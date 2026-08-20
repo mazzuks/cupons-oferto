@@ -23,6 +23,7 @@ $shareDescription = $guide['summary'];
 $shareSlug = $guide['slug'] ?? $slug;
 $shareUrl = $shareSlug ? 'https://cupons.oferto.digital/guia.php?tema=' . rawurlencode($shareSlug) : 'https://cupons.oferto.digital/guias';
 $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
+$whatsappShareUrl = 'https://wa.me/?text=' . rawurlencode($guide['title'] . ' - ' . $shareUrl);
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -51,7 +52,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260820-cards" />
+    <link rel="stylesheet" href="styles.css?v=20260820-guides" />
   </head>
   <body>
     <header class="site-header">
@@ -74,6 +75,12 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         <p><?= e($guide['intro']) ?></p>
       </section>
 
+      <aside class="inventory-band guide-inventory" aria-label="Publicidade">
+        <div class="inventory-slot inventory-slot-wide" data-inventory-slot="guias_artigo_topo_responsivo">
+          <span>Publicidade</span>
+        </div>
+      </aside>
+
       <section class="guide-layout">
         <article class="guide-article">
           <?php foreach ($guide['sections'] as $section): ?>
@@ -87,6 +94,17 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         </article>
 
         <aside class="guide-sidebar">
+          <section class="rail-block share-block">
+            <p class="section-kicker">Compartilhar</p>
+            <h2>Envie este guia no WhatsApp</h2>
+            <p>Compartilhe o link com quem também quer economizar antes de finalizar a compra.</p>
+            <a class="whatsapp-action" href="<?= e($whatsappShareUrl) ?>" target="_blank" rel="noopener">Compartilhar no WhatsApp</a>
+          </section>
+
+          <aside class="inventory-slot inventory-slot-rectangle" aria-label="Publicidade" data-inventory-slot="guias_lateral_300x250">
+            <span>Publicidade</span>
+          </aside>
+
           <section class="rail-block">
             <p class="section-kicker">Próximo passo</p>
             <h2>Encontre um cupom ativo</h2>

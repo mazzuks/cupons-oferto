@@ -195,7 +195,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <section class="guides-section" id="guias">
         <div class="section-heading">
           <div>
-            <p class="section-kicker">SEO que ajuda de verdade</p>
             <h2>Guias para economizar sem complicar</h2>
           </div>
           <a class="text-action" href="#cupons">Explorar cupons</a>

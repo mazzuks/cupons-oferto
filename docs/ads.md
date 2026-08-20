@@ -9,6 +9,8 @@ Este projeto ja tem espacos preparados para Google Ad Manager, Ad Exchange ou de
 | `cupons_topo_responsivo` | Depois das categorias, antes da lista de cupons | 970x250 desktop, 728x90 tablet, 320x100 mobile |
 | `cupons_lateral_300x250` | Lateral desktop, abaixo do bloco de fidelizacao | 300x250 |
 | `cupons_entre_lista_e_guias` | Depois da lista de cupons, antes dos guias SEO | 970x250 desktop, 728x90 tablet, 320x100 mobile |
+| `guias_artigo_topo_responsivo` | Paginas de guia, entre o hero e o artigo | 970x250 desktop, 728x90 tablet, 320x100 mobile |
+| `guias_lateral_300x250` | Lateral das paginas de guia | 300x250 |
 
 ## Proxima etapa
 

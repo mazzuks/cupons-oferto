@@ -89,6 +89,7 @@ input {
 
 .header-cta,
 .primary-action,
+.whatsapp-action,
 .alert-form button {
   display: inline-flex;
   align-items: center;
@@ -101,6 +102,11 @@ input {
   background: #000000;
   font-weight: 800;
   cursor: pointer;
+}
+
+.whatsapp-action {
+  width: 100%;
+  background: #128c3f;
 }
 
 .hero {
@@ -330,6 +336,11 @@ h3 {
 
 .inventory-band-before-guides {
   padding-top: 0;
+}
+
+.guide-inventory {
+  padding-top: 28px;
+  padding-bottom: 0;
 }
 
 .inventory-slot {
@@ -798,12 +809,17 @@ h3 {
   top: 100px;
 }
 
-.guide-sidebar .rail-block a:not(.primary-action) {
+.guide-sidebar .rail-block a:not(.primary-action):not(.whatsapp-action) {
   display: block;
   padding: 12px 0;
   color: var(--blue);
   border-top: 1px solid var(--line);
   font-weight: 800;
+}
+
+.share-block h2 {
+  font-size: 25px;
+  line-height: 1.08;
 }
 
 .site-footer {

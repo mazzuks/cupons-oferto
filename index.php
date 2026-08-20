@@ -25,6 +25,8 @@ $guides = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Oferto Cupons - Cupons por categoria</title>
+    <link rel="icon" href="assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
     <meta name="description" content="Encontre cupons ativos por categoria, veja ofertas que vencem em breve e economize em alimentação, bebidas, compras, games, educação e mais." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

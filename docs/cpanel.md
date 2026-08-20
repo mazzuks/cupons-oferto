@@ -29,7 +29,16 @@ Na maioria dos cPanels, o host e `localhost`.
 
 ## 3. Subir os arquivos
 
-Envie os arquivos para `public_html` ou para uma subpasta, como `public_html/cupons`.
+No cPanel, use o mesmo processo do projeto de campanhas:
+
+1. Abra **Git Version Control**.
+2. Clone `https://github.com/mazzuks/cupons-oferto.git`.
+3. Use uma pasta fora do site oficial, por exemplo `/home/oferto/cupons-oferto`.
+4. Em **Domains**, crie ou gerencie estes subdominios:
+   - `cupons.oferto.digital` apontando para `/home/oferto/cupons-oferto`;
+   - `crm.oferto.digital` apontando para `/home/oferto/cupons-oferto`.
+
+Quando o acesso vier por `crm.oferto.digital`, o `index.php` redireciona automaticamente para `/admin/`. Assim o site publico e o painel usam a mesma base, o mesmo banco e a mesma pasta de uploads.
 
 Pastas importantes:
 

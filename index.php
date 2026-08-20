@@ -1,6 +1,12 @@
 <?php
 require_once __DIR__ . '/includes/coupons.php';
 
+$host = strtolower($_SERVER['HTTP_HOST'] ?? '');
+if (strpos($host, 'crm.') === 0) {
+    header('Location: /admin/');
+    exit;
+}
+
 $coupons = active_coupons();
 $categories = array_values(array_unique(array_map(fn ($coupon) => $coupon['category'], $coupons)));
 sort($categories);

@@ -25,8 +25,15 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?= e($shareTitle) ?></title>
+    <meta name="theme-color" content="#162a4e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Oferto Cupons" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="icon" href="assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="description" content="<?= e($shareDescription) ?>" />
     <link rel="canonical" href="<?= e($shareUrl) ?>" />
     <meta property="og:type" content="website" />
@@ -217,6 +224,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <span>Compras inteligentes, ofertas imperdíveis.</span>
     </footer>
     <script src="php-site.js"></script>
+    <script src="pwa.js"></script>
   </body>
 </html>
 

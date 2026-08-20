@@ -97,8 +97,8 @@ $guides = [
         <?php endforeach; ?>
       </section>
 
-      <aside class="ad-band" aria-label="Publicidade">
-        <div class="ad-slot ad-slot-wide" data-ad-slot="cupons_topo_responsivo">
+      <aside class="inventory-band" aria-label="Publicidade">
+        <div class="inventory-slot inventory-slot-wide" data-inventory-slot="cupons_topo_responsivo">
           <span>Publicidade</span>
         </div>
       </aside>
@@ -126,7 +126,7 @@ $guides = [
               <button type="button">Quero receber</button>
             </form>
           </section>
-          <aside class="ad-slot ad-slot-rectangle" aria-label="Publicidade" data-ad-slot="cupons_lateral_300x250">
+          <aside class="inventory-slot inventory-slot-rectangle" aria-label="Publicidade" data-inventory-slot="cupons_lateral_300x250">
             <span>Publicidade</span>
           </aside>
         </aside>
@@ -171,8 +171,8 @@ $guides = [
         </section>
       </section>
 
-      <aside class="ad-band ad-band-before-guides" aria-label="Publicidade">
-        <div class="ad-slot ad-slot-wide" data-ad-slot="cupons_entre_lista_e_guias">
+      <aside class="inventory-band inventory-band-before-guides" aria-label="Publicidade">
+        <div class="inventory-slot inventory-slot-wide" data-inventory-slot="cupons_entre_lista_e_guias">
           <span>Publicidade</span>
         </div>
       </aside>
@@ -204,3 +204,4 @@ $guides = [
     <script src="php-site.js"></script>
   </body>
 </html>
+

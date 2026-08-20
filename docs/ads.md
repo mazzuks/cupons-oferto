@@ -12,4 +12,5 @@ Este projeto ja tem espacos preparados para Google Ad Manager, Ad Exchange ou de
 
 ## Proxima etapa
 
-Quando a conta do Google Ad Manager estiver pronta, basta trocar os placeholders `.ad-slot` pelas tags oficiais, mantendo os mesmos `data-ad-slot`.
+Quando a conta do Google Ad Manager estiver pronta, basta trocar os placeholders `.inventory-slot` pelas tags oficiais, mantendo os mesmos `data-inventory-slot`.
+

@@ -89,6 +89,7 @@ input {
 
 .header-cta,
 .primary-action,
+.install-action,
 .whatsapp-action,
 .alert-form button {
   display: inline-flex;
@@ -104,9 +105,26 @@ input {
   cursor: pointer;
 }
 
+.install-action {
+  background: var(--blue);
+}
+
 .whatsapp-action {
   width: 100%;
   background: #128c3f;
+}
+
+.install-help {
+  max-width: 560px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  color: var(--blue);
+  background: rgba(235, 244, 255, 0.86);
+  border: 1px solid rgba(25, 64, 121, 0.14);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .hero {

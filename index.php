@@ -77,8 +77,10 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <p>Escolha uma categoria, veja ofertas ativas e copie o cupom ideal para pagar menos em alimentação, compras, games, educação e serviços.</p>
           <div class="hero-actions">
             <a class="primary-action" href="#cupons">Ver cupons</a>
+            <button class="install-action" type="button" data-install-app hidden>Instalar app</button>
             <a class="text-action" href="admin/">Gerenciar cupons</a>
           </div>
+          <p class="install-help" data-install-help hidden></p>
         </div>
         <div class="hero-panel" aria-label="Resumo dos cupons">
           <div class="hero-panel-top">

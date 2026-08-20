@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/coupons.php';
+require_once __DIR__ . '/includes/guides.php';
 
 $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
 if (strpos($host, 'crm.') === 0) {
@@ -12,12 +13,7 @@ $categories = array_values(array_unique(array_map(fn ($coupon) => $coupon['categ
 sort($categories);
 $featured = array_slice(array_values(array_filter($coupons, fn ($coupon) => (int) $coupon['featured'] === 1)), 0, 3);
 $expiring = array_slice($coupons, 0, 5);
-$guides = [
-    ['category' => 'Alimentação e Bebidas', 'title' => 'Como economizar em uma bela pizza usando cupom', 'summary' => 'Veja como comparar pedido mínimo, taxa de entrega e combos antes de aplicar o desconto.'],
-    ['category' => 'Compras', 'title' => 'Cupom bom não é só porcentagem alta', 'summary' => 'Aprenda a olhar frete, validade e regra de uso para não cair em oferta fraca.'],
-    ['category' => 'Games', 'title' => 'Gift cards: quando vale esperar uma promoção', 'summary' => 'Um guia rápido para renovar assinatura, comprar créditos e evitar gasto por impulso.'],
-    ['category' => 'Educação', 'title' => 'Como escolher cursos com desconto sem perder qualidade', 'summary' => 'Critérios simples para avaliar carga horária, reputação e aplicação prática.'],
-];
+$guides = all_guides();
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -31,7 +27,7 @@ $guides = [
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260820-ads" />
+    <link rel="stylesheet" href="styles.css?v=20260820-guides" />
   </head>
   <body>
     <header class="site-header">
@@ -187,11 +183,12 @@ $guides = [
         </div>
         <div class="guide-grid">
           <?php foreach ($guides as $guide): ?>
-            <article class="guide-card">
+            <a class="guide-card" href="guia.php?tema=<?= e($guide['slug']) ?>">
               <span><?= e($guide['category']) ?></span>
               <h3><?= e($guide['title']) ?></h3>
               <p><?= e($guide['summary']) ?></p>
-            </article>
+              <strong class="guide-link">Ler guia</strong>
+            </a>
           <?php endforeach; ?>
         </div>
       </section>

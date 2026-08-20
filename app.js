@@ -223,12 +223,15 @@ function renderHighlights() {
 function renderGuides() {
   guideGrid.replaceChildren(
     ...guides.map((guide) => {
-      const article = document.createElement("article");
+      const link = guide.slug ? `guia.php?tema=${encodeURIComponent(guide.slug)}` : "#cupons";
+      const article = document.createElement("a");
       article.className = "guide-card";
+      article.href = link;
       article.innerHTML = `
         <span>${guide.categoria}</span>
         <h3>${guide.titulo}</h3>
         <p>${guide.resumo}</p>
+        <strong class="guide-link">Ler guia</strong>
       `;
       return article;
     })

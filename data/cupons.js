@@ -108,21 +108,25 @@ window.OFERTO_COUPONS = [
 
 window.OFERTO_GUIDES = [
   {
+    slug: "pizza-com-cupom",
     categoria: "Alimentação e Bebidas",
     titulo: "Como economizar em uma bela pizza usando cupom",
     resumo: "Veja como comparar pedido mínimo, taxa de entrega e combos antes de aplicar o desconto."
   },
   {
+    slug: "cupom-bom-nao-e-so-porcentagem",
     categoria: "Compras",
     titulo: "Cupom bom não é só porcentagem alta",
     resumo: "Aprenda a olhar frete, validade e regra de uso para não cair em oferta fraca."
   },
   {
+    slug: "gift-cards-quando-esperar-promocao",
     categoria: "Games",
     titulo: "Gift cards: quando vale esperar uma promoção",
     resumo: "Um guia rápido para renovar assinatura, comprar créditos e evitar gasto por impulso."
   },
   {
+    slug: "curso-com-desconto-sem-perder-qualidade",
     categoria: "Educação",
     titulo: "Como escolher cursos com desconto sem perder qualidade",
     resumo: "Critérios simples para avaliar carga horária, reputação e aplicação prática."

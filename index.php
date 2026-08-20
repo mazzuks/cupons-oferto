@@ -14,16 +14,35 @@ sort($categories);
 $featured = array_slice(array_values(array_filter($coupons, fn ($coupon) => (int) $coupon['featured'] === 1)), 0, 3);
 $expiring = array_slice($coupons, 0, 5);
 $guides = all_guides();
+$shareTitle = 'Oferto Cupons - Cupons válidos para economizar hoje';
+$shareDescription = 'Encontre cupons ativos por categoria, copie códigos válidos e aproveite ofertas em alimentação, compras, games, educação e serviços.';
+$shareUrl = 'https://cupons.oferto.digital/';
+$shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
 ?>
 <!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Oferto Cupons - Cupons por categoria</title>
+    <title><?= e($shareTitle) ?></title>
     <link rel="icon" href="assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="assets/favicon.png" />
-    <meta name="description" content="Encontre cupons ativos por categoria, veja ofertas que vencem em breve e economize em alimentação, bebidas, compras, games, educação e mais." />
+    <meta name="description" content="<?= e($shareDescription) ?>" />
+    <link rel="canonical" href="<?= e($shareUrl) ?>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="Oferto Cupons" />
+    <meta property="og:title" content="<?= e($shareTitle) ?>" />
+    <meta property="og:description" content="<?= e($shareDescription) ?>" />
+    <meta property="og:url" content="<?= e($shareUrl) ?>" />
+    <meta property="og:image" content="<?= e($shareImage) ?>" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Oferto Cupons - cupons válidos por categoria" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="<?= e($shareTitle) ?>" />
+    <meta name="twitter:description" content="<?= e($shareDescription) ?>" />
+    <meta name="twitter:image" content="<?= e($shareImage) ?>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -31,7 +50,7 @@ $guides = all_guides();
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="#top" aria-label="Oferto Cupons">
+      <a class="brand" href="/" aria-label="Oferto Cupons">
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
         <span>Cupons</span>
       </a>

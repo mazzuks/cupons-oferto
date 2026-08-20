@@ -31,7 +31,7 @@ $relatedGuides = array_values(array_filter(all_guides(), fn ($item) => ($item['s
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260820-guides" />
+    <link rel="stylesheet" href="styles.css?v=20260820-cards" />
   </head>
   <body>
     <header class="site-header">
@@ -90,3 +90,4 @@ $relatedGuides = array_values(array_filter(all_guides(), fn ($item) => ($item['s
     </footer>
   </body>
 </html>
+

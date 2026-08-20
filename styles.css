@@ -443,11 +443,13 @@ h3 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
+  align-items: stretch;
 }
 
 .coupon-card {
   display: grid;
   grid-template-rows: auto 1fr;
+  min-width: 0;
   overflow: hidden;
   background: var(--paper);
   border: 1px solid var(--line);
@@ -470,14 +472,16 @@ h3 {
   display: grid;
   place-items: center;
   aspect-ratio: 1.9 / 1;
-  padding: 14px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 26px 16px 18px;
   background:
     linear-gradient(180deg, rgba(235, 244, 255, 0.92), rgba(213, 229, 249, 0.88)),
     var(--sky);
 }
 
 .coupon-media img {
-  width: 100%;
+  width: min(100%, 430px);
   height: 100%;
   object-fit: contain;
   display: block;
@@ -489,24 +493,30 @@ h3 {
   position: absolute;
   left: 14px;
   top: 14px;
+  max-width: calc(100% - 28px);
   padding: 7px 11px;
   color: var(--navy);
   background: var(--yellow);
   border-radius: 999px;
   font-size: 12px;
   font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   box-shadow: 0 8px 18px rgba(22, 42, 78, 0.12);
 }
 
 .coupon-body {
   display: grid;
-  grid-template-rows: auto auto auto 1fr auto auto;
+  grid-template-rows: auto auto auto auto auto 1fr;
   gap: 14px;
+  min-width: 0;
   padding: 20px;
 }
 
 .coupon-meta {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -520,17 +530,32 @@ h3 {
   position: absolute;
   right: 14px;
   bottom: 14px;
+  max-width: calc(100% - 28px);
   padding: 7px 11px;
   color: var(--paper);
   background: rgba(22, 42, 78, 0.9);
   border-radius: 999px;
   font-size: 12px;
   font-weight: 800;
-  white-space: nowrap;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 
 .coupon-type {
   color: var(--green);
+  min-width: 0;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.store {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .coupon-body h3 {
@@ -554,7 +579,8 @@ h3 {
 }
 
 .coupon-code-box {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   justify-content: space-between;
   gap: 14px;
@@ -580,13 +606,15 @@ h3 {
   font-family: Kanit, Inter, sans-serif;
   font-size: 18px;
   line-height: 1;
+  text-align: right;
   overflow-wrap: anywhere;
 }
 
 .coupon-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 10px;
+  min-width: 0;
 }
 
 .copy-button,
@@ -595,10 +623,13 @@ h3 {
   align-items: center;
   justify-content: center;
   min-height: 46px;
+  min-width: 0;
   padding: 0 12px;
   border-radius: 999px;
   font-size: 14px;
   font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
 }
 
 .copy-button {

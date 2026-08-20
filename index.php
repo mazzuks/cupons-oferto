@@ -50,9 +50,9 @@ $guides = [
     <main id="top">
       <section class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">Cupons ativos, separados por categoria</p>
-          <h1>Economize melhor, sem caçar cupom vencido.</h1>
-          <p>Uma vitrine simples para encontrar descontos de alimentação e bebidas, compras, games, educação e serviços, com validade clara e atualização fácil.</p>
+          <p class="eyebrow">Cupons válidos para economizar hoje</p>
+          <h1>Encontre descontos antes de finalizar sua compra.</h1>
+          <p>Escolha uma categoria, veja ofertas ativas e copie o cupom ideal para pagar menos em alimentação, compras, games, educação e serviços.</p>
           <div class="hero-actions">
             <a class="primary-action" href="#cupons">Ver cupons</a>
             <a class="text-action" href="admin/">Gerenciar cupons</a>

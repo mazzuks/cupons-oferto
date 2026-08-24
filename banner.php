@@ -137,22 +137,27 @@ function download_banner(string $url): ?array
 
 function banner_extension(string $contentType): ?string
 {
-    return match ($contentType) {
-        'image/jpeg', 'image/jpg' => 'jpg',
+    $types = [
+        'image/jpeg' => 'jpg',
+        'image/jpg' => 'jpg',
         'image/png' => 'png',
         'image/webp' => 'webp',
         'image/gif' => 'gif',
-        default => null,
-    };
+    ];
+
+    return $types[$contentType] ?? null;
 }
 
 function banner_content_type(string $path): string
 {
-    return match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
-        'jpg', 'jpeg' => 'image/jpeg',
+    $types = [
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
         'png' => 'image/png',
         'webp' => 'image/webp',
         'gif' => 'image/gif',
-        default => 'application/octet-stream',
-    };
+    ];
+
+    $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    return $types[$extension] ?? 'application/octet-stream';
 }

@@ -1354,6 +1354,10 @@ h3 {
   background: #f3f7fb;
 }
 
+.site-v2 [hidden] {
+  display: none !important;
+}
+
 .site-v2-compact .v2-compact-header {
   border-bottom: 1px solid rgba(221, 229, 240, 0.9);
   box-shadow: 0 10px 24px rgba(22, 42, 78, 0.05);

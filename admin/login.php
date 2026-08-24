@@ -10,7 +10,7 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     if (login_admin(trim($_POST['email'] ?? ''), $_POST['password'] ?? '')) {
-        redirect('index.php');
+        redirect('dashboard.php');
     }
     $error = 'E-mail ou senha incorretos.';
 }
@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Login - Oferto Cupons</title>
     <link rel="icon" href="../assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../styles.css?v=20260820-cards" />
-    <link rel="stylesheet" href="admin.css" />
+    <link rel="stylesheet" href="../styles.css?v=20260824-sidebar" />
+    <link rel="stylesheet" href="admin.css?v=20260824-sidebar" />
   </head>
   <body class="admin-screen">
     <main class="auth-card">

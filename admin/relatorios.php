@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/coupons.php';
+require_once __DIR__ . '/layout.php';
 
 require_admin();
 
@@ -54,32 +55,7 @@ function format_report_date(?string $date): string
     return date('d/m/Y H:i', strtotime($date));
 }
 ?>
-<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Relatorios - Oferto Cupons</title>
-    <link rel="icon" href="../assets/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../styles.css?v=20260824-platto" />
-    <link rel="stylesheet" href="admin.css?v=20260824-platto" />
-  </head>
-  <body>
-    <header class="admin-header">
-      <a class="brand" href="index.php">
-        <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
-        <span>CRM</span>
-      </a>
-      <nav>
-        <a href="index.php">Ofertas</a>
-        <a href="relatorios.php">Relatorios</a>
-        <a href="../index.php">Ver site</a>
-        <a href="logout.php">Sair</a>
-      </nav>
-    </header>
-
-    <main class="admin-shell">
+<?php admin_layout_start('Relatorios - Oferto Cupons', 'relatorios', 'Performance'); ?>
       <section class="admin-hero">
         <div>
           <p class="section-kicker">Performance</p>
@@ -166,6 +142,4 @@ function format_report_date(?string $date): string
           </table>
         </div>
       </section>
-    </main>
-  </body>
-</html>
+<?php admin_layout_end(); ?>

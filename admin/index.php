@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/coupons.php';
+require_once __DIR__ . '/layout.php';
 
 require_admin();
 
@@ -365,31 +366,7 @@ $defaults = [
 ];
 $form = array_merge($defaults, $editing ?: []);
 ?>
-<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin - Oferto Cupons</title>
-    <link rel="icon" href="../assets/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../styles.css?v=20260824-platto" />
-    <link rel="stylesheet" href="admin.css?v=20260824-platto" />
-  </head>
-  <body>
-    <header class="admin-header">
-      <a class="brand" href="../index.php">
-        <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
-        <span>Admin</span>
-      </a>
-      <nav>
-        <a href="relatorios.php">Relatorios</a>
-        <a href="../index.php">Ver site</a>
-        <a href="logout.php">Sair</a>
-      </nav>
-    </header>
-
-    <main class="admin-shell">
+<?php admin_layout_start('Ofertas - Oferto Cupons', 'ofertas'); ?>
       <section class="admin-hero">
         <div>
           <p class="section-kicker">CRM Oferto</p>
@@ -522,7 +499,7 @@ $form = array_merge($defaults, $editing ?: []);
           </div>
         </form>
 
-        <form method="post" enctype="multipart/form-data" class="coupon-admin-form import-form">
+        <form method="post" enctype="multipart/form-data" class="coupon-admin-form import-form" id="importar-lote">
           <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
           <input type="hidden" name="action" value="import_csv" />
           <div class="admin-fieldset">
@@ -588,7 +565,4 @@ $form = array_merge($defaults, $editing ?: []);
         </div>
       </section>
       </div>
-    </main>
-  </body>
-</html>
-
+<?php admin_layout_end(); ?>

@@ -4,8 +4,8 @@ const resultCount = document.querySelector("#result-count");
 const search = document.querySelector("#coupon-search");
 const empty = document.querySelector("#empty-state");
 
-let category = "Todos";
-let offerType = "Todos";
+let category = document.querySelector("[data-category].is-active")?.dataset.category || "Todos";
+let offerType = document.querySelector("[data-offer-type].is-active")?.dataset.offerType || "Todos";
 
 function normalizeText(value) {
   return (value || "")
@@ -29,7 +29,7 @@ function applyFilters() {
     if (show) visible += 1;
   });
 
-  const activeOffer = document.querySelector(`[data-offer-type="${offerType}"]`)?.textContent || "Todas as ofertas";
+  const activeOffer = document.querySelector(`[data-offer-type="${offerType}"]`)?.dataset.label || "Todas as ofertas";
   const baseTitle = offerType === "Todos" ? "Todas as ofertas" : activeOffer;
   title.textContent = category === "Todos" ? baseTitle : `${baseTitle} em ${category}`;
   resultCount.textContent = `${visible} ${visible === 1 ? "encontrado" : "encontrados"}`;
@@ -54,6 +54,7 @@ document.addEventListener("click", (event) => {
 });
 
 search?.addEventListener("input", applyFilters);
+applyFilters();
 
 grid?.addEventListener("click", async (event) => {
   const button = event.target.closest(".copy-button");

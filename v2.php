@@ -17,6 +17,11 @@ $featured = array_slice(array_values(array_filter($coupons, fn ($coupon) => (int
 $topCoupons = $featured ?: array_slice($coupons, 0, 6);
 $expiring = expiring_soon_coupons($coupons);
 $guides = all_guides();
+$defaultCategory = $categories[0] ?? 'Todos';
+$initialCoupons = $defaultCategory === 'Todos'
+    ? $coupons
+    : array_values(array_filter($coupons, fn ($coupon) => $coupon['category'] === $defaultCategory));
+$initialTitle = $defaultCategory === 'Todos' ? 'Todas as ofertas' : 'Ofertas em ' . $defaultCategory;
 $shareTitle = 'Oferto Cupons V2 - cupons e campanhas ativas';
 $shareDescription = 'Encontre cupons, sorteios e campanhas abertas com validade clara, filtros por categoria e links para usar no site parceiro.';
 $shareUrl = 'https://cupons.oferto.digital/v2.php';
@@ -96,7 +101,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
               <p class="section-kicker">Destaques</p>
               <h2>Campanhas para olhar primeiro</h2>
             </div>
-            <a class="text-action" href="#cupons">Ver lista completa</a>
+            <a class="text-action" href="#cupons">Ver campanhas</a>
           </div>
           <div class="v2-store-grid">
             <?php foreach ($topCoupons as $coupon): ?>
@@ -147,17 +152,17 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         <section class="v2-results" aria-live="polite">
           <div class="v2-local-filters" aria-label="Filtros de campanhas">
             <section class="v2-category-strip" aria-label="Categorias">
-              <button class="category-chip is-active" type="button" data-category="Todos">Todos</button>
-              <?php foreach ($categories as $category): ?>
-                <button class="category-chip" type="button" data-category="<?= e($category) ?>"><?= e($category) ?> <small><?= (int) ($categoryCounts[$category] ?? 0) ?></small></button>
+              <button class="category-chip <?= $defaultCategory === 'Todos' ? 'is-active' : '' ?>" type="button" data-category="Todos" data-label="Todas as ofertas">Todos</button>
+              <?php foreach ($categories as $filterCategory): ?>
+                <button class="category-chip <?= $defaultCategory === $filterCategory ? 'is-active' : '' ?>" type="button" data-category="<?= e($filterCategory) ?>" data-label="<?= e($filterCategory) ?>"><?= e($filterCategory) ?> <small><?= (int) ($categoryCounts[$filterCategory] ?? 0) ?></small></button>
               <?php endforeach; ?>
             </section>
 
             <section class="v2-type-strip" aria-label="Tipos de campanha">
-              <button class="category-chip is-active" type="button" data-offer-type="Todos">Todas as campanhas</button>
+              <button class="category-chip is-active" type="button" data-offer-type="Todos" data-label="Todas as ofertas">Todas as campanhas</button>
               <?php foreach (offer_types() as $type => $label): ?>
                 <?php if (in_array($type, $availableOfferTypes, true)): ?>
-                  <button class="category-chip" type="button" data-offer-type="<?= e($type) ?>"><?= e($label) ?></button>
+                  <button class="category-chip" type="button" data-offer-type="<?= e($type) ?>" data-label="<?= e($label) ?>"><?= e($label) ?></button>
                 <?php endif; ?>
               <?php endforeach; ?>
             </section>
@@ -165,15 +170,14 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
 
           <div class="section-heading">
             <div>
-              <p class="section-kicker">Lista completa</p>
-              <h2 id="coupon-title">Todas as ofertas</h2>
+              <h2 id="coupon-title"><?= e($initialTitle) ?></h2>
             </div>
-            <span id="result-count"><?= count($coupons) ?> encontrados</span>
+            <span id="result-count"><?= count($initialCoupons) ?> <?= count($initialCoupons) === 1 ? 'encontrado' : 'encontrados' ?></span>
           </div>
 
           <div class="v2-list" id="coupon-grid">
             <?php foreach ($coupons as $coupon): ?>
-              <article class="coupon-card v2-list-card" data-category="<?= e($coupon['category']) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'cupom') ?>" data-search="<?= e(strtolower($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'] . ' ' . ($coupon['tags'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'cupom') . ' ' . redemption_type_label($coupon['redemption_type'] ?? 'texto'))) ?>">
+              <article class="coupon-card v2-list-card" <?= $defaultCategory !== 'Todos' && $coupon['category'] !== $defaultCategory ? 'hidden' : '' ?> data-category="<?= e($coupon['category']) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'cupom') ?>" data-search="<?= e(strtolower($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'] . ' ' . ($coupon['tags'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'cupom') . ' ' . redemption_type_label($coupon['redemption_type'] ?? 'texto'))) ?>">
                 <div class="v2-list-logo">
                   <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="Banner da campanha <?= e($coupon['store']) ?>" />
                 </div>
@@ -237,7 +241,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <strong>Oferto Cupons V2</strong>
       <span>Ambiente de teste, sem alterar a home atual.</span>
     </footer>
-    <script src="php-site.js?v=20260824-v2-filters"></script>
+    <script src="php-site.js?v=20260824-v2-filter-default"></script>
     <script src="pwa.js"></script>
   </body>
 </html>

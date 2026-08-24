@@ -148,7 +148,7 @@ function coupon_shows_public_code(array $coupon): bool
     $cta = strtolower(trim((string) ($coupon['cta_label'] ?? '')));
     $externalTerms = ['oferta', 'cadastro', 'cadastrar', 'cadastre', 'participar', 'ver ', 'acessar', 'site'];
     foreach ($externalTerms as $term) {
-        if ($cta !== '' && str_contains($cta, $term)) {
+        if ($cta !== '' && strpos($cta, $term) !== false) {
             return false;
         }
     }

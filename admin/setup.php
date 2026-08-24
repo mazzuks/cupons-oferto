@@ -29,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Criar admin - Oferto Cupons</title>
     <link rel="icon" href="../assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../styles.css?v=20260824-campaign-ux" />
-    <link rel="stylesheet" href="admin.css?v=20260824-campaign-ux" />
+    <link rel="stylesheet" href="../styles.css?v=20260824-campaign-flow" />
+    <link rel="stylesheet" href="admin.css?v=20260824-campaign-flow" />
   </head>
   <body class="admin-screen">
     <main class="auth-card">

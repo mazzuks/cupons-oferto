@@ -141,7 +141,19 @@ function coupon_uses_text_redemption(array $coupon): bool
 
 function coupon_shows_public_code(array $coupon): bool
 {
-    return coupon_uses_text_redemption($coupon);
+    if (!coupon_uses_text_redemption($coupon)) {
+        return false;
+    }
+
+    $cta = strtolower(trim((string) ($coupon['cta_label'] ?? '')));
+    $externalTerms = ['oferta', 'cadastro', 'cadastrar', 'cadastre', 'participar', 'ver ', 'acessar', 'site'];
+    foreach ($externalTerms as $term) {
+        if ($cta !== '' && str_contains($cta, $term)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 function coupon_mechanic_label(array $coupon): string

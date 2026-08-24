@@ -649,6 +649,10 @@ h3 {
   min-width: 0;
 }
 
+.coupon-actions-single {
+  grid-template-columns: 1fr;
+}
+
 .copy-button,
 .use-button {
   display: inline-flex;
@@ -976,6 +980,10 @@ h3 {
 
   .coupon-actions {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .coupon-actions-single {
+    grid-template-columns: 1fr;
   }
 
   .section-heading,
@@ -1684,7 +1692,7 @@ h3 {
 
   .site-v2-compact .v2-list-actions {
     grid-column: 1 / -1;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 }
 

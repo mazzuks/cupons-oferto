@@ -194,9 +194,8 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                   <?php if (coupon_shows_public_code($coupon)): ?>
                     <button class="copy-button" type="button" data-code="<?= e($coupon['code']) ?>">Copiar codigo</button>
                   <?php else: ?>
-                    <a class="copy-button" href="<?= e(coupon_go_url($coupon, 'v2_details')) ?>" target="_blank" rel="noopener">Ver detalhes</a>
+                    <a class="use-button" href="<?= e(coupon_go_url($coupon, 'v2_cta')) ?>" target="_blank" rel="noopener"><?= e(coupon_cta_label($coupon)) ?></a>
                   <?php endif; ?>
-                  <a class="use-button" href="<?= e(coupon_go_url($coupon, 'v2_cta')) ?>" target="_blank" rel="noopener"><?= e(coupon_cta_label($coupon)) ?></a>
                 </div>
               </article>
             <?php endforeach; ?>

@@ -15,7 +15,7 @@ $categoryCounts = array_count_values(array_map(fn ($coupon) => $coupon['category
 $availableOfferTypes = array_values(array_unique(array_map(fn ($coupon) => $coupon['offer_type'] ?? 'cupom', $coupons)));
 $featured = array_slice(array_values(array_filter($coupons, fn ($coupon) => (int) ($coupon['featured'] ?? 0) === 1)), 0, 6);
 $topCoupons = $featured ?: array_slice($coupons, 0, 6);
-$expiring = array_slice($coupons, 0, 5);
+$expiring = expiring_soon_coupons($coupons);
 $guides = all_guides();
 $shareTitle = 'Oferto Cupons V2 - cupons e campanhas ativas';
 $shareDescription = 'Encontre cupons, sorteios e campanhas abertas com validade clara, filtros por categoria e links para usar no site parceiro.';
@@ -47,7 +47,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260824-v2-compact" />
+    <link rel="stylesheet" href="styles.css?v=20260824-v2-polish" />
   </head>
   <body class="site-v2 site-v2-compact">
     <header class="site-header v2-compact-header">
@@ -58,7 +58,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <nav class="nav-links" aria-label="Navegacao principal">
         <a href="#top-cupons">Destaques</a>
         <a href="#cupons">Todos</a>
-        <a href="#guias">Guias</a>
+        <a href="#dicas">Dicas de economia</a>
       </nav>
       <a class="header-cta" href="/">Home atual</a>
     </header>
@@ -66,9 +66,9 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <main id="top">
       <section class="v2-compact-hero">
         <div>
-          <p class="eyebrow">Cupons, sorteios e campanhas abertas</p>
-          <h1>Encontre uma oferta ativa antes de comprar.</h1>
-          <p>Uma vitrine direta para comparar validade, regra e categoria sem depender de cashback ou area logada neste primeiro momento.</p>
+          <p class="eyebrow">Cupons e ofertas para economizar hoje</p>
+          <h1>Antes de comprar, veja se tem cupom ativo.</h1>
+          <p>Busque por loja, categoria ou tipo de oferta e encontre campanhas validas para economizar sem perder tempo.</p>
         </div>
         <label class="v2-hero-search">
           <span>Buscar cupom ou loja</span>
@@ -80,7 +80,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         <div class="v2-quick-stat"><strong><?= count($coupons) ?></strong><span>campanhas ativas</span></div>
         <div class="v2-quick-stat"><strong><?= count($categories) ?></strong><span>categorias</span></div>
         <div class="v2-quick-stat"><strong><?= count($expiring) ?></strong><span>vencendo em breve</span></div>
-        <div class="v2-quick-note">No futuro, cupons restritos podem migrar para uma area logada. Sorteios e campanhas abertas seguem publicos.</div>
+        <div class="v2-quick-note">Veja validade, regra de uso e caminho de resgate antes de acessar o site parceiro.</div>
       </section>
 
       <section class="v2-category-strip" aria-label="Categorias">
@@ -126,18 +126,28 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         </section>
       <?php endif; ?>
 
+      <aside class="inventory-band v2-ad-band v2-ad-band-between" aria-label="Publicidade">
+        <div class="inventory-slot inventory-slot-wide" data-inventory-slot="v2_entre_destaques_e_lista">
+          <span>Publicidade</span>
+        </div>
+      </aside>
+
       <section class="v2-layout" id="cupons">
         <aside class="v2-side-panel">
           <section>
             <p class="section-kicker">Vencendo</p>
             <h2>Use antes que acabe</h2>
             <div class="v2-expiring-list">
-              <?php foreach ($expiring as $coupon): ?>
-                <a href="<?= e(coupon_go_url($coupon, 'v2_expiring')) ?>" target="_blank" rel="noopener">
-                  <strong><?= e($coupon['store']) ?></strong>
-                  <span><?= e(validity_label($coupon['ends_at'])) ?></span>
-                </a>
-              <?php endforeach; ?>
+              <?php if ($expiring): ?>
+                <?php foreach ($expiring as $coupon): ?>
+                  <a href="<?= e(coupon_go_url($coupon, 'v2_expiring')) ?>" target="_blank" rel="noopener">
+                    <strong><?= e($coupon['store']) ?></strong>
+                    <span><?= e(validity_label($coupon['ends_at'])) ?></span>
+                  </a>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <p class="v2-muted-note">Nenhuma campanha termina nos proximos 3 dias.</p>
+              <?php endif; ?>
             </div>
           </section>
           <section class="v2-side-note">
@@ -145,6 +155,9 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <h2>Direcionador agora, comunidade depois</h2>
             <p>Hoje tudo fica exposto. A estrutura ja diferencia cupom, sorteio e cadastro para permitir ofertas restritas quando a area logada entrar.</p>
           </section>
+          <aside class="inventory-slot inventory-slot-rectangle v2-side-ad" aria-label="Publicidade" data-inventory-slot="v2_lateral_300x250">
+            <span>Publicidade</span>
+          </aside>
         </aside>
 
         <section class="v2-results" aria-live="polite">
@@ -192,12 +205,19 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         </section>
       </section>
 
-      <section class="v2-section v2-guides-compact" id="guias">
+      <aside class="inventory-band v2-ad-band" aria-label="Publicidade">
+        <div class="inventory-slot inventory-slot-wide" data-inventory-slot="v2_antes_dicas">
+          <span>Publicidade</span>
+        </div>
+      </aside>
+
+      <section class="v2-section v2-guides-compact" id="dicas">
         <div class="section-heading">
           <div>
-            <p class="section-kicker">Guias</p>
-            <h2>Conteudo para atrair busca longtail</h2>
+            <p class="section-kicker">Dicas de economia</p>
+            <h2>Aprenda a economizar melhor antes de comprar</h2>
           </div>
+          <a class="primary-action v2-more-content" href="<?= $guides ? 'guia.php?tema=' . e($guides[0]['slug']) : '#dicas' ?>">Ver mais dicas</a>
         </div>
         <div class="guide-grid">
           <?php foreach ($guides as $guide): ?>
@@ -205,7 +225,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
               <span><?= e($guide['category']) ?></span>
               <h3><?= e($guide['title']) ?></h3>
               <p><?= e($guide['summary']) ?></p>
-              <strong class="guide-link">Ler guia</strong>
+              <strong class="guide-link">Ver dica</strong>
             </a>
           <?php endforeach; ?>
         </div>
@@ -216,7 +236,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <strong>Oferto Cupons V2</strong>
       <span>Ambiente de teste, sem alterar a home atual.</span>
     </footer>
-    <script src="php-site.js?v=20260824-v2-compact"></script>
+    <script src="php-site.js?v=20260824-v2-polish"></script>
     <script src="pwa.js"></script>
   </body>
 </html>

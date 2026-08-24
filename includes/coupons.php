@@ -416,6 +416,16 @@ function coupon_banner_src(array $coupon): string
     return 'banner.php?id=' . $id;
 }
 
+function expiring_soon_coupons(array $coupons, int $days = 3, int $limit = 5): array
+{
+    $filtered = array_values(array_filter($coupons, function (array $coupon) use ($days): bool {
+        $remaining = days_until($coupon['ends_at']);
+        return $remaining >= 0 && $remaining <= $days;
+    }));
+
+    return array_slice($filtered, 0, $limit);
+}
+
 function is_remote_banner_url(string $url): bool
 {
     return (bool) preg_match('/^https?:\/\//i', $url);

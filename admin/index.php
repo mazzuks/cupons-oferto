@@ -373,8 +373,8 @@ $form = array_merge($defaults, $editing ?: []);
     <title>Admin - Oferto Cupons</title>
     <link rel="icon" href="../assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../styles.css?v=20260824-reports" />
-    <link rel="stylesheet" href="admin.css?v=20260824-reports" />
+    <link rel="stylesheet" href="../styles.css?v=20260824-platto" />
+    <link rel="stylesheet" href="admin.css?v=20260824-platto" />
   </head>
   <body>
     <header class="admin-header">

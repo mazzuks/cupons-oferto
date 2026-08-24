@@ -630,3 +630,248 @@ body {
     font-size: 34px;
   }
 }
+
+/* Platto-inspired CRM surface */
+body {
+  color: #e5edf7;
+  background:
+    radial-gradient(circle at top left, rgba(26, 186, 226, 0.18), transparent 34vw),
+    radial-gradient(circle at top right, rgba(25, 64, 121, 0.24), transparent 38vw),
+    linear-gradient(180deg, #081322 0%, #0f172a 42%, #111827 100%);
+}
+
+.admin-header {
+  background: rgba(8, 19, 34, 0.92);
+  border-bottom-color: rgba(148, 163, 184, 0.18);
+}
+
+.admin-header nav {
+  color: #dbeafe;
+}
+
+.admin-header nav a {
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.admin-header nav a:hover {
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.admin-header .brand {
+  color: #ffffff;
+}
+
+.admin-hero {
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(25, 64, 121, 0.82)),
+    #0f172a;
+  border-color: rgba(148, 163, 184, 0.2);
+  box-shadow: 0 24px 60px rgba(2, 6, 23, 0.34);
+}
+
+.admin-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, var(--cyan), #60a5fa, var(--yellow));
+}
+
+.admin-hero h1,
+.admin-panel h1,
+.admin-panel h2,
+.admin-fieldset-heading h2,
+.admin-kpi-card strong {
+  color: #ffffff;
+}
+
+.admin-hero p:not(.section-kicker),
+.admin-fieldset p,
+.admin-fieldset-heading p,
+.admin-kpi-card small {
+  color: #94a3b8;
+}
+
+.admin-hero-stats span,
+.admin-kpi-card,
+.admin-panel,
+.auth-card {
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.88);
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 20px 48px rgba(2, 6, 23, 0.28);
+}
+
+.admin-hero-stats strong {
+  color: #ffffff;
+}
+
+.admin-kpi-card {
+  position: relative;
+}
+
+.admin-kpi-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cyan), #60a5fa);
+}
+
+.admin-fieldset {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(17, 24, 39, 0.96));
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+.admin-fieldset-heading > span {
+  color: #06101f;
+  background: var(--cyan);
+}
+
+.admin-form label,
+.coupon-admin-form label,
+.admin-choice-field legend,
+.admin-report-filter label {
+  color: #e2e8f0;
+}
+
+.admin-form input,
+.coupon-admin-form input,
+.coupon-admin-form textarea,
+.coupon-admin-form select,
+.admin-report-filter input {
+  color: #f8fafc;
+  background: #020617;
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+.admin-form input::placeholder,
+.coupon-admin-form input::placeholder,
+.coupon-admin-form textarea::placeholder {
+  color: #64748b;
+}
+
+.coupon-admin-form small,
+.admin-table td span,
+.admin-kpi-card span {
+  color: #94a3b8;
+}
+
+.admin-check,
+.admin-segmented,
+.admin-report-filter {
+  background: rgba(2, 6, 23, 0.72);
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.admin-segmented span {
+  color: #bfdbfe;
+}
+
+.admin-segmented input:checked + span {
+  color: #03111f;
+  background: var(--cyan);
+  box-shadow: 0 12px 24px rgba(26, 186, 226, 0.18);
+}
+
+.admin-form button,
+.coupon-admin-form button,
+.admin-report-filter button {
+  color: #07111f;
+  background: var(--cyan);
+  box-shadow: 0 14px 28px rgba(26, 186, 226, 0.18);
+}
+
+.admin-actions a,
+.admin-report-filter a {
+  color: #dbeafe;
+  background: rgba(96, 165, 250, 0.14);
+  border: 1px solid rgba(96, 165, 250, 0.18);
+}
+
+.admin-alert {
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.42);
+  border: 1px solid rgba(248, 113, 113, 0.28);
+}
+
+.admin-success {
+  color: #bbf7d0;
+  background: rgba(20, 83, 45, 0.42);
+  border: 1px solid rgba(74, 222, 128, 0.22);
+}
+
+.admin-table-wrap {
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 20px 44px rgba(2, 6, 23, 0.22);
+}
+
+.admin-table th {
+  color: #94a3b8;
+  background: #020617;
+}
+
+.admin-table td {
+  color: #cbd5e1;
+  border-bottom-color: rgba(148, 163, 184, 0.12);
+}
+
+.admin-table tbody tr {
+  background: rgba(15, 23, 42, 0.92);
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(30, 41, 59, 0.92);
+}
+
+.admin-table td strong {
+  color: #ffffff;
+}
+
+.status-pill,
+.admin-pill {
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+.status-ativo {
+  color: #86efac;
+  background: rgba(22, 101, 52, 0.34);
+}
+
+.status-pausado {
+  color: #fde68a;
+  background: rgba(113, 63, 18, 0.34);
+}
+
+.status-rascunho {
+  color: #bfdbfe;
+  background: rgba(30, 64, 175, 0.28);
+}
+
+.admin-pill {
+  color: #bfdbfe;
+  background: rgba(30, 64, 175, 0.22);
+}
+
+.admin-pill-type {
+  color: #fef3c7;
+  background: rgba(146, 64, 14, 0.3);
+}
+
+.admin-pill-locked {
+  color: #ddd6fe;
+  background: rgba(91, 33, 182, 0.28);
+}
+
+.row-actions a,
+.row-actions button {
+  color: #7dd3fc;
+}
+
+.admin-empty-cell {
+  color: #94a3b8;
+}

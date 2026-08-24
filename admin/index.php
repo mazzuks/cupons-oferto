@@ -373,8 +373,8 @@ $form = array_merge($defaults, $editing ?: []);
     <title>Admin - Oferto Cupons</title>
     <link rel="icon" href="../assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../styles.css?v=20260824-crm-polish" />
-    <link rel="stylesheet" href="admin.css?v=20260824-crm-polish" />
+    <link rel="stylesheet" href="../styles.css?v=20260824-reports" />
+    <link rel="stylesheet" href="admin.css?v=20260824-reports" />
   </head>
   <body>
     <header class="admin-header">
@@ -383,6 +383,7 @@ $form = array_merge($defaults, $editing ?: []);
         <span>Admin</span>
       </a>
       <nav>
+        <a href="relatorios.php">Relatorios</a>
         <a href="../index.php">Ver site</a>
         <a href="logout.php">Sair</a>
       </nav>

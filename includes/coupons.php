@@ -303,6 +303,89 @@ function coupon_go_url(array $coupon, string $eventType = 'cta'): string
     return 'go.php?id=' . (int) ($coupon['id'] ?? 0) . '&event=' . rawurlencode($eventType);
 }
 
+function click_report_summary(string $startDate, string $endDate): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return [
+            'total_clicks' => 0,
+            'unique_users' => 0,
+            'active_offers' => 0,
+            'top_offer' => '',
+        ];
+    }
+
+    $statement = $pdo->prepare("SELECT
+            COUNT(*) AS total_clicks,
+            COUNT(DISTINCT ip_hash) AS unique_users,
+            COUNT(DISTINCT coupon_id) AS active_offers
+        FROM coupon_clicks
+        WHERE created_at >= :start_date
+          AND created_at < DATE_ADD(:end_date, INTERVAL 1 DAY)");
+    $statement->execute([
+        'start_date' => $startDate,
+        'end_date' => $endDate,
+    ]);
+    $summary = $statement->fetch() ?: [];
+
+    $top = $pdo->prepare("SELECT c.store, c.title, COUNT(*) AS clicks
+        FROM coupon_clicks cc
+        INNER JOIN coupons c ON c.id = cc.coupon_id
+        WHERE cc.created_at >= :start_date
+          AND cc.created_at < DATE_ADD(:end_date, INTERVAL 1 DAY)
+        GROUP BY c.id, c.store, c.title
+        ORDER BY clicks DESC, c.store ASC
+        LIMIT 1");
+    $top->execute([
+        'start_date' => $startDate,
+        'end_date' => $endDate,
+    ]);
+    $topOffer = $top->fetch();
+
+    return [
+        'total_clicks' => (int) ($summary['total_clicks'] ?? 0),
+        'unique_users' => (int) ($summary['unique_users'] ?? 0),
+        'active_offers' => (int) ($summary['active_offers'] ?? 0),
+        'top_offer' => $topOffer ? $topOffer['store'] . ' - ' . $topOffer['title'] : '',
+    ];
+}
+
+function click_report_rows(string $startDate, string $endDate): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return [];
+    }
+
+    $statement = $pdo->prepare("SELECT
+            c.id,
+            c.store,
+            c.title,
+            c.category,
+            c.offer_type,
+            c.partner_network,
+            c.status,
+            COUNT(cc.id) AS total_clicks,
+            SUM(CASE WHEN cc.event_type = 'cta' THEN 1 ELSE 0 END) AS cta_clicks,
+            SUM(CASE WHEN cc.event_type = 'details' THEN 1 ELSE 0 END) AS detail_clicks,
+            SUM(CASE WHEN cc.event_type = 'mini' THEN 1 ELSE 0 END) AS mini_clicks,
+            COUNT(DISTINCT cc.ip_hash) AS unique_users,
+            MAX(cc.created_at) AS last_click_at
+        FROM coupons c
+        LEFT JOIN coupon_clicks cc
+          ON cc.coupon_id = c.id
+         AND cc.created_at >= :start_date
+         AND cc.created_at < DATE_ADD(:end_date, INTERVAL 1 DAY)
+        GROUP BY c.id, c.store, c.title, c.category, c.offer_type, c.partner_network, c.status
+        ORDER BY total_clicks DESC, c.created_at DESC");
+    $statement->execute([
+        'start_date' => $startDate,
+        'end_date' => $endDate,
+    ]);
+
+    return $statement->fetchAll();
+}
+
 function coupon_banner_src(array $coupon): string
 {
     $url = trim((string) ($coupon['banner_url'] ?? ''));

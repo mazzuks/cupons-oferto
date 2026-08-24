@@ -127,6 +127,23 @@ function delete_coupon(int $id): void
     $statement->execute([$id]);
 }
 
+function coupon_banner_src(array $coupon): string
+{
+    $url = trim((string) ($coupon['banner_url'] ?? ''));
+    $id = (int) ($coupon['id'] ?? 0);
+
+    if ($id <= 0 || !is_remote_banner_url($url) || !db()) {
+        return $url;
+    }
+
+    return 'banner.php?id=' . $id;
+}
+
+function is_remote_banner_url(string $url): bool
+{
+    return (bool) preg_match('/^https?:\/\//i', $url);
+}
+
 function days_until(string $date): int
 {
     $today = new DateTimeImmutable('today');

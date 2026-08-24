@@ -94,7 +94,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <div class="mini-coupons">
             <?php foreach ($featured as $coupon): ?>
               <a class="mini-coupon" href="<?= e($coupon['target_url']) ?>" target="_blank" rel="noopener">
-                <img src="<?= e($coupon['banner_url']) ?>" alt="" />
+                <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="" />
                 <strong><?= e($coupon['store']) ?></strong>
                 <span><?= e(validity_label($coupon['ends_at'])) ?></span>
               </a>
@@ -167,7 +167,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <?php foreach ($coupons as $coupon): ?>
               <article class="coupon-card" data-category="<?= e($coupon['category']) ?>" data-search="<?= e(strtolower($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'])) ?>">
                 <div class="coupon-media">
-                  <img src="<?= e($coupon['banner_url']) ?>" alt="Banner do cupom <?= e($coupon['store']) ?>" />
+                  <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="Banner do cupom <?= e($coupon['store']) ?>" />
                   <span class="coupon-badge"><?= e($coupon['category']) ?></span>
                   <span class="validity"><?= e(validity_label($coupon['ends_at'])) ?></span>
                 </div>

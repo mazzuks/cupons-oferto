@@ -172,11 +172,13 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                   <div class="v2-list-tags">
                     <span><?= e($coupon['category']) ?></span>
                     <span><?= e(validity_label($coupon['ends_at'])) ?></span>
-                    <span><?= e(coupon_mechanic_label($coupon)) ?>: <?= e(coupon_mechanic_value($coupon)) ?></span>
+                    <?php if (coupon_shows_public_code($coupon)): ?>
+                      <span><?= e(coupon_mechanic_label($coupon)) ?>: <?= e(coupon_mechanic_value($coupon)) ?></span>
+                    <?php endif; ?>
                   </div>
                 </div>
                 <div class="v2-list-actions">
-                  <?php if (coupon_uses_text_redemption($coupon)): ?>
+                  <?php if (coupon_shows_public_code($coupon)): ?>
                     <button class="copy-button" type="button" data-code="<?= e($coupon['code']) ?>">Copiar codigo</button>
                   <?php else: ?>
                     <a class="copy-button" href="<?= e(coupon_go_url($coupon, 'v2_details')) ?>" target="_blank" rel="noopener">Ver detalhes</a>

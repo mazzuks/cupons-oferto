@@ -70,7 +70,7 @@ function redemption_types(): array
 {
     return [
         'texto' => 'Mostra texto/codigo para copiar',
-        'redirect' => 'Abre site/cadastro',
+        'redirect' => 'Abre site/cadastro sem mostrar codigo',
     ];
 }
 
@@ -119,7 +119,8 @@ function coupon_cta_label(array $coupon): string
         return $custom;
     }
 
-    return default_cta_label($coupon['offer_type'] ?? 'cupom', $coupon['code'] ?? '');
+    $publicCode = coupon_shows_public_code($coupon) ? ($coupon['code'] ?? '') : '';
+    return default_cta_label($coupon['offer_type'] ?? 'cupom', $publicCode);
 }
 
 function coupon_destination_url(array $coupon): string
@@ -138,9 +139,14 @@ function coupon_uses_text_redemption(array $coupon): bool
     return ($coupon['redemption_type'] ?? 'texto') === 'texto' && coupon_has_code($coupon);
 }
 
+function coupon_shows_public_code(array $coupon): bool
+{
+    return coupon_uses_text_redemption($coupon);
+}
+
 function coupon_mechanic_label(array $coupon): string
 {
-    if (coupon_uses_text_redemption($coupon)) {
+    if (coupon_shows_public_code($coupon)) {
         return 'Codigo';
     }
 
@@ -157,7 +163,7 @@ function coupon_mechanic_label(array $coupon): string
 
 function coupon_mechanic_value(array $coupon): string
 {
-    if (coupon_uses_text_redemption($coupon)) {
+    if (coupon_shows_public_code($coupon)) {
         return trim((string) $coupon['code']);
     }
 

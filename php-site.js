@@ -10,6 +10,8 @@ let category = "Todos";
 let offerType = "Todos";
 
 function applyFilters() {
+  if (!search || !title || !resultCount || !empty) return;
+
   const term = search.value.trim().toLowerCase();
   let visible = 0;
 
@@ -45,9 +47,9 @@ offerTypeChips.forEach((chip) => {
   });
 });
 
-search.addEventListener("input", applyFilters);
+search?.addEventListener("input", applyFilters);
 
-grid.addEventListener("click", async (event) => {
+grid?.addEventListener("click", async (event) => {
   const button = event.target.closest(".copy-button");
   if (!button || !button.dataset.code) return;
 

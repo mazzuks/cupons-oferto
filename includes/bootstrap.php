@@ -76,6 +76,7 @@ function ensure_database(PDO $pdo): void
         status ENUM('ativo', 'rascunho', 'pausado') NOT NULL DEFAULT 'rascunho',
         featured TINYINT(1) NOT NULL DEFAULT 0,
         rules TEXT DEFAULT NULL,
+        redemption_type VARCHAR(30) NOT NULL DEFAULT 'texto',
         offer_type VARCHAR(40) NOT NULL DEFAULT 'cupom',
         cta_label VARCHAR(80) DEFAULT NULL,
         tracking_url VARCHAR(500) DEFAULT NULL,
@@ -87,6 +88,7 @@ function ensure_database(PDO $pdo): void
         tags VARCHAR(500) DEFAULT NULL,
         requirements VARCHAR(220) DEFAULT NULL,
         pixel_event VARCHAR(120) DEFAULT NULL,
+        members_only TINYINT(1) NOT NULL DEFAULT 0,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
@@ -127,6 +129,7 @@ function ensure_database(PDO $pdo): void
 function ensure_coupon_columns(PDO $pdo): void
 {
     $columns = [
+        'redemption_type' => "ALTER TABLE coupons ADD redemption_type VARCHAR(30) NOT NULL DEFAULT 'texto' AFTER rules",
         'offer_type' => "ALTER TABLE coupons ADD offer_type VARCHAR(40) NOT NULL DEFAULT 'cupom' AFTER rules",
         'cta_label' => "ALTER TABLE coupons ADD cta_label VARCHAR(80) DEFAULT NULL AFTER offer_type",
         'tracking_url' => "ALTER TABLE coupons ADD tracking_url VARCHAR(500) DEFAULT NULL AFTER cta_label",
@@ -138,6 +141,7 @@ function ensure_coupon_columns(PDO $pdo): void
         'tags' => "ALTER TABLE coupons ADD tags VARCHAR(500) DEFAULT NULL AFTER priority",
         'requirements' => "ALTER TABLE coupons ADD requirements VARCHAR(220) DEFAULT NULL AFTER tags",
         'pixel_event' => "ALTER TABLE coupons ADD pixel_event VARCHAR(120) DEFAULT NULL AFTER requirements",
+        'members_only' => "ALTER TABLE coupons ADD members_only TINYINT(1) NOT NULL DEFAULT 0 AFTER pixel_event",
     ];
 
     foreach ($columns as $column => $sql) {

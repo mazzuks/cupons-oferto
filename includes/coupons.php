@@ -21,6 +21,7 @@ function fallback_coupons(): array
             'status' => 'ativo',
             'featured' => 1,
             'rules' => 'Confira disponibilidade, lojas participantes e pedido mínimo antes de finalizar.',
+            'redemption_type' => 'texto',
             'offer_type' => 'cupom',
             'cta_label' => '',
             'tracking_url' => '',
@@ -32,6 +33,7 @@ function fallback_coupons(): array
             'tags' => '',
             'requirements' => '',
             'pixel_event' => '',
+            'members_only' => 0,
         ],
         [
             'id' => 2,
@@ -47,6 +49,7 @@ function fallback_coupons(): array
             'status' => 'ativo',
             'featured' => 0,
             'rules' => 'Produto alimentício: classificar sempre em Alimentação e Bebidas.',
+            'redemption_type' => 'texto',
             'offer_type' => 'cupom',
             'cta_label' => '',
             'tracking_url' => '',
@@ -58,8 +61,23 @@ function fallback_coupons(): array
             'tags' => '',
             'requirements' => '',
             'pixel_event' => '',
+            'members_only' => 0,
         ],
     ];
+}
+
+function redemption_types(): array
+{
+    return [
+        'texto' => 'Mostra texto/codigo para copiar',
+        'redirect' => 'Abre site/cadastro',
+    ];
+}
+
+function redemption_type_label(?string $type): string
+{
+    $types = redemption_types();
+    return $types[$type ?: 'texto'] ?? $types['texto'];
 }
 
 function offer_types(): array
@@ -83,7 +101,7 @@ function offer_type_label(?string $type): string
 function default_cta_label(?string $type, ?string $code = ''): string
 {
     $labels = [
-        'cupom' => $code ? 'Usar cupom' : 'Ver oferta',
+        'cupom' => $code ? 'Resgatar cupom' : 'Resgatar oferta',
         'sorteio' => 'Participar',
         'cadastro' => 'Cadastrar agora',
         'cashback' => 'Ativar cashback',
@@ -115,9 +133,14 @@ function coupon_has_code(array $coupon): bool
     return trim((string) ($coupon['code'] ?? '')) !== '';
 }
 
+function coupon_uses_text_redemption(array $coupon): bool
+{
+    return ($coupon['redemption_type'] ?? 'texto') === 'texto' && coupon_has_code($coupon);
+}
+
 function coupon_mechanic_label(array $coupon): string
 {
-    if (coupon_has_code($coupon)) {
+    if (coupon_uses_text_redemption($coupon)) {
         return 'Codigo';
     }
 
@@ -134,7 +157,7 @@ function coupon_mechanic_label(array $coupon): string
 
 function coupon_mechanic_value(array $coupon): string
 {
-    if (coupon_has_code($coupon)) {
+    if (coupon_uses_text_redemption($coupon)) {
         return trim((string) $coupon['code']);
     }
 
@@ -214,6 +237,7 @@ function save_coupon(array $data, ?int $id = null): void
         'status',
         'featured',
         'rules',
+        'redemption_type',
         'offer_type',
         'cta_label',
         'tracking_url',
@@ -225,6 +249,7 @@ function save_coupon(array $data, ?int $id = null): void
         'tags',
         'requirements',
         'pixel_event',
+        'members_only',
     ];
 
     if ($id) {

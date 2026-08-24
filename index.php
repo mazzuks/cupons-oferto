@@ -175,7 +175,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           </div>
           <div class="coupon-grid" id="coupon-grid">
             <?php foreach ($coupons as $coupon): ?>
-              <article class="coupon-card" data-category="<?= e($coupon['category']) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'cupom') ?>" data-search="<?= e(strtolower($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'] . ' ' . ($coupon['tags'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'cupom'))) ?>">
+              <article class="coupon-card" data-category="<?= e($coupon['category']) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'cupom') ?>" data-search="<?= e(strtolower($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'] . ' ' . ($coupon['tags'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'cupom') . ' ' . redemption_type_label($coupon['redemption_type'] ?? 'texto'))) ?>">
                 <div class="coupon-media">
                   <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="Banner do cupom <?= e($coupon['store']) ?>" />
                   <span class="coupon-badge"><?= e($coupon['category']) ?></span>
@@ -193,7 +193,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                     <strong class="code-value"><?= e(coupon_mechanic_value($coupon)) ?></strong>
                   </div>
                   <div class="coupon-actions">
-                    <?php if (coupon_has_code($coupon)): ?>
+                    <?php if (coupon_uses_text_redemption($coupon)): ?>
                       <button class="copy-button" type="button" data-code="<?= e($coupon['code']) ?>">Copiar código</button>
                     <?php else: ?>
                       <a class="copy-button" href="<?= e(coupon_go_url($coupon, 'details')) ?>" target="_blank" rel="noopener">Ver detalhes</a>

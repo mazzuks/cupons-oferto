@@ -12,6 +12,7 @@ function coupon_payload(array $source, string $bannerUrl): array
 {
     $code = trim($source['code'] ?? '');
     $offerType = normalize_offer_type($source['offer_type'] ?? 'cupom');
+    $redemptionType = normalize_redemption_type($source['redemption_type'] ?? ($code !== '' ? 'texto' : 'redirect'));
 
     return [
         'category' => trim($source['category'] ?? ''),
@@ -26,8 +27,9 @@ function coupon_payload(array $source, string $bannerUrl): array
         'status' => $source['status'] ?? 'rascunho',
         'featured' => truthy($source['featured'] ?? '') ? 1 : 0,
         'rules' => trim($source['rules'] ?? ''),
+        'redemption_type' => $redemptionType,
         'offer_type' => $offerType,
-        'cta_label' => trim($source['cta_label'] ?? '') ?: default_cta_label($offerType, $code),
+        'cta_label' => trim($source['cta_label'] ?? '') ?: default_cta_label($offerType, $redemptionType === 'texto' ? $code : ''),
         'tracking_url' => trim($source['tracking_url'] ?? ''),
         'partner_network' => trim($source['partner_network'] ?? ''),
         'payout' => decimal_or_null($source['payout'] ?? ''),
@@ -37,7 +39,30 @@ function coupon_payload(array $source, string $bannerUrl): array
         'tags' => trim($source['tags'] ?? ''),
         'requirements' => trim($source['requirements'] ?? ''),
         'pixel_event' => trim($source['pixel_event'] ?? ''),
+        'members_only' => truthy($source['members_only'] ?? '') ? 1 : 0,
     ];
+}
+
+function normalize_redemption_type(string $type): string
+{
+    $type = strtolower(trim($type));
+    $type = str_replace([' ', '-'], '_', $type);
+    $aliases = [
+        'codigo' => 'texto',
+        'código' => 'texto',
+        'cupom' => 'texto',
+        'texto_codigo' => 'texto',
+        'texto_código' => 'texto',
+        'copiar' => 'texto',
+        'site' => 'redirect',
+        'cadastro' => 'redirect',
+        'link' => 'redirect',
+        'url' => 'redirect',
+        'redirecionamento' => 'redirect',
+    ];
+    $type = $aliases[$type] ?? $type;
+
+    return array_key_exists($type, redemption_types()) ? $type : 'texto';
 }
 
 function normalize_offer_type(string $type): string
@@ -159,6 +184,10 @@ function import_campaigns_from_csv(): int
                 throw new RuntimeException('Linha ' . ($imported + 2) . ': preencha categoria, loja, titulo, descricao, URL, banner, inicio e fim.');
             }
         }
+        if ($payload['redemption_type'] === 'texto' && !$payload['code']) {
+            fclose($handle);
+            throw new RuntimeException('Linha ' . ($imported + 2) . ': resgate por texto/codigo precisa do campo codigo preenchido.');
+        }
 
         save_coupon($payload, null);
         $imported++;
@@ -217,6 +246,10 @@ function normalize_csv_header(string $header): string
         'observacao' => 'rules',
         'obs' => 'rules',
         'regra' => 'rules',
+        'modo_resgate' => 'redemption_type',
+        'modo_de_resgate' => 'redemption_type',
+        'resgate' => 'redemption_type',
+        'tipo_de_resgate' => 'redemption_type',
         'tipo' => 'offer_type',
         'tipo_de_oferta' => 'offer_type',
         'cta' => 'cta_label',
@@ -233,6 +266,10 @@ function normalize_csv_header(string $header): string
         'requisitos' => 'requirements',
         'mecanica' => 'requirements',
         'evento_pixel' => 'pixel_event',
+        'usuarios_conectados' => 'members_only',
+        'somente_logados' => 'members_only',
+        'somente_usuarios_conectados' => 'members_only',
+        'privado' => 'members_only',
     ];
 
     return $aliases[$header] ?? $header;
@@ -244,6 +281,7 @@ function csv_row_to_coupon_source(array $headers, array $row): array
         'status' => 'rascunho',
         'starts_at' => date('Y-m-d'),
         'ends_at' => date('Y-m-d', strtotime('+7 days')),
+        'redemption_type' => 'redirect',
         'offer_type' => 'cupom',
     ];
 
@@ -274,6 +312,9 @@ try {
                 if (!$payload[$field]) {
                     throw new RuntimeException('Preencha os campos obrigatorios.');
                 }
+            }
+            if ($payload['redemption_type'] === 'texto' && !$payload['code']) {
+                throw new RuntimeException('Quando o resgate for por texto/codigo, preencha o texto do cupom.');
             }
 
             save_coupon($payload, $id);
@@ -308,6 +349,7 @@ $defaults = [
     'status' => 'rascunho',
     'featured' => 0,
     'rules' => '',
+    'redemption_type' => 'redirect',
     'offer_type' => 'cupom',
     'cta_label' => '',
     'tracking_url' => '',
@@ -319,6 +361,7 @@ $defaults = [
     'tags' => '',
     'requirements' => '',
     'pixel_event' => '',
+    'members_only' => 0,
 ];
 $form = array_merge($defaults, $editing ?: []);
 ?>
@@ -330,8 +373,8 @@ $form = array_merge($defaults, $editing ?: []);
     <title>Admin - Oferto Cupons</title>
     <link rel="icon" href="../assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../styles.css?v=20260824-crm" />
-    <link rel="stylesheet" href="admin.css?v=20260824-crm" />
+    <link rel="stylesheet" href="../styles.css?v=20260824-resgate" />
+    <link rel="stylesheet" href="admin.css?v=20260824-resgate" />
   </head>
   <body>
     <header class="admin-header">
@@ -381,8 +424,18 @@ $form = array_merge($defaults, $editing ?: []);
             <label>Titulo<input name="title" value="<?= e($form['title']) ?>" required /></label>
             <label>Descricao<textarea name="description" required><?= e($form['description']) ?></textarea></label>
             <div class="admin-two-cols">
-              <label>Codigo do cupom<input name="code" value="<?= e($form['code']) ?>" placeholder="Deixe vazio para sorteio, cadastro ou oferta direta" /></label>
-              <label>Texto do botao<input name="cta_label" value="<?= e($form['cta_label']) ?>" placeholder="Ex: Participar, Cadastrar agora" /></label>
+              <label>Como o usuario resgata?
+                <select name="redemption_type" required>
+                  <?php foreach (redemption_types() as $value => $label): ?>
+                    <option value="<?= e($value) ?>" <?= $form['redemption_type'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </label>
+              <label>Texto do botao<input name="cta_label" value="<?= e($form['cta_label']) ?>" placeholder="Ex: Cadastre-se, Resgatar, Participar" /></label>
+            </div>
+            <div class="admin-two-cols">
+              <label>Texto/codigo para copiar<input name="code" value="<?= e($form['code']) ?>" placeholder="Ex: YBOX, OFERTO10 ou instrucao curta" /></label>
+              <label class="admin-check"><input name="members_only" type="checkbox" value="1" <?= (int) $form['members_only'] === 1 ? 'checked' : '' ?> /> Somente usuarios conectados</label>
             </div>
             <label>Mecanica/requisito curto<input name="requirements" value="<?= e($form['requirements']) ?>" placeholder="Ex: Cadastro gratuito, Comprar produto, Sem codigo" /></label>
             <label>Regra/observacao<textarea name="rules"><?= e($form['rules']) ?></textarea></label>
@@ -435,7 +488,7 @@ $form = array_merge($defaults, $editing ?: []);
           <input type="hidden" name="action" value="import_csv" />
           <div class="admin-fieldset">
             <h2>Importar campanhas em lote</h2>
-            <p>Use CSV com cabecalhos como categoria, loja, titulo, descricao, url_final, banner, inicio, fim, tipo, codigo, cta, status, parceiro, payout, cap e tags.</p>
+            <p>Use CSV com cabecalhos como modo_resgate, categoria, loja, titulo, descricao, url_final, banner, inicio, fim, tipo, codigo, cta, status, parceiro, payout, cap, tags e somente_logados.</p>
             <p><a href="modelo-campanhas.csv" download>Baixar modelo de CSV</a></p>
             <label>Arquivo CSV<input name="campaigns_csv" type="file" accept=".csv,text/csv" required /></label>
             <div class="admin-actions">
@@ -454,8 +507,10 @@ $form = array_merge($defaults, $editing ?: []);
               <tr>
                 <th>Loja</th>
                 <th>Tipo</th>
+                <th>Resgate</th>
                 <th>Categoria</th>
                 <th>Status</th>
+                <th>Acesso</th>
                 <th>Parceiro</th>
                 <th>Validade</th>
                 <th></th>
@@ -466,8 +521,10 @@ $form = array_merge($defaults, $editing ?: []);
                 <tr>
                   <td><strong><?= e($coupon['store']) ?></strong><br /><span><?= e($coupon['title']) ?></span></td>
                   <td><?= e(offer_type_label($coupon['offer_type'] ?? 'cupom')) ?></td>
+                  <td><?= e(redemption_type_label($coupon['redemption_type'] ?? 'texto')) ?></td>
                   <td><?= e($coupon['category']) ?></td>
                   <td><span class="status-pill"><?= e($coupon['status']) ?></span></td>
+                  <td><?= (int) ($coupon['members_only'] ?? 0) === 1 ? 'Conectados' : 'Publico' ?></td>
                   <td><?= e($coupon['partner_network'] ?? '') ?></td>
                   <td><?= e(date('d/m/Y', strtotime($coupon['ends_at']))) ?></td>
                   <td class="row-actions">

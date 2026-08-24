@@ -379,10 +379,16 @@ $form = array_merge($defaults, $editing ?: []);
         </div>
       </section>
 
-      <div class="admin-layout">
-      <section class="admin-panel">
+      <div class="admin-campaign-workspace">
+      <section class="admin-panel admin-campaign-create">
         <p class="section-kicker"><?= $editing ? 'Editar oferta' : 'Nova oferta' ?></p>
-        <h1><?= $editing ? e($editing['store']) : 'Cadastrar oferta' ?></h1>
+        <div class="admin-panel-title-row">
+          <div>
+            <h1><?= $editing ? e($editing['store']) : 'Criar campanha' ?></h1>
+            <p>Preencha os dados da vitrine, escolha a forma de resgate e configure links, validade e tracking comercial.</p>
+          </div>
+          <a href="#campanhas-cadastradas" class="admin-secondary-link">Ver cadastradas</a>
+        </div>
         <?php if ($error): ?><p class="admin-alert"><?= e($error) ?></p><?php endif; ?>
         <?php if (isset($_GET['saved'])): ?><p class="admin-success">Oferta salva.</p><?php endif; ?>
         <?php if (isset($_GET['deleted'])): ?><p class="admin-success">Oferta excluida.</p><?php endif; ?>
@@ -393,7 +399,8 @@ $form = array_merge($defaults, $editing ?: []);
           <input type="hidden" name="action" value="save" />
           <input type="hidden" name="id" value="<?= e((string) $form['id']) ?>" />
 
-          <div class="admin-fieldset">
+          <div class="admin-form-grid">
+          <div class="admin-fieldset admin-fieldset-main">
             <div class="admin-fieldset-heading">
               <span>1</span>
               <div>
@@ -459,20 +466,6 @@ $form = array_merge($defaults, $editing ?: []);
             <label>Upload do banner<input name="banner_file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
           </div>
 
-          <div class="admin-two-cols">
-            <label>Inicio<input name="starts_at" type="date" value="<?= e($form['starts_at']) ?>" required /></label>
-            <label>Fim<input name="ends_at" type="date" value="<?= e($form['ends_at']) ?>" required /></label>
-          </div>
-          <div class="admin-two-cols">
-            <label>Status
-              <select name="status">
-                <?php foreach (['ativo', 'rascunho', 'pausado'] as $status): ?>
-                  <option value="<?= e($status) ?>" <?= $form['status'] === $status ? 'selected' : '' ?>><?= e(ucfirst($status)) ?></option>
-                <?php endforeach; ?>
-              </select>
-            </label>
-            <label class="admin-check"><input name="featured" type="checkbox" value="1" <?= (int) $form['featured'] === 1 ? 'checked' : '' ?> /> Destaque</label>
-          </div>
           <div class="admin-fieldset">
             <div class="admin-fieldset-heading">
               <span>3</span>
@@ -492,6 +485,30 @@ $form = array_merge($defaults, $editing ?: []);
             <label>Tags<input name="tags" value="<?= e($form['tags']) ?>" placeholder="Ex: seguro, cpl, mobile, servicos" /></label>
             <label>Evento/pixel<input name="pixel_event" value="<?= e($form['pixel_event']) ?>" placeholder="Ex: kakau_click, lead_submit" /></label>
             <label class="admin-check"><input name="sponsored" type="checkbox" value="1" <?= (int) $form['sponsored'] === 1 ? 'checked' : '' ?> /> Campanha patrocinada</label>
+          </div>
+          <div class="admin-fieldset admin-fieldset-compact">
+            <div class="admin-fieldset-heading">
+              <span>4</span>
+              <div>
+                <h2>Publicacao</h2>
+                <p>Controle quando aparece, prioridade editorial e status da campanha.</p>
+              </div>
+            </div>
+            <div class="admin-two-cols">
+              <label>Inicio<input name="starts_at" type="date" value="<?= e($form['starts_at']) ?>" required /></label>
+              <label>Fim<input name="ends_at" type="date" value="<?= e($form['ends_at']) ?>" required /></label>
+            </div>
+            <div class="admin-two-cols">
+              <label>Status
+                <select name="status">
+                  <?php foreach (['ativo', 'rascunho', 'pausado'] as $status): ?>
+                    <option value="<?= e($status) ?>" <?= $form['status'] === $status ? 'selected' : '' ?>><?= e(ucfirst($status)) ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </label>
+              <label class="admin-check"><input name="featured" type="checkbox" value="1" <?= (int) $form['featured'] === 1 ? 'checked' : '' ?> /> Destaque</label>
+            </div>
+          </div>
           </div>
           <div class="admin-actions">
             <button type="submit">Salvar oferta</button>
@@ -520,9 +537,15 @@ $form = array_merge($defaults, $editing ?: []);
         </form>
       </section>
 
-      <section class="admin-panel">
+      <section class="admin-panel admin-campaign-list" id="campanhas-cadastradas">
         <p class="section-kicker">Ofertas cadastradas</p>
-        <h2><?= count($coupons) ?> itens</h2>
+        <div class="admin-panel-title-row">
+          <div>
+            <h2>Campanhas cadastradas</h2>
+            <p><?= count($coupons) ?> itens na base, entre cupons, sorteios, cadastros e ofertas diretas.</p>
+          </div>
+          <a href="index.php" class="admin-primary-link">Criar nova</a>
+        </div>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>

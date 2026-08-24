@@ -373,8 +373,8 @@ $form = array_merge($defaults, $editing ?: []);
     <title>Admin - Oferto Cupons</title>
     <link rel="icon" href="../assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../styles.css?v=20260824-resgate" />
-    <link rel="stylesheet" href="admin.css?v=20260824-resgate" />
+    <link rel="stylesheet" href="../styles.css?v=20260824-crm-polish" />
+    <link rel="stylesheet" href="admin.css?v=20260824-crm-polish" />
   </head>
   <body>
     <header class="admin-header">
@@ -388,7 +388,20 @@ $form = array_merge($defaults, $editing ?: []);
       </nav>
     </header>
 
-    <main class="admin-layout">
+    <main class="admin-shell">
+      <section class="admin-hero">
+        <div>
+          <p class="section-kicker">CRM Oferto</p>
+          <h1>Central de ofertas e campanhas</h1>
+          <p>Cadastre cupons, sorteios, campanhas de cadastro e ofertas patrocinadas com validade, banner, tracking e importacao em lote.</p>
+        </div>
+        <div class="admin-hero-stats" aria-label="Resumo do CRM">
+          <span><strong><?= count($coupons) ?></strong> ofertas</span>
+          <span><strong><?= count(array_filter($coupons, fn ($coupon) => ($coupon['status'] ?? '') === 'ativo')) ?></strong> ativas</span>
+        </div>
+      </section>
+
+      <div class="admin-layout">
       <section class="admin-panel">
         <p class="section-kicker"><?= $editing ? 'Editar oferta' : 'Nova oferta' ?></p>
         <h1><?= $editing ? e($editing['store']) : 'Cadastrar oferta' ?></h1>
@@ -403,7 +416,13 @@ $form = array_merge($defaults, $editing ?: []);
           <input type="hidden" name="id" value="<?= e((string) $form['id']) ?>" />
 
           <div class="admin-fieldset">
-            <h2>Conteudo publico</h2>
+            <div class="admin-fieldset-heading">
+              <span>1</span>
+              <div>
+                <h2>Conteudo publico</h2>
+                <p>O que aparece no card da home e nos filtros da vitrine.</p>
+              </div>
+            </div>
             <div class="admin-two-cols">
               <label>Tipo de oferta
                 <select name="offer_type" required>
@@ -423,18 +442,25 @@ $form = array_merge($defaults, $editing ?: []);
             <label>Loja / marca<input name="store" value="<?= e($form['store']) ?>" required /></label>
             <label>Titulo<input name="title" value="<?= e($form['title']) ?>" required /></label>
             <label>Descricao<textarea name="description" required><?= e($form['description']) ?></textarea></label>
-            <div class="admin-two-cols">
-              <label>Como o usuario resgata?
-                <select name="redemption_type" required>
+            <div class="admin-two-cols admin-two-cols-wide-left">
+              <fieldset class="admin-choice-field">
+                <legend>Como o usuario resgata?</legend>
+                <div class="admin-segmented">
                   <?php foreach (redemption_types() as $value => $label): ?>
-                    <option value="<?= e($value) ?>" <?= $form['redemption_type'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                    <label>
+                      <input name="redemption_type" type="radio" value="<?= e($value) ?>" <?= $form['redemption_type'] === $value ? 'checked' : '' ?> required />
+                      <span><?= e($label) ?></span>
+                    </label>
                   <?php endforeach; ?>
-                </select>
-              </label>
+                </div>
+              </fieldset>
               <label>Texto do botao<input name="cta_label" value="<?= e($form['cta_label']) ?>" placeholder="Ex: Cadastre-se, Resgatar, Participar" /></label>
             </div>
             <div class="admin-two-cols">
-              <label>Texto/codigo para copiar<input name="code" value="<?= e($form['code']) ?>" placeholder="Ex: YBOX, OFERTO10 ou instrucao curta" /></label>
+              <label>Texto/codigo para copiar
+                <input name="code" value="<?= e($form['code']) ?>" placeholder="Ex: YBOX, OFERTO10 ou instrucao curta" />
+                <small>Use quando o resgate for por texto/codigo. Para cadastro em site, pode ficar vazio.</small>
+              </label>
               <label class="admin-check"><input name="members_only" type="checkbox" value="1" <?= (int) $form['members_only'] === 1 ? 'checked' : '' ?> /> Somente usuarios conectados</label>
             </div>
             <label>Mecanica/requisito curto<input name="requirements" value="<?= e($form['requirements']) ?>" placeholder="Ex: Cadastro gratuito, Comprar produto, Sem codigo" /></label>
@@ -442,7 +468,13 @@ $form = array_merge($defaults, $editing ?: []);
           </div>
 
           <div class="admin-fieldset">
-            <h2>Links e banner</h2>
+            <div class="admin-fieldset-heading">
+              <span>2</span>
+              <div>
+                <h2>Links e banner</h2>
+                <p>URL final, tracking de parceiro e imagem que sera exibida no card.</p>
+              </div>
+            </div>
             <label>URL final da campanha<input name="target_url" type="url" value="<?= e($form['target_url']) ?>" required /></label>
             <label>URL de tracking/afiliado<input name="tracking_url" type="url" value="<?= e($form['tracking_url']) ?>" placeholder="Opcional. Se preenchida, o botao publico usa esta URL." /></label>
             <label>URL do banner<input name="banner_url" type="text" value="<?= e($form['banner_url']) ?>" placeholder="Ou envie um arquivo abaixo" /></label>
@@ -464,7 +496,13 @@ $form = array_merge($defaults, $editing ?: []);
             <label class="admin-check"><input name="featured" type="checkbox" value="1" <?= (int) $form['featured'] === 1 ? 'checked' : '' ?> /> Destaque</label>
           </div>
           <div class="admin-fieldset">
-            <h2>Comercial e tracking</h2>
+            <div class="admin-fieldset-heading">
+              <span>3</span>
+              <div>
+                <h2>Comercial e tracking</h2>
+                <p>Campos internos para performance, prioridade e organizacao comercial.</p>
+              </div>
+            </div>
             <div class="admin-two-cols">
               <label>Rede/parceiro<input name="partner_network" value="<?= e($form['partner_network']) ?>" placeholder="Ex: Ybox, Tofu, direto" /></label>
               <label>Payout estimado<input name="payout" inputmode="decimal" value="<?= e((string) $form['payout']) ?>" placeholder="Ex: 2,00" /></label>
@@ -487,7 +525,13 @@ $form = array_merge($defaults, $editing ?: []);
           <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
           <input type="hidden" name="action" value="import_csv" />
           <div class="admin-fieldset">
-            <h2>Importar campanhas em lote</h2>
+            <div class="admin-fieldset-heading">
+              <span>CSV</span>
+              <div>
+                <h2>Importar campanhas em lote</h2>
+                <p>Suba uma planilha exportada em CSV. Por seguranca, campanhas sem status entram como rascunho.</p>
+              </div>
+            </div>
             <p>Use CSV com cabecalhos como modo_resgate, categoria, loja, titulo, descricao, url_final, banner, inicio, fim, tipo, codigo, cta, status, parceiro, payout, cap, tags e somente_logados.</p>
             <p><a href="modelo-campanhas.csv" download>Baixar modelo de CSV</a></p>
             <label>Arquivo CSV<input name="campaigns_csv" type="file" accept=".csv,text/csv" required /></label>
@@ -520,11 +564,11 @@ $form = array_merge($defaults, $editing ?: []);
               <?php foreach ($coupons as $coupon): ?>
                 <tr>
                   <td><strong><?= e($coupon['store']) ?></strong><br /><span><?= e($coupon['title']) ?></span></td>
-                  <td><?= e(offer_type_label($coupon['offer_type'] ?? 'cupom')) ?></td>
-                  <td><?= e(redemption_type_label($coupon['redemption_type'] ?? 'texto')) ?></td>
+                  <td><span class="admin-pill admin-pill-type"><?= e(offer_type_label($coupon['offer_type'] ?? 'cupom')) ?></span></td>
+                  <td><span class="admin-pill"><?= e(redemption_type_label($coupon['redemption_type'] ?? 'texto')) ?></span></td>
                   <td><?= e($coupon['category']) ?></td>
-                  <td><span class="status-pill"><?= e($coupon['status']) ?></span></td>
-                  <td><?= (int) ($coupon['members_only'] ?? 0) === 1 ? 'Conectados' : 'Publico' ?></td>
+                  <td><span class="status-pill status-<?= e($coupon['status']) ?>"><?= e($coupon['status']) ?></span></td>
+                  <td><span class="admin-pill <?= (int) ($coupon['members_only'] ?? 0) === 1 ? 'admin-pill-locked' : '' ?>"><?= (int) ($coupon['members_only'] ?? 0) === 1 ? 'Conectados' : 'Publico' ?></span></td>
                   <td><?= e($coupon['partner_network'] ?? '') ?></td>
                   <td><?= e(date('d/m/Y', strtotime($coupon['ends_at']))) ?></td>
                   <td class="row-actions">
@@ -542,6 +586,7 @@ $form = array_merge($defaults, $editing ?: []);
           </table>
         </div>
       </section>
+      </div>
     </main>
   </body>
 </html>

@@ -140,9 +140,9 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             </div>
           </section>
           <section class="v2-side-note">
-            <p class="section-kicker">Estrategia</p>
-            <h2>Direcionador agora, comunidade depois</h2>
-            <p>Hoje tudo fica exposto. A estrutura ja diferencia cupom, sorteio e cadastro para permitir ofertas restritas quando a area logada entrar.</p>
+            <p class="section-kicker">Antes de clicar</p>
+            <h2>Confira a regra da oferta</h2>
+            <p>Veja validade, categoria e forma de resgate antes de acessar o site parceiro. Assim fica mais facil escolher o cupom certo e evitar oferta vencida.</p>
           </section>
           <aside class="inventory-slot inventory-slot-rectangle v2-side-ad" aria-label="Publicidade" data-inventory-slot="v2_lateral_300x250">
             <span>Publicidade</span>

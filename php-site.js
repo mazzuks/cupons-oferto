@@ -3,9 +3,11 @@ const title = document.querySelector("#coupon-title");
 const resultCount = document.querySelector("#result-count");
 const search = document.querySelector("#coupon-search");
 const empty = document.querySelector("#empty-state");
-const chips = [...document.querySelectorAll(".category-chip")];
+const categoryChips = [...document.querySelectorAll("[data-category]")];
+const offerTypeChips = [...document.querySelectorAll("[data-offer-type]")];
 
 let category = "Todos";
+let offerType = "Todos";
 
 function applyFilters() {
   const term = search.value.trim().toLowerCase();
@@ -13,21 +15,32 @@ function applyFilters() {
 
   document.querySelectorAll(".coupon-card").forEach((card) => {
     const matchCategory = category === "Todos" || card.dataset.category === category;
+    const matchOfferType = offerType === "Todos" || card.dataset.offerType === offerType;
     const matchSearch = (card.dataset.search || "").includes(term);
-    const show = matchCategory && matchSearch;
+    const show = matchCategory && matchOfferType && matchSearch;
     card.hidden = !show;
     if (show) visible += 1;
   });
 
-  title.textContent = category === "Todos" ? "Todos os cupons" : `Cupons de ${category}`;
+  const activeOffer = document.querySelector(`[data-offer-type="${offerType}"]`)?.textContent || "Todas as ofertas";
+  const baseTitle = offerType === "Todos" ? "Todas as ofertas" : activeOffer;
+  title.textContent = category === "Todos" ? baseTitle : `${baseTitle} em ${category}`;
   resultCount.textContent = `${visible} ${visible === 1 ? "encontrado" : "encontrados"}`;
   empty.hidden = visible > 0;
 }
 
-chips.forEach((chip) => {
+categoryChips.forEach((chip) => {
   chip.addEventListener("click", () => {
     category = chip.dataset.category;
-    chips.forEach((item) => item.classList.toggle("is-active", item === chip));
+    categoryChips.forEach((item) => item.classList.toggle("is-active", item === chip));
+    applyFilters();
+  });
+});
+
+offerTypeChips.forEach((chip) => {
+  chip.addEventListener("click", () => {
+    offerType = chip.dataset.offerType;
+    offerTypeChips.forEach((item) => item.classList.toggle("is-active", item === chip));
     applyFilters();
   });
 });

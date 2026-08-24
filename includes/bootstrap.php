@@ -76,11 +76,37 @@ function ensure_database(PDO $pdo): void
         status ENUM('ativo', 'rascunho', 'pausado') NOT NULL DEFAULT 'rascunho',
         featured TINYINT(1) NOT NULL DEFAULT 0,
         rules TEXT DEFAULT NULL,
+        offer_type VARCHAR(40) NOT NULL DEFAULT 'cupom',
+        cta_label VARCHAR(80) DEFAULT NULL,
+        tracking_url VARCHAR(500) DEFAULT NULL,
+        partner_network VARCHAR(120) DEFAULT NULL,
+        payout DECIMAL(10,2) DEFAULT NULL,
+        campaign_cap INT UNSIGNED DEFAULT NULL,
+        sponsored TINYINT(1) NOT NULL DEFAULT 0,
+        priority INT NOT NULL DEFAULT 0,
+        tags VARCHAR(500) DEFAULT NULL,
+        requirements VARCHAR(220) DEFAULT NULL,
+        pixel_event VARCHAR(120) DEFAULT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY coupons_public_idx (status, starts_at, ends_at, featured),
         KEY coupons_category_idx (category)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    ensure_coupon_columns($pdo);
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS coupon_clicks (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        coupon_id INT UNSIGNED NOT NULL,
+        event_type VARCHAR(40) NOT NULL DEFAULT 'cta',
+        referer VARCHAR(500) DEFAULT NULL,
+        user_agent VARCHAR(500) DEFAULT NULL,
+        ip_hash CHAR(64) DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY coupon_clicks_coupon_idx (coupon_id, created_at),
+        KEY coupon_clicks_event_idx (event_type, created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
     $couponCount = (int) $pdo->query('SELECT COUNT(*) FROM coupons')->fetchColumn();
@@ -96,6 +122,36 @@ function ensure_database(PDO $pdo): void
     foreach (fallback_coupons_seed() as $coupon) {
         $statement->execute($coupon);
     }
+}
+
+function ensure_coupon_columns(PDO $pdo): void
+{
+    $columns = [
+        'offer_type' => "ALTER TABLE coupons ADD offer_type VARCHAR(40) NOT NULL DEFAULT 'cupom' AFTER rules",
+        'cta_label' => "ALTER TABLE coupons ADD cta_label VARCHAR(80) DEFAULT NULL AFTER offer_type",
+        'tracking_url' => "ALTER TABLE coupons ADD tracking_url VARCHAR(500) DEFAULT NULL AFTER cta_label",
+        'partner_network' => "ALTER TABLE coupons ADD partner_network VARCHAR(120) DEFAULT NULL AFTER tracking_url",
+        'payout' => "ALTER TABLE coupons ADD payout DECIMAL(10,2) DEFAULT NULL AFTER partner_network",
+        'campaign_cap' => "ALTER TABLE coupons ADD campaign_cap INT UNSIGNED DEFAULT NULL AFTER payout",
+        'sponsored' => "ALTER TABLE coupons ADD sponsored TINYINT(1) NOT NULL DEFAULT 0 AFTER campaign_cap",
+        'priority' => "ALTER TABLE coupons ADD priority INT NOT NULL DEFAULT 0 AFTER sponsored",
+        'tags' => "ALTER TABLE coupons ADD tags VARCHAR(500) DEFAULT NULL AFTER priority",
+        'requirements' => "ALTER TABLE coupons ADD requirements VARCHAR(220) DEFAULT NULL AFTER tags",
+        'pixel_event' => "ALTER TABLE coupons ADD pixel_event VARCHAR(120) DEFAULT NULL AFTER requirements",
+    ];
+
+    foreach ($columns as $column => $sql) {
+        if (!coupon_column_exists($pdo, $column)) {
+            $pdo->exec($sql);
+        }
+    }
+}
+
+function coupon_column_exists(PDO $pdo, string $column): bool
+{
+    $statement = $pdo->prepare("SHOW COLUMNS FROM coupons LIKE ?");
+    $statement->execute([$column]);
+    return (bool) $statement->fetch();
 }
 
 function fallback_coupons_seed(): array

@@ -21,6 +21,17 @@ function fallback_coupons(): array
             'status' => 'ativo',
             'featured' => 1,
             'rules' => 'Confira disponibilidade, lojas participantes e pedido mínimo antes de finalizar.',
+            'offer_type' => 'cupom',
+            'cta_label' => '',
+            'tracking_url' => '',
+            'partner_network' => '',
+            'payout' => '',
+            'campaign_cap' => '',
+            'sponsored' => 0,
+            'priority' => 0,
+            'tags' => '',
+            'requirements' => '',
+            'pixel_event' => '',
         ],
         [
             'id' => 2,
@@ -36,8 +47,111 @@ function fallback_coupons(): array
             'status' => 'ativo',
             'featured' => 0,
             'rules' => 'Produto alimentício: classificar sempre em Alimentação e Bebidas.',
+            'offer_type' => 'cupom',
+            'cta_label' => '',
+            'tracking_url' => '',
+            'partner_network' => '',
+            'payout' => '',
+            'campaign_cap' => '',
+            'sponsored' => 0,
+            'priority' => 0,
+            'tags' => '',
+            'requirements' => '',
+            'pixel_event' => '',
         ],
     ];
+}
+
+function offer_types(): array
+{
+    return [
+        'cupom' => 'Cupom',
+        'sorteio' => 'Sorteio',
+        'cadastro' => 'Cadastro',
+        'cashback' => 'Cashback',
+        'oferta_direta' => 'Oferta direta',
+        'compre_concorra' => 'Compre e concorra',
+    ];
+}
+
+function offer_type_label(?string $type): string
+{
+    $types = offer_types();
+    return $types[$type ?: 'cupom'] ?? 'Oferta';
+}
+
+function default_cta_label(?string $type, ?string $code = ''): string
+{
+    $labels = [
+        'cupom' => $code ? 'Usar cupom' : 'Ver oferta',
+        'sorteio' => 'Participar',
+        'cadastro' => 'Cadastrar agora',
+        'cashback' => 'Ativar cashback',
+        'oferta_direta' => 'Ver oferta',
+        'compre_concorra' => 'Ver como participar',
+    ];
+
+    return $labels[$type ?: 'cupom'] ?? 'Ver oferta';
+}
+
+function coupon_cta_label(array $coupon): string
+{
+    $custom = trim((string) ($coupon['cta_label'] ?? ''));
+    if ($custom !== '') {
+        return $custom;
+    }
+
+    return default_cta_label($coupon['offer_type'] ?? 'cupom', $coupon['code'] ?? '');
+}
+
+function coupon_destination_url(array $coupon): string
+{
+    $tracking = trim((string) ($coupon['tracking_url'] ?? ''));
+    return $tracking !== '' ? $tracking : trim((string) ($coupon['target_url'] ?? ''));
+}
+
+function coupon_has_code(array $coupon): bool
+{
+    return trim((string) ($coupon['code'] ?? '')) !== '';
+}
+
+function coupon_mechanic_label(array $coupon): string
+{
+    if (coupon_has_code($coupon)) {
+        return 'Codigo';
+    }
+
+    $labels = [
+        'sorteio' => 'Participacao',
+        'cadastro' => 'Cadastro',
+        'cashback' => 'Cashback',
+        'oferta_direta' => 'Oferta',
+        'compre_concorra' => 'Mecanica',
+    ];
+
+    return $labels[$coupon['offer_type'] ?? ''] ?? 'Oferta';
+}
+
+function coupon_mechanic_value(array $coupon): string
+{
+    if (coupon_has_code($coupon)) {
+        return trim((string) $coupon['code']);
+    }
+
+    $custom = trim((string) ($coupon['requirements'] ?? ''));
+    if ($custom !== '') {
+        return $custom;
+    }
+
+    $values = [
+        'sorteio' => 'Ver regras',
+        'cadastro' => 'Cadastro online',
+        'cashback' => 'Ativacao online',
+        'oferta_direta' => 'Sem codigo',
+        'compre_concorra' => 'Compre e concorra',
+    ];
+
+    return $values[$coupon['offer_type'] ?? ''] ?? 'Oferta direta';
 }
 
 function active_coupons(): array
@@ -51,7 +165,7 @@ function active_coupons(): array
             WHERE status = 'ativo'
               AND starts_at <= CURDATE()
               AND ends_at >= CURDATE()
-            ORDER BY featured DESC, ends_at ASC, store ASC";
+            ORDER BY featured DESC, priority DESC, ends_at ASC, store ASC";
 
     return $pdo->query($sql)->fetchAll();
 }
@@ -100,6 +214,17 @@ function save_coupon(array $data, ?int $id = null): void
         'status',
         'featured',
         'rules',
+        'offer_type',
+        'cta_label',
+        'tracking_url',
+        'partner_network',
+        'payout',
+        'campaign_cap',
+        'sponsored',
+        'priority',
+        'tags',
+        'requirements',
+        'pixel_event',
     ];
 
     if ($id) {
@@ -125,6 +250,32 @@ function delete_coupon(int $id): void
 
     $statement = $pdo->prepare('DELETE FROM coupons WHERE id = ?');
     $statement->execute([$id]);
+}
+
+function log_coupon_click(int $couponId, string $eventType): void
+{
+    $pdo = db();
+    if (!$pdo) {
+        return;
+    }
+
+    $eventType = preg_replace('/[^a-z0-9_\-]/i', '', $eventType) ?: 'cta';
+    $referer = substr((string) ($_SERVER['HTTP_REFERER'] ?? ''), 0, 500);
+    $userAgent = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500);
+    $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+    $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . session_id()) : null;
+
+    try {
+        $statement = $pdo->prepare('INSERT INTO coupon_clicks (coupon_id, event_type, referer, user_agent, ip_hash) VALUES (?, ?, ?, ?, ?)');
+        $statement->execute([$couponId, $eventType, $referer, $userAgent, $ipHash]);
+    } catch (Throwable $error) {
+        return;
+    }
+}
+
+function coupon_go_url(array $coupon, string $eventType = 'cta'): string
+{
+    return 'go.php?id=' . (int) ($coupon['id'] ?? 0) . '&event=' . rawurlencode($eventType);
 }
 
 function coupon_banner_src(array $coupon): string

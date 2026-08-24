@@ -11,6 +11,7 @@ if (strpos($host, 'crm.') === 0) {
 $coupons = active_coupons();
 $categories = array_values(array_unique(array_map(fn ($coupon) => $coupon['category'], $coupons)));
 sort($categories);
+$availableOfferTypes = array_values(array_unique(array_map(fn ($coupon) => $coupon['offer_type'] ?? 'cupom', $coupons)));
 $featured = array_slice(array_values(array_filter($coupons, fn ($coupon) => (int) $coupon['featured'] === 1)), 0, 3);
 $expiring = array_slice($coupons, 0, 5);
 $guides = all_guides();
@@ -53,7 +54,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260824-banners" />
+    <link rel="stylesheet" href="styles.css?v=20260824-crm" />
   </head>
   <body>
     <header class="site-header">
@@ -93,7 +94,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           </div>
           <div class="mini-coupons">
             <?php foreach ($featured as $coupon): ?>
-              <a class="mini-coupon" href="<?= e($coupon['target_url']) ?>" target="_blank" rel="noopener">
+              <a class="mini-coupon" href="<?= e(coupon_go_url($coupon, 'mini')) ?>" target="_blank" rel="noopener">
                 <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="" />
                 <strong><?= e($coupon['store']) ?></strong>
                 <span><?= e(validity_label($coupon['ends_at'])) ?></span>
@@ -114,7 +115,16 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         </label>
       </section>
 
-      <section class="category-strip" id="categorias" aria-label="Categorias de cupons">
+      <section class="category-strip offer-type-strip" id="categorias" aria-label="Tipos de oferta">
+        <button class="category-chip is-active" type="button" data-offer-type="Todos">Todas as ofertas</button>
+        <?php foreach (offer_types() as $type => $label): ?>
+          <?php if (in_array($type, $availableOfferTypes, true)): ?>
+            <button class="category-chip" type="button" data-offer-type="<?= e($type) ?>"><?= e($label) ?></button>
+          <?php endif; ?>
+        <?php endforeach; ?>
+      </section>
+
+      <section class="category-strip category-filter-strip" aria-label="Categorias de cupons">
         <button class="category-chip is-active" type="button" data-category="Todos">Todos</button>
         <?php foreach ($categories as $category): ?>
           <button class="category-chip" type="button" data-category="<?= e($category) ?>"><?= e($category) ?></button>
@@ -159,13 +169,13 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <div class="section-heading">
             <div>
               <p class="section-kicker">Selecionados para hoje</p>
-              <h2 id="coupon-title">Todos os cupons</h2>
+              <h2 id="coupon-title">Todas as ofertas</h2>
             </div>
             <span id="result-count"><?= count($coupons) ?> encontrados</span>
           </div>
           <div class="coupon-grid" id="coupon-grid">
             <?php foreach ($coupons as $coupon): ?>
-              <article class="coupon-card" data-category="<?= e($coupon['category']) ?>" data-search="<?= e(strtolower($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'])) ?>">
+              <article class="coupon-card" data-category="<?= e($coupon['category']) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'cupom') ?>" data-search="<?= e(strtolower($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'] . ' ' . ($coupon['tags'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'cupom'))) ?>">
                 <div class="coupon-media">
                   <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="Banner do cupom <?= e($coupon['store']) ?>" />
                   <span class="coupon-badge"><?= e($coupon['category']) ?></span>
@@ -174,17 +184,21 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                 <div class="coupon-body">
                   <div class="coupon-meta">
                     <span class="store"><?= e($coupon['store']) ?></span>
-                    <span class="coupon-type">Cupom verificado</span>
+                    <span class="coupon-type"><?= e(offer_type_label($coupon['offer_type'] ?? 'cupom')) ?> verificado</span>
                   </div>
                   <h3><?= e($coupon['title']) ?></h3>
                   <p><?= e($coupon['description']) ?></p>
                   <div class="coupon-code-box">
-                    <span class="code-label">Código</span>
-                    <strong class="code-value"><?= e($coupon['code'] ?: 'Oferta direta') ?></strong>
+                    <span class="code-label"><?= e(coupon_mechanic_label($coupon)) ?></span>
+                    <strong class="code-value"><?= e(coupon_mechanic_value($coupon)) ?></strong>
                   </div>
                   <div class="coupon-actions">
-                    <button class="copy-button" type="button" data-code="<?= e($coupon['code']) ?>"><?= $coupon['code'] ? 'Copiar código' : 'Ver oferta' ?></button>
-                    <a class="use-button" href="<?= e($coupon['target_url']) ?>" target="_blank" rel="noopener">Usar cupom</a>
+                    <?php if (coupon_has_code($coupon)): ?>
+                      <button class="copy-button" type="button" data-code="<?= e($coupon['code']) ?>">Copiar código</button>
+                    <?php else: ?>
+                      <a class="copy-button" href="<?= e(coupon_go_url($coupon, 'details')) ?>" target="_blank" rel="noopener">Ver detalhes</a>
+                    <?php endif; ?>
+                    <a class="use-button" href="<?= e(coupon_go_url($coupon, 'cta')) ?>" target="_blank" rel="noopener"><?= e(coupon_cta_label($coupon)) ?></a>
                   </div>
                   <small class="coupon-note"><?= e($coupon['rules']) ?></small>
                 </div>
@@ -225,7 +239,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <strong>Oferto Cupons</strong>
       <span>Compras inteligentes, ofertas imperdíveis.</span>
     </footer>
-    <script src="php-site.js"></script>
+    <script src="php-site.js?v=20260824-crm"></script>
     <script src="pwa.js"></script>
   </body>
 </html>

@@ -83,22 +83,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         <div class="v2-quick-note">Veja validade, regra de uso e caminho de resgate antes de acessar o site parceiro.</div>
       </section>
 
-      <section class="v2-category-strip" aria-label="Categorias">
-        <button class="category-chip is-active" type="button" data-category="Todos">Todos</button>
-        <?php foreach ($categories as $category): ?>
-          <button class="category-chip" type="button" data-category="<?= e($category) ?>"><?= e($category) ?> <small><?= (int) ($categoryCounts[$category] ?? 0) ?></small></button>
-        <?php endforeach; ?>
-      </section>
-
-      <section class="v2-type-strip" aria-label="Tipos de campanha">
-        <button class="category-chip is-active" type="button" data-offer-type="Todos">Todas as campanhas</button>
-        <?php foreach (offer_types() as $type => $label): ?>
-          <?php if (in_array($type, $availableOfferTypes, true)): ?>
-            <button class="category-chip" type="button" data-offer-type="<?= e($type) ?>"><?= e($label) ?></button>
-          <?php endif; ?>
-        <?php endforeach; ?>
-      </section>
-
       <aside class="inventory-band v2-ad-band" aria-label="Publicidade">
         <div class="inventory-slot inventory-slot-wide" data-inventory-slot="v2_topo_responsivo">
           <span>Publicidade</span>
@@ -161,6 +145,24 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         </aside>
 
         <section class="v2-results" aria-live="polite">
+          <div class="v2-local-filters" aria-label="Filtros de campanhas">
+            <section class="v2-category-strip" aria-label="Categorias">
+              <button class="category-chip is-active" type="button" data-category="Todos">Todos</button>
+              <?php foreach ($categories as $category): ?>
+                <button class="category-chip" type="button" data-category="<?= e($category) ?>"><?= e($category) ?> <small><?= (int) ($categoryCounts[$category] ?? 0) ?></small></button>
+              <?php endforeach; ?>
+            </section>
+
+            <section class="v2-type-strip" aria-label="Tipos de campanha">
+              <button class="category-chip is-active" type="button" data-offer-type="Todos">Todas as campanhas</button>
+              <?php foreach (offer_types() as $type => $label): ?>
+                <?php if (in_array($type, $availableOfferTypes, true)): ?>
+                  <button class="category-chip" type="button" data-offer-type="<?= e($type) ?>"><?= e($label) ?></button>
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </section>
+          </div>
+
           <div class="section-heading">
             <div>
               <p class="section-kicker">Lista completa</p>
@@ -235,7 +237,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <strong>Oferto Cupons V2</strong>
       <span>Ambiente de teste, sem alterar a home atual.</span>
     </footer>
-    <script src="php-site.js?v=20260824-v2-polish"></script>
+    <script src="php-site.js?v=20260824-v2-filters"></script>
     <script src="pwa.js"></script>
   </body>
 </html>

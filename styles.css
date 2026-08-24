@@ -1475,6 +1475,23 @@ h3 {
   scrollbar-width: none;
 }
 
+.site-v2-compact .v2-local-filters {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 14px 30px rgba(22, 42, 78, 0.06);
+}
+
+.site-v2-compact .v2-local-filters .v2-category-strip,
+.site-v2-compact .v2-local-filters .v2-type-strip {
+  padding: 0;
+  background: transparent;
+}
+
 .site-v2-compact .v2-category-strip::-webkit-scrollbar,
 .site-v2-compact .v2-type-strip::-webkit-scrollbar {
   display: none;

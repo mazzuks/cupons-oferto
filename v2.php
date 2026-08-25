@@ -52,7 +52,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260824-hidden-fix" />
+    <link rel="stylesheet" href="styles.css?v=20260824-mobile-hero" />
   </head>
   <body class="site-v2 site-v2-compact">
     <header class="site-header v2-compact-header">
@@ -71,13 +71,19 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <main id="top">
       <section class="v2-compact-hero">
         <div>
-          <p class="eyebrow">Cupons e ofertas para economizar hoje</p>
-          <h1>Antes de comprar, veja se tem cupom ativo.</h1>
-          <p>Busque por loja, categoria ou tipo de oferta e encontre campanhas validas para economizar sem perder tempo.</p>
+          <p class="eyebrow">Cupons ativos, sorteios e ofertas selecionadas</p>
+          <h1>Economize antes de finalizar sua compra.</h1>
+          <p>Encontre campanhas validas por loja ou categoria, confira a regra de uso e siga direto para resgatar no site parceiro.</p>
+          <div class="v2-hero-points" aria-label="Diferenciais do Oferto Cupons">
+            <span>Validade clara</span>
+            <span>Categorias rapidas</span>
+            <span>Acesso direto</span>
+          </div>
         </div>
         <label class="v2-hero-search">
-          <span>Buscar cupom ou loja</span>
+          <span>Qual loja ou oferta voce procura?</span>
           <input id="coupon-search" type="search" placeholder="Pizza, seguros, games, mercado..." />
+          <small>Digite uma marca, produto ou categoria para filtrar as campanhas abaixo.</small>
         </label>
       </section>
 

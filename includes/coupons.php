@@ -200,6 +200,8 @@ function active_coupons(): array
             WHERE status = 'ativo'
               AND starts_at <= CURDATE()
               AND ends_at >= CURDATE()
+              AND title NOT LIKE 'BANNERS:%'
+              AND title NOT LIKE 'BANNER:%'
             ORDER BY featured DESC, priority DESC, ends_at ASC, store ASC";
 
     return $pdo->query($sql)->fetchAll();

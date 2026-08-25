@@ -35,7 +35,7 @@ function posted_filters(): array
 
 $filters = lomadee_normalize_filters(integration_profile('lomadee', [
     'max_pages' => 20,
-    'types' => array_keys(lomadee_campaign_type_options()),
+    'types' => lomadee_default_campaign_types(),
     'categories' => [],
     'excluded_terms' => 'BANNERS:',
     'publish_status' => 'rascunho',

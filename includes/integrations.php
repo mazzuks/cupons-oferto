@@ -813,6 +813,11 @@ function lomadee_campaign_type_options(): array
     ];
 }
 
+function lomadee_default_campaign_types(): array
+{
+    return ['GenericCoupon', 'PersonalCoupon'];
+}
+
 function lomadee_category_options(): array
 {
     return [
@@ -829,7 +834,7 @@ function lomadee_category_options(): array
 
 function lomadee_normalize_filters(array $filters): array
 {
-    $types = $filters['types'] ?? array_keys(lomadee_campaign_type_options());
+    $types = $filters['types'] ?? lomadee_default_campaign_types();
     $types = array_values(array_intersect((array) $types, array_keys(lomadee_campaign_type_options())));
 
     $categories = array_values(array_filter(array_map('trim', (array) ($filters['categories'] ?? []))));
@@ -839,7 +844,7 @@ function lomadee_normalize_filters(array $filters): array
 
     return [
         'max_pages' => max(1, min(50, (int) ($filters['max_pages'] ?? 20))),
-        'types' => $types ?: array_keys(lomadee_campaign_type_options()),
+        'types' => $types ?: lomadee_default_campaign_types(),
         'categories' => $categories,
         'brand_query' => trim((string) ($filters['brand_query'] ?? '')),
         'brand_ids' => $brandIds,
@@ -1097,6 +1102,10 @@ function lomadee_campaign_passes_filters(array $campaign, array $brand, array $f
     $description = trim(strip_tags((string) ($campaign['description'] ?? '')));
     $haystack = strtolower($brandName . ' ' . $brandSegment . ' ' . $title . ' ' . $description);
 
+    if (lomadee_is_media_material($title, $description)) {
+        return false;
+    }
+
     if ($filters['brand_query'] !== '' && !$filters['brand_ids'] && !text_contains($haystack, strtolower($filters['brand_query']))) {
         return false;
     }
@@ -1115,6 +1124,18 @@ function lomadee_campaign_passes_filters(array $campaign, array $brand, array $f
     }
 
     return true;
+}
+
+function lomadee_is_media_material(string $title, string $description = ''): bool
+{
+    $text = strtolower(trim($title . ' ' . $description));
+    foreach (['banners:', 'banner:', 'material de divulgacao', 'material de divulgação'] as $term) {
+        if ($term !== '' && text_contains($text, $term)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function lomadee_campaign_payload(array $campaign, array $brands, string $status = 'ativo'): ?array

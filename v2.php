@@ -22,8 +22,8 @@ $initialCoupons = $defaultCategory === 'Todos'
     ? $coupons
     : array_values(array_filter($coupons, fn ($coupon) => $coupon['category'] === $defaultCategory));
 $initialTitle = $defaultCategory === 'Todos' ? 'Todas as ofertas' : 'Ofertas em ' . $defaultCategory;
-$shareTitle = 'Oferto Cupons V2 - cupons e campanhas ativas';
-$shareDescription = 'Encontre cupons, sorteios e campanhas abertas com validade clara, filtros por categoria e links para usar no site parceiro.';
+$shareTitle = 'Oferto Cupons - cupons, promocoes e sorteios';
+$shareDescription = 'Ache cupons, promocoes e sorteios ativos por loja ou categoria e economize antes de comprar.';
 $shareUrl = 'https://cupons.oferto.digital/v2.php';
 $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
 ?>
@@ -52,13 +52,13 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260824-mobile-hero" />
+    <link rel="stylesheet" href="styles.css?v=20260824-mobile-copy" />
   </head>
   <body class="site-v2 site-v2-compact">
     <header class="site-header v2-compact-header">
       <a class="brand" href="/" aria-label="Oferto Cupons">
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
-        <span>Cupons V2</span>
+        <span>Cupons</span>
       </a>
       <nav class="nav-links" aria-label="Navegacao principal">
         <a href="#top-cupons">Destaques</a>
@@ -71,27 +71,27 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <main id="top">
       <section class="v2-compact-hero">
         <div>
-          <p class="eyebrow">Cupons ativos, sorteios e ofertas selecionadas</p>
-          <h1>Economize antes de finalizar sua compra.</h1>
-          <p>Encontre campanhas validas por loja ou categoria, confira a regra de uso e siga direto para resgatar no site parceiro.</p>
-          <div class="v2-hero-points" aria-label="Diferenciais do Oferto Cupons">
-            <span>Validade clara</span>
-            <span>Categorias rapidas</span>
-            <span>Acesso direto</span>
+          <p class="eyebrow">Cupons, promocoes e sorteios para hoje</p>
+          <h1>Economize mais nas suas compras.</h1>
+          <p>Antes de comprar, procure um cupom, veja uma promocao ou participe de um sorteio. O Oferto junta oportunidades em um so lugar para voce gastar menos.</p>
+          <div class="v2-hero-points" aria-label="O que encontrar no Oferto Cupons">
+            <span>Descontos do dia</span>
+            <span>Promocoes por categoria</span>
+            <span>Sorteios abertos</span>
           </div>
         </div>
         <label class="v2-hero-search">
-          <span>Qual loja ou oferta voce procura?</span>
+          <span>Procure sua loja, produto ou cupom</span>
           <input id="coupon-search" type="search" placeholder="Pizza, seguros, games, mercado..." />
-          <small>Digite uma marca, produto ou categoria para filtrar as campanhas abaixo.</small>
+          <small>Exemplo: pizza, seguro, games, mercado ou o nome de uma loja.</small>
         </label>
       </section>
 
       <section class="v2-quick-bar" aria-label="Resumo e filtros">
-        <div class="v2-quick-stat"><strong><?= count($coupons) ?></strong><span>campanhas ativas</span></div>
+        <div class="v2-quick-stat"><strong><?= count($coupons) ?></strong><span>ofertas ativas</span></div>
         <div class="v2-quick-stat"><strong><?= count($categories) ?></strong><span>categorias</span></div>
         <div class="v2-quick-stat"><strong><?= count($expiring) ?></strong><span>vencendo em breve</span></div>
-        <div class="v2-quick-note">Veja validade, regra de uso e caminho de resgate antes de acessar o site parceiro.</div>
+        <div class="v2-quick-note">Abra a oferta, veja como aproveitar e siga para o site parceiro quando quiser resgatar.</div>
       </section>
 
       <aside class="inventory-band v2-ad-band" aria-label="Publicidade">
@@ -105,9 +105,9 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <div class="section-heading">
             <div>
               <p class="section-kicker">Destaques</p>
-              <h2>Campanhas para olhar primeiro</h2>
+              <h2>Ofertas para ver primeiro</h2>
             </div>
-            <a class="text-action" href="#cupons">Ver campanhas</a>
+            <a class="text-action" href="#cupons">Ver ofertas</a>
           </div>
           <div class="v2-store-grid">
             <?php foreach ($topCoupons as $coupon): ?>
@@ -141,7 +141,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                   </a>
                 <?php endforeach; ?>
               <?php else: ?>
-                <p class="v2-muted-note">Nenhuma campanha termina nos proximos 3 dias.</p>
+                <p class="v2-muted-note">Nenhuma oferta termina nos proximos 3 dias.</p>
               <?php endif; ?>
             </div>
           </section>
@@ -156,7 +156,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         </aside>
 
         <section class="v2-results" aria-live="polite">
-          <div class="v2-local-filters" aria-label="Filtros de campanhas">
+          <div class="v2-local-filters" aria-label="Filtros de ofertas">
             <section class="v2-category-strip" aria-label="Categorias">
               <button class="category-chip <?= $defaultCategory === 'Todos' ? 'is-active' : '' ?>" type="button" data-category="Todos" data-label="Todas as ofertas">Todos</button>
               <?php foreach ($categories as $filterCategory): ?>
@@ -164,8 +164,8 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
               <?php endforeach; ?>
             </section>
 
-            <section class="v2-type-strip" aria-label="Tipos de campanha">
-              <button class="category-chip is-active" type="button" data-offer-type="Todos" data-label="Todas as ofertas">Todas as campanhas</button>
+            <section class="v2-type-strip" aria-label="Tipos de oferta">
+              <button class="category-chip is-active" type="button" data-offer-type="Todos" data-label="Todas as ofertas">Todas as ofertas</button>
               <?php foreach (offer_types() as $type => $label): ?>
                 <?php if (in_array($type, $availableOfferTypes, true)): ?>
                   <button class="category-chip" type="button" data-offer-type="<?= e($type) ?>" data-label="<?= e($label) ?>"><?= e($label) ?></button>
@@ -185,7 +185,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <?php foreach ($coupons as $coupon): ?>
               <article class="coupon-card v2-list-card" <?= $defaultCategory !== 'Todos' && $coupon['category'] !== $defaultCategory ? 'hidden' : '' ?> data-category="<?= e($coupon['category']) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'cupom') ?>" data-search="<?= e(strtolower($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'] . ' ' . ($coupon['tags'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'cupom') . ' ' . redemption_type_label($coupon['redemption_type'] ?? 'texto'))) ?>">
                 <div class="v2-list-logo">
-                  <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="Banner da campanha <?= e($coupon['store']) ?>" />
+                  <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="Banner da oferta <?= e($coupon['store']) ?>" />
                 </div>
                 <div class="v2-list-content">
                   <div class="coupon-meta">
@@ -212,7 +212,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
               </article>
             <?php endforeach; ?>
           </div>
-          <p class="empty-state" id="empty-state" hidden>Nenhuma campanha ativa encontrada para esse filtro.</p>
+          <p class="empty-state" id="empty-state" hidden>Nenhuma oferta encontrada para esse filtro.</p>
         </section>
       </section>
 

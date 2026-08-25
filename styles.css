@@ -1768,6 +1768,24 @@ h3 {
       linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
   }
 
+  .site-v2-compact .v2-compact-header {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .site-v2-compact .v2-compact-header .brand {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .site-v2-compact .v2-compact-header .nav-links {
+    justify-content: center;
+  }
+
+  .site-v2-compact .v2-compact-header .header-cta {
+    margin: 0 auto;
+  }
+
   .site-v2-compact .v2-compact-hero h1 {
     font-size: 38px;
     line-height: 0.96;

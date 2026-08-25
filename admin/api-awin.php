@@ -25,7 +25,7 @@ function awin_posted_filters(): array
         'page' => (int) ($_POST['page'] ?? 1),
         'page_size' => (int) ($_POST['page_size'] ?? 50),
         'type' => (string) ($_POST['type'] ?? 'all'),
-        'membership' => (string) ($_POST['membership'] ?? 'joined'),
+        'membership' => (string) ($_POST['membership'] ?? 'all'),
         'status' => (string) ($_POST['status'] ?? 'active'),
         'region' => (string) ($_POST['region'] ?? 'BR'),
         'query' => trim((string) ($_POST['query'] ?? '')),
@@ -40,7 +40,7 @@ $filters = awin_normalize_filters([
     'page' => 1,
     'page_size' => 50,
     'type' => 'all',
-    'membership' => 'joined',
+    'membership' => 'all',
     'status' => 'active',
     'region' => 'BR',
     'excluded_terms' => awin_default_excluded_terms(),
@@ -151,7 +151,7 @@ $awinPublisherName = awin_publisher_name();
             <div>
               <p class="section-kicker">Busca</p>
               <h2>Pesquisar ofertas</h2>
-              <p>Comece pelo segmento e por parceiros aprovados. Isso reduz lixo e evita ofertas fora da linha do Oferto.</p>
+              <p>Comece por segmentos e termos bloqueados. Depois refine por anunciante ou parceiros aprovados.</p>
             </div>
           </div>
 
@@ -279,7 +279,7 @@ $awinPublisherName = awin_publisher_name();
                 </thead>
                 <tbody>
                   <?php if (!$previewResult['items']): ?>
-                    <tr><td colspan="6" class="admin-empty-cell">Nenhuma oferta encontrada com estes filtros.</td></tr>
+                    <tr><td colspan="6" class="admin-empty-cell">Nenhuma oferta passou por estes filtros. Tente deixar segmentos sem marcar, usar relacionamento "Todos os anunciantes" ou remover termos bloqueados temporariamente.</td></tr>
                   <?php endif; ?>
 
                   <?php foreach ($previewResult['items'] as $item): ?>

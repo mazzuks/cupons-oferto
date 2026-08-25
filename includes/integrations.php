@@ -173,8 +173,8 @@ function awin_offer_type_options(): array
 function awin_membership_options(): array
 {
     return [
-        'joined' => 'Apenas parceiros aprovados',
         'all' => 'Todos os anunciantes',
+        'joined' => 'Apenas parceiros aprovados',
         'notJoined' => 'Ainda nao aprovados',
     ];
 }
@@ -196,7 +196,7 @@ function awin_default_excluded_terms(): string
 function awin_normalize_filters(array $filters): array
 {
     $type = (string) ($filters['type'] ?? 'all');
-    $membership = (string) ($filters['membership'] ?? 'joined');
+    $membership = (string) ($filters['membership'] ?? 'all');
     $status = (string) ($filters['status'] ?? 'active');
     $publishStatus = in_array($filters['publish_status'] ?? 'rascunho', ['ativo', 'rascunho'], true) ? $filters['publish_status'] : 'rascunho';
 
@@ -204,7 +204,7 @@ function awin_normalize_filters(array $filters): array
         $type = 'all';
     }
     if (!array_key_exists($membership, awin_membership_options())) {
-        $membership = 'joined';
+        $membership = 'all';
     }
     if (!array_key_exists($status, awin_status_options())) {
         $status = 'active';
@@ -365,7 +365,7 @@ function awin_offer_passes_filters(array $offer, array $filters): bool
         }
     }
 
-    if ($filters['categories']) {
+    if (awin_should_filter_categories($filters['categories'])) {
         $category = awin_offer_category($offer);
         if (!in_array($category, $filters['categories'], true)) {
             return false;
@@ -373,6 +373,17 @@ function awin_offer_passes_filters(array $offer, array $filters): bool
     }
 
     return true;
+}
+
+function awin_should_filter_categories(array $categories): bool
+{
+    $categories = array_values(array_unique($categories));
+    if (!$categories) {
+        return false;
+    }
+
+    $available = lomadee_category_options();
+    return count(array_intersect($available, $categories)) < count($available);
 }
 
 function awin_offer_payload(array $offer, string $status = 'rascunho'): ?array

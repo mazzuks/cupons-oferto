@@ -1822,27 +1822,36 @@ h3 {
 
   .site-v2-compact .v2-local-filters {
     gap: 10px;
-    margin: 0 16px 16px;
-    padding: 12px;
+    margin: 0 0 16px;
+    padding: 12px 0;
     overflow: hidden;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border-color: rgba(189, 207, 232, 0.8);
+    box-shadow: 0 12px 24px rgba(22, 42, 78, 0.05);
   }
 
   .site-v2-compact .v2-category-strip,
   .site-v2-compact .v2-type-strip {
     gap: 8px;
-    margin: 0 -12px;
     padding: 0 12px 2px;
     scroll-padding-inline: 12px;
     scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 26px), transparent 100%);
   }
 
   .site-v2-compact .v2-local-filters .category-chip {
     flex: 0 0 auto;
-    min-height: 44px;
-    padding-inline: 18px;
+    min-height: 42px;
+    padding-inline: 17px;
+    border-color: rgba(189, 207, 232, 0.9);
+    box-shadow: 0 7px 18px rgba(22, 42, 78, 0.04);
     scroll-snap-align: start;
     white-space: nowrap;
+  }
+
+  .site-v2-compact .v2-local-filters .category-chip.is-active {
+    box-shadow: 0 10px 20px rgba(25, 76, 140, 0.18);
   }
 
   .site-v2-compact .v2-local-filters .category-chip:last-child {

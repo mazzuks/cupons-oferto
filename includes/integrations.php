@@ -1058,6 +1058,8 @@ function sync_awin_watchlist(): array
             mark_monitor_seen('Awin', $externalId);
             $updated++;
         } elseif ($payload && $monitoredBrandIds) {
+            save_coupon($payload);
+            monitor_integration_offer('Awin', $payload, (string) $offer['promotionId'], (string) ($offer['advertiserId'] ?? ''));
             create_admin_notification(
                 'campaign_new',
                 'Nova oferta de anunciante monitorado',

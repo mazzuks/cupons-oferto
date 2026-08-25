@@ -131,7 +131,7 @@ function coupon_destination_url(array $coupon): string
     $partner = strtolower(trim((string) ($coupon['partner_network'] ?? '')));
 
     if ($partner === 'lomadee') {
-        return coupon_is_partner_tracking_url($tracking, $target) ? $tracking : '';
+        return coupon_is_lomadee_tracking_url($tracking, $target) ? $tracking : '';
     }
 
     if ($partner === 'awin') {
@@ -141,6 +141,49 @@ function coupon_destination_url(array $coupon): string
     return $tracking !== '' ? $tracking : $target;
 }
 
+function coupon_has_valid_destination(array $coupon): bool
+{
+    $url = coupon_destination_url($coupon);
+    return is_remote_banner_url($url);
+}
+
+function coupon_is_ready_for_public_site(array $coupon): bool
+{
+    return !coupon_shows_rescue_button($coupon) || coupon_has_valid_destination($coupon);
+}
+
+function coupon_tracking_label(array $coupon): string
+{
+    $partner = strtolower(trim((string) ($coupon['partner_network'] ?? '')));
+    if (!coupon_shows_rescue_button($coupon)) {
+        return 'Sem botao externo';
+    }
+
+    if (in_array($partner, ['lomadee', 'awin'], true)) {
+        return coupon_has_valid_destination($coupon) ? 'Tracking ok' : 'Sem tracking';
+    }
+
+    if (trim((string) ($coupon['tracking_url'] ?? '')) !== '') {
+        return coupon_has_valid_destination($coupon) ? 'Tracking manual' : 'Tracking invalido';
+    }
+
+    return coupon_has_valid_destination($coupon) ? 'Link direto' : 'URL invalida';
+}
+
+function coupon_tracking_status_class(array $coupon): string
+{
+    $label = coupon_tracking_label($coupon);
+    if (in_array($label, ['Tracking ok', 'Tracking manual'], true)) {
+        return 'status-ativo';
+    }
+
+    if (in_array($label, ['Sem tracking', 'Tracking invalido', 'URL invalida'], true)) {
+        return 'status-pausado';
+    }
+
+    return 'status-rascunho';
+}
+
 function coupon_is_partner_tracking_url(string $url, string $targetUrl = ''): bool
 {
     if (!is_remote_banner_url($url)) {
@@ -148,6 +191,24 @@ function coupon_is_partner_tracking_url(string $url, string $targetUrl = ''): bo
     }
 
     return trim_trailing_url_slash($url) !== trim_trailing_url_slash($targetUrl);
+}
+
+function coupon_is_lomadee_tracking_url(string $url, string $targetUrl = ''): bool
+{
+    if (!coupon_is_partner_tracking_url($url, $targetUrl)) {
+        return false;
+    }
+
+    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+    $query = strtolower((string) parse_url($url, PHP_URL_QUERY));
+
+    return $host === 'lmdee.link'
+        || substr($host, -11) === '.lmdee.link'
+        || $host === 'acesse.vc'
+        || substr($host, -10) === '.acesse.vc'
+        || strpos($host, 'lomadee') !== false
+        || strpos($query, 'lmdeetracking=') !== false
+        || strpos($query, 'utm_source=lomadee') !== false;
 }
 
 function trim_trailing_url_slash(string $url): string
@@ -244,7 +305,7 @@ function active_coupons(): array
               AND title NOT LIKE 'BANNER:%'
             ORDER BY featured DESC, priority DESC, ends_at ASC, store ASC";
 
-    return $pdo->query($sql)->fetchAll();
+    return array_values(array_filter($pdo->query($sql)->fetchAll(), 'coupon_is_ready_for_public_site'));
 }
 
 function all_coupons(): array

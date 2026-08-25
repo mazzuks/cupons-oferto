@@ -44,6 +44,22 @@ function coupon_payload(array $source, string $bannerUrl): array
     ];
 }
 
+function validate_coupon_payload(array $payload, string $context = 'Oferta'): void
+{
+    if (in_array($payload['redemption_type'], ['texto', 'texto_redirect'], true) && !$payload['code']) {
+        throw new RuntimeException($context . ': resgate com cupom para copiar precisa do campo codigo preenchido.');
+    }
+
+    if (($payload['status'] ?? '') === 'ativo' && coupon_shows_rescue_button($payload) && !coupon_has_valid_destination($payload)) {
+        $partner = trim((string) ($payload['partner_network'] ?? ''));
+        if (in_array(strtolower($partner), ['lomadee', 'awin'], true)) {
+            throw new RuntimeException($context . ': campanha de ' . $partner . ' precisa de URL de tracking valida antes de publicar.');
+        }
+
+        throw new RuntimeException($context . ': informe uma URL valida antes de publicar.');
+    }
+}
+
 function normalize_redemption_type(string $type): string
 {
     $type = strtolower(trim($type));
@@ -193,10 +209,7 @@ function import_campaigns_from_csv(): int
                 throw new RuntimeException('Linha ' . ($imported + 2) . ': preencha categoria, loja, titulo, descricao, URL, banner, inicio e fim.');
             }
         }
-        if (in_array($payload['redemption_type'], ['texto', 'texto_redirect'], true) && !$payload['code']) {
-            fclose($handle);
-            throw new RuntimeException('Linha ' . ($imported + 2) . ': resgate com cupom para copiar precisa do campo codigo preenchido.');
-        }
+        validate_coupon_payload($payload, 'Linha ' . ($imported + 2));
 
         save_coupon($payload, null);
         $imported++;
@@ -327,9 +340,7 @@ try {
                     throw new RuntimeException('Preencha os campos obrigatorios.');
                 }
             }
-            if (in_array($payload['redemption_type'], ['texto', 'texto_redirect'], true) && !$payload['code']) {
-                throw new RuntimeException('Quando o resgate tiver cupom para copiar, preencha o texto do cupom.');
-            }
+            validate_coupon_payload($payload);
 
             save_coupon($payload, $id);
             redirect('index.php?saved=1');
@@ -578,6 +589,7 @@ $form = array_merge($defaults, $editing ?: []);
                 <th>Categoria</th>
                 <th>Status</th>
                 <th>Acesso</th>
+                <th>Tracking</th>
                 <th>Parceiro</th>
                 <th>Validade</th>
                 <th></th>
@@ -592,6 +604,7 @@ $form = array_merge($defaults, $editing ?: []);
                   <td><?= e($coupon['category']) ?></td>
                   <td><span class="status-pill status-<?= e($coupon['status']) ?>"><?= e($coupon['status']) ?></span></td>
                   <td><span class="admin-pill <?= (int) ($coupon['members_only'] ?? 0) === 1 ? 'admin-pill-locked' : '' ?>"><?= (int) ($coupon['members_only'] ?? 0) === 1 ? 'Conectados' : 'Publico' ?></span></td>
+                  <td><span class="status-pill <?= e(coupon_tracking_status_class($coupon)) ?>"><?= e(coupon_tracking_label($coupon)) ?></span></td>
                   <td><?= e($coupon['partner_network'] ?? '') ?></td>
                   <td><?= e(date('d/m/Y', strtotime($coupon['ends_at']))) ?></td>
                   <td class="row-actions">

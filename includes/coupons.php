@@ -316,10 +316,6 @@ function clear_campaign_data(): int
     $pdo->beginTransaction();
     try {
         $pdo->exec("INSERT INTO integration_settings (setting_key, setting_value) VALUES ('seed_coupons_disabled', '1') ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
-        $pdo->exec("DELETE FROM admin_notifications WHERE type IN ('campaign_missing', 'campaign_new')");
-        $pdo->exec('DELETE FROM affiliate_conversions');
-        $pdo->exec('DELETE FROM coupon_clicks');
-        $pdo->exec('DELETE FROM integration_watchlist');
         $pdo->exec('DELETE FROM coupons');
         $pdo->commit();
     } catch (Throwable $error) {

@@ -565,7 +565,7 @@ $form = array_merge($defaults, $editing ?: []);
             <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
             <input type="hidden" name="action" value="clear_campaigns" />
             <button type="submit">Limpar campanhas cadastradas</button>
-            <span>Remove campanhas, cliques, conversoes e alertas antigos de campanha.</span>
+            <span>Remove apenas as campanhas cadastradas. Usuarios, APIs, historico e marcas monitoradas continuam salvos.</span>
           </form>
         <?php endif; ?>
         <div class="admin-table-wrap">

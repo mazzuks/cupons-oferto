@@ -130,11 +130,139 @@ function lomadee_brand_map(int $maxPages = 10): array
     return $map;
 }
 
-function lomadee_import_campaigns(int $maxPages = 10): array
+function lomadee_brand_options(string $search = '', int $maxPages = 20): array
 {
-    $brands = lomadee_brand_map($maxPages);
+    $search = trim($search);
+    $brands = lomadee_fetch_all('/affiliate/brands', ['isPublic' => 'true'], $maxPages);
+    $options = [];
+
+    foreach ($brands as $brand) {
+        if (!is_array($brand) || empty($brand['id'])) {
+            continue;
+        }
+
+        $name = trim((string) ($brand['name'] ?? ''));
+        $segment = trim((string) ($brand['segment'] ?? ''));
+        $haystack = strtolower($name . ' ' . $segment);
+        if ($search !== '' && !str_contains($haystack, strtolower($search))) {
+            continue;
+        }
+
+        $options[] = [
+            'id' => (string) $brand['id'],
+            'name' => $name ?: 'Marca sem nome',
+            'segment' => $segment,
+            'site' => trim((string) ($brand['site'] ?? '')),
+        ];
+    }
+
+    usort($options, fn (array $a, array $b): int => strcmp($a['name'], $b['name']));
+    return array_slice($options, 0, 80);
+}
+
+function lomadee_campaign_type_options(): array
+{
+    return [
+        'GenericCoupon' => 'Cupom geral',
+        'PersonalCoupon' => 'Cupom pessoal',
+        'Offer' => 'Oferta sem codigo',
+    ];
+}
+
+function lomadee_category_options(): array
+{
+    return [
+        'Alimentacao e Bebidas',
+        'Compras',
+        'Games',
+        'Educacao',
+        'Servicos',
+        'Entretenimento',
+        'Kids',
+        'Viagem',
+    ];
+}
+
+function lomadee_normalize_filters(array $filters): array
+{
+    $types = $filters['types'] ?? array_keys(lomadee_campaign_type_options());
+    $types = array_values(array_intersect((array) $types, array_keys(lomadee_campaign_type_options())));
+
+    $categories = array_values(array_filter(array_map('trim', (array) ($filters['categories'] ?? []))));
+    $brandIds = array_values(array_filter(array_map('strval', (array) ($filters['brand_ids'] ?? []))));
+    $excludedTerms = array_values(array_filter(array_map('trim', explode(',', (string) ($filters['excluded_terms'] ?? 'BANNERS:')))));
+    $status = in_array($filters['publish_status'] ?? 'rascunho', ['ativo', 'rascunho'], true) ? $filters['publish_status'] : 'rascunho';
+
+    return [
+        'max_pages' => max(1, min(50, (int) ($filters['max_pages'] ?? 20))),
+        'types' => $types ?: array_keys(lomadee_campaign_type_options()),
+        'categories' => $categories,
+        'brand_query' => trim((string) ($filters['brand_query'] ?? '')),
+        'brand_ids' => $brandIds,
+        'excluded_terms' => $excludedTerms,
+        'publish_status' => $status,
+        'selected_external_ids' => array_values(array_filter(array_map('strval', (array) ($filters['selected_external_ids'] ?? [])))),
+    ];
+}
+
+function lomadee_preview_campaigns(array $filters = []): array
+{
+    $filters = lomadee_normalize_filters($filters);
+    $brands = lomadee_brand_map(max($filters['max_pages'], 20));
     $campaigns = lomadee_fetch_all('/affiliate/campaigns', [
-        'types' => 'GenericCoupon,PersonalCoupon,Offer',
+        'types' => implode(',', $filters['types']),
+        'status' => 'onTime',
+    ], $filters['max_pages']);
+
+    $items = [];
+    foreach ($campaigns as $campaign) {
+        if (!is_array($campaign) || empty($campaign['id'])) {
+            continue;
+        }
+
+        $brand = $brands[(string) ($campaign['organizationId'] ?? '')] ?? [];
+        if (!lomadee_campaign_passes_filters($campaign, $brand, $filters)) {
+            continue;
+        }
+
+        $payload = lomadee_campaign_payload($campaign, $brands, $filters['publish_status']);
+        if (!$payload) {
+            continue;
+        }
+
+        $items[] = [
+            'external_id' => $payload['external_id'],
+            'campaign_id' => (string) $campaign['id'],
+            'brand_id' => (string) ($campaign['organizationId'] ?? ''),
+            'store' => $payload['store'],
+            'title' => $payload['title'],
+            'category' => $payload['category'],
+            'type' => (string) ($campaign['type'] ?? ''),
+            'offer_type' => $payload['offer_type'],
+            'redemption_type' => $payload['redemption_type'],
+            'has_code' => $payload['code'] !== '',
+            'banner_url' => $payload['banner_url'],
+            'status' => $payload['status'],
+            'existing' => (bool) coupon_by_external_id($payload['external_id']),
+        ];
+    }
+
+    return [
+        'filters' => $filters,
+        'items' => $items,
+        'total' => count($campaigns),
+        'matched' => count($items),
+    ];
+}
+
+function lomadee_import_campaigns(int $maxPages = 10, array $filters = []): array
+{
+    $filters['max_pages'] = $maxPages;
+    $filters = lomadee_normalize_filters($filters);
+    $selectedExternalIds = $filters['selected_external_ids'];
+    $brands = lomadee_brand_map(max($maxPages, 20));
+    $campaigns = lomadee_fetch_all('/affiliate/campaigns', [
+        'types' => implode(',', $filters['types']),
         'status' => 'onTime',
     ], $maxPages);
 
@@ -148,7 +276,19 @@ function lomadee_import_campaigns(int $maxPages = 10): array
             continue;
         }
 
-        $payload = lomadee_campaign_payload($campaign, $brands);
+        $brand = $brands[(string) ($campaign['organizationId'] ?? '')] ?? [];
+        if (!lomadee_campaign_passes_filters($campaign, $brand, $filters)) {
+            $skipped++;
+            continue;
+        }
+
+        $externalId = 'lomadee:' . (string) $campaign['id'];
+        if ($selectedExternalIds && !in_array($externalId, $selectedExternalIds, true)) {
+            $skipped++;
+            continue;
+        }
+
+        $payload = lomadee_campaign_payload($campaign, $brands, $filters['publish_status']);
         if ($payload === null) {
             $skipped++;
             continue;
@@ -167,7 +307,40 @@ function lomadee_import_campaigns(int $maxPages = 10): array
     ];
 }
 
-function lomadee_campaign_payload(array $campaign, array $brands): ?array
+function lomadee_campaign_passes_filters(array $campaign, array $brand, array $filters): bool
+{
+    $brandId = (string) ($campaign['organizationId'] ?? '');
+    if ($filters['brand_ids'] && !in_array($brandId, $filters['brand_ids'], true)) {
+        return false;
+    }
+
+    $brandName = trim((string) ($brand['name'] ?? ''));
+    $brandSegment = trim((string) ($brand['segment'] ?? ''));
+    $title = trim((string) ($campaign['name'] ?? ''));
+    $description = trim(strip_tags((string) ($campaign['description'] ?? '')));
+    $haystack = strtolower($brandName . ' ' . $brandSegment . ' ' . $title . ' ' . $description);
+
+    if ($filters['brand_query'] !== '' && !$filters['brand_ids'] && !str_contains($haystack, strtolower($filters['brand_query']))) {
+        return false;
+    }
+
+    foreach ($filters['excluded_terms'] as $term) {
+        if ($term !== '' && str_contains($haystack, strtolower($term))) {
+            return false;
+        }
+    }
+
+    if ($filters['categories']) {
+        $category = lomadee_category($campaign, $brand);
+        if (!in_array($category, $filters['categories'], true)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function lomadee_campaign_payload(array $campaign, array $brands, string $status = 'ativo'): ?array
 {
     $organizationId = (string) ($campaign['organizationId'] ?? '');
     $brand = $brands[$organizationId] ?? [];
@@ -193,7 +366,7 @@ function lomadee_campaign_payload(array $campaign, array $brands): ?array
         'banner_url' => lomadee_banner($campaign, $brand),
         'starts_at' => $startsAt,
         'ends_at' => $endsAt,
-        'status' => 'ativo',
+        'status' => $status,
         'featured' => !empty($campaign['isHighlight']) ? 1 : 0,
         'rules' => trim((string) ($campaign['channels'][0]['message'] ?? 'Confira as regras no site parceiro antes de finalizar.')),
         'redemption_type' => $code !== '' ? 'texto_redirect' : 'redirect',
@@ -270,10 +443,50 @@ function lomadee_category(array $campaign, array $brand): string
 {
     $categories = $campaign['categories'] ?? [];
     if (is_array($categories) && !empty($categories[0])) {
-        return trim((string) $categories[0]);
+        return lomadee_site_category(trim((string) $categories[0]));
     }
 
-    return trim((string) ($brand['segment'] ?? 'Ofertas'));
+    return lomadee_site_category(trim((string) ($brand['segment'] ?? 'Ofertas')));
+}
+
+function lomadee_site_category(string $value): string
+{
+    $normalized = strtolower($value);
+    $map = [
+        'food' => 'Alimentacao e Bebidas',
+        'beverage' => 'Alimentacao e Bebidas',
+        'bebida' => 'Alimentacao e Bebidas',
+        'aliment' => 'Alimentacao e Bebidas',
+        'yakisoba' => 'Alimentacao e Bebidas',
+        'restaurant' => 'Alimentacao e Bebidas',
+        'games' => 'Games',
+        'game' => 'Games',
+        'education' => 'Educacao',
+        'educa' => 'Educacao',
+        'course' => 'Educacao',
+        'kids' => 'Kids',
+        'infantil' => 'Kids',
+        'travel' => 'Viagem',
+        'viagem' => 'Viagem',
+        'service' => 'Servicos',
+        'servic' => 'Servicos',
+        'insurance' => 'Servicos',
+        'seguro' => 'Servicos',
+        'entertainment' => 'Entretenimento',
+        'entreten' => 'Entretenimento',
+        'shopping' => 'Compras',
+        'compras' => 'Compras',
+        'fashion' => 'Compras',
+        'moda' => 'Compras',
+    ];
+
+    foreach ($map as $needle => $category) {
+        if (str_contains($normalized, $needle)) {
+            return $category;
+        }
+    }
+
+    return 'Compras';
 }
 
 function lomadee_description(array $campaign, array $brand): string

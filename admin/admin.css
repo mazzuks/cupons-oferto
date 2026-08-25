@@ -1135,6 +1135,166 @@ body {
   color: #94a3b8;
 }
 
+.admin-api-hero .admin-hero-stats {
+  grid-template-columns: repeat(2, minmax(130px, 1fr));
+}
+
+.admin-api-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-api-partner {
+  display: grid;
+  gap: 10px;
+  min-height: 150px;
+  padding: 18px;
+  overflow: hidden;
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.86);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 18px 38px rgba(2, 6, 23, 0.22);
+}
+
+.admin-api-partner.is-active {
+  border-color: rgba(26, 186, 226, 0.42);
+  background:
+    linear-gradient(135deg, rgba(14, 165, 233, 0.16), rgba(15, 23, 42, 0.86)),
+    rgba(15, 23, 42, 0.86);
+}
+
+.admin-api-partner span {
+  justify-self: start;
+  padding: 5px 9px;
+  color: #07111f;
+  background: var(--cyan);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-api-partner:not(.is-active) span {
+  color: #bfdbfe;
+  background: rgba(96, 165, 250, 0.14);
+}
+
+.admin-api-partner strong {
+  color: #ffffff;
+  font-family: Kanit, Inter, sans-serif;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.admin-api-partner p {
+  margin: 0;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.admin-api-workspace {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.72fr) minmax(0, 1.28fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.admin-api-card {
+  min-height: 100%;
+}
+
+.admin-inline-form {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.admin-api-filter-form {
+  gap: 18px;
+}
+
+.admin-segmented-compact {
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+}
+
+.admin-brand-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  max-height: 330px;
+  overflow: auto;
+  padding: 6px;
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 8px;
+}
+
+.admin-brand-picker label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  min-height: 74px;
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 8px;
+}
+
+.admin-brand-picker input {
+  width: 18px;
+  min-height: 18px;
+  margin-top: 3px;
+}
+
+.admin-brand-picker span {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-brand-picker strong {
+  color: #ffffff;
+}
+
+.admin-brand-picker small {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.admin-api-result-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-api-preview {
+  overflow: hidden;
+}
+
+.admin-api-table {
+  min-width: 920px;
+}
+
+.admin-mini-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #dbeafe;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.admin-mini-check input {
+  width: 18px;
+  min-height: 18px;
+}
+
+.coupon-admin-form button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
 @media (max-width: 1100px) {
   .admin-app {
     grid-template-columns: 240px minmax(0, 1fr);
@@ -1149,6 +1309,14 @@ body {
   }
 
   .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-api-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-api-workspace {
     grid-template-columns: 1fr;
   }
 
@@ -1203,5 +1371,14 @@ body {
   .admin-primary-link,
   .admin-secondary-link {
     width: 100%;
+  }
+
+  .admin-api-grid,
+  .admin-api-result-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-inline-form {
+    grid-template-columns: 1fr;
   }
 }

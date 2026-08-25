@@ -1145,6 +1145,59 @@ body {
   gap: 14px;
 }
 
+.admin-api-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.admin-api-hub-card {
+  display: grid;
+  gap: 22px;
+  align-content: space-between;
+  min-height: 260px;
+  padding: 24px;
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.86);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 20px 48px rgba(2, 6, 23, 0.24);
+}
+
+.admin-api-hub-card.is-ready {
+  border-color: rgba(26, 186, 226, 0.32);
+}
+
+.admin-api-hub-card span:first-child {
+  display: inline-flex;
+  width: fit-content;
+  padding: 5px 9px;
+  color: #07111f;
+  background: var(--cyan);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-api-hub-card:not(.is-ready) span:first-child {
+  color: #bfdbfe;
+  background: rgba(96, 165, 250, 0.14);
+}
+
+.admin-api-hub-card h2 {
+  margin: 14px 0 8px;
+  color: #ffffff;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 0.98;
+}
+
+.admin-api-hub-card p {
+  margin: 0;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
 .admin-api-partner {
   display: grid;
   gap: 10px;
@@ -1201,11 +1254,15 @@ body {
   align-items: start;
 }
 
+.admin-api-workspace-split {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .admin-api-card {
   min-height: 100%;
 }
 
-.admin-api-card:last-child {
+.admin-api-workspace:not(.admin-api-workspace-split) .admin-api-card:last-child {
   grid-column: 1 / -1;
 }
 
@@ -1301,6 +1358,21 @@ body {
   font-weight: 800;
 }
 
+.admin-api-roadmap {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-api-roadmap span {
+  display: block;
+  padding: 13px 14px;
+  color: #dbeafe;
+  background: rgba(2, 6, 23, 0.52);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 8px;
+  font-weight: 800;
+}
+
 .admin-api-preview {
   overflow: hidden;
 }
@@ -1349,7 +1421,9 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .admin-api-workspace {
+  .admin-api-hub-grid,
+  .admin-api-workspace,
+  .admin-api-workspace-split {
     grid-template-columns: 1fr;
   }
 

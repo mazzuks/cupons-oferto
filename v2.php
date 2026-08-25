@@ -17,6 +17,13 @@ $featured = array_slice(array_values(array_filter($coupons, fn ($coupon) => (int
 $topCoupons = $featured ?: array_slice($coupons, 0, 6);
 $expiring = expiring_soon_coupons($coupons);
 $guides = all_guides();
+$searchSuggestions = array_values(array_unique(array_filter(array_merge(
+    $categories,
+    array_column($coupons, 'store'),
+    array_column($coupons, 'title'),
+    ['pizza', 'seguro', 'games', 'mercado', 'sorteio', 'promocao', 'cupom']
+))));
+sort($searchSuggestions);
 $defaultCategory = $categories[0] ?? 'Todos';
 $initialCoupons = $defaultCategory === 'Todos'
     ? $coupons
@@ -52,7 +59,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260824-mobile-featured" />
+    <link rel="stylesheet" href="styles.css?v=20260824-search-box" />
   </head>
   <body class="site-v2 site-v2-compact">
     <header class="site-header v2-compact-header">
@@ -82,7 +89,19 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         </div>
         <label class="v2-hero-search">
           <span>Procure sua loja, produto ou cupom</span>
-          <input id="coupon-search" type="search" placeholder="Pizza, seguros, games, mercado..." />
+          <div class="v2-search-control">
+            <input id="coupon-search" type="search" list="coupon-search-suggestions" placeholder="Pizza, seguros, games, mercado..." autocomplete="off" />
+            <button id="coupon-search-submit" type="button" aria-label="Buscar ofertas">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10.8 18.1a7.3 7.3 0 1 1 0-14.6 7.3 7.3 0 0 1 0 14.6Zm5.4-1.9 4.3 4.3" />
+              </svg>
+            </button>
+          </div>
+          <datalist id="coupon-search-suggestions">
+            <?php foreach (array_slice($searchSuggestions, 0, 40) as $suggestion): ?>
+              <option value="<?= e($suggestion) ?>"></option>
+            <?php endforeach; ?>
+          </datalist>
           <small>Exemplo: pizza, seguro, games, mercado ou o nome de uma loja.</small>
         </label>
       </section>
@@ -252,6 +271,27 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <span>Ambiente de teste, sem alterar a home atual.</span>
     </footer>
     <script src="php-site.js?v=20260824-v2-filter-default"></script>
+    <script>
+      (() => {
+        const search = document.querySelector("#coupon-search");
+        const submit = document.querySelector("#coupon-search-submit");
+        const goToResults = () => {
+          search?.dispatchEvent(new Event("input", { bubbles: true }));
+          document.querySelector("#cupons")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        };
+
+        search?.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter") return;
+          event.preventDefault();
+          goToResults();
+        });
+
+        submit?.addEventListener("click", () => {
+          search?.focus();
+          goToResults();
+        });
+      })();
+    </script>
     <script src="pwa.js"></script>
   </body>
 </html>

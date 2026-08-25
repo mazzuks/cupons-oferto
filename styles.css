@@ -1448,15 +1448,65 @@ h3 {
   line-height: 1.35;
 }
 
+.site-v2-compact .v2-search-control {
+  position: relative;
+}
+
 .site-v2-compact .v2-hero-search input {
   width: 100%;
   min-height: 50px;
-  padding: 0 14px;
+  padding: 0 58px 0 14px;
   color: var(--ink);
   background: #f8fbff;
   border: 1px solid var(--line);
   border-radius: 8px;
   font: inherit;
+}
+
+.site-v2-compact .v2-hero-search input:focus {
+  outline: 3px solid rgba(24, 183, 221, 0.22);
+  border-color: var(--cyan);
+  background: #ffffff;
+}
+
+.site-v2-compact .v2-search-control button {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: #ffffff;
+  background: var(--blue);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: 0 10px 20px rgba(25, 76, 140, 0.22);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.site-v2-compact .v2-search-control button:hover,
+.site-v2-compact .v2-search-control button:focus-visible {
+  background: var(--navy);
+  box-shadow: 0 12px 24px rgba(22, 42, 78, 0.28);
+  transform: translateY(-50%) scale(1.04);
+}
+
+.site-v2-compact .v2-search-control button:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+.site-v2-compact .v2-search-control svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.6;
 }
 
 .site-v2-compact .v2-quick-bar {

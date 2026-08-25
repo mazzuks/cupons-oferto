@@ -16,7 +16,9 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $endDate)) {
 }
 
 $summary = click_report_summary($startDate, $endDate);
+$conversionSummary = conversion_report_summary($startDate, $endDate);
 $rows = click_report_rows($startDate, $endDate);
+$conversionRows = conversion_report_rows($startDate, $endDate);
 
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     header('Content-Type: text/csv; charset=utf-8');
@@ -91,6 +93,11 @@ function format_report_date(?string $date): string
           <strong class="admin-kpi-text"><?= e($summary['top_offer'] ?: '-') ?></strong>
           <small>Maior volume no periodo</small>
         </article>
+        <article class="admin-kpi-card">
+          <span>Conversoes</span>
+          <strong><?= (int) $conversionSummary['total_conversions'] ?></strong>
+          <small>R$ <?= number_format((float) $conversionSummary['total_commission'], 2, ',', '.') ?> em comissao</small>
+        </article>
       </section>
 
       <section class="admin-panel">
@@ -136,6 +143,50 @@ function format_report_date(?string $date): string
               <?php if (!$rows): ?>
                 <tr>
                   <td colspan="10" class="admin-empty-cell">Nenhuma oferta encontrada.</td>
+                </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admin-panel">
+        <div class="section-heading admin-section-heading">
+          <div>
+            <p class="section-kicker">Vendas e comissoes</p>
+            <h2>Conversoes por parceiro</h2>
+          </div>
+          <span><?= count($conversionRows) ?> itens</span>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table admin-report-table">
+            <thead>
+              <tr>
+                <th>Parceiro</th>
+                <th>Oferta</th>
+                <th>Status</th>
+                <th>Conversoes</th>
+                <th>Vendas</th>
+                <th>Comissao</th>
+                <th>Ultima conversao</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($conversionRows as $row): ?>
+                <tr>
+                  <td><?= e($row['partner']) ?></td>
+                  <td><strong><?= e($row['store'] ?: '-') ?></strong><br /><span><?= e($row['title'] ?: '-') ?></span></td>
+                  <td><span class="status-pill status-rascunho"><?= e($row['status']) ?></span></td>
+                  <td><strong><?= (int) $row['total_conversions'] ?></strong></td>
+                  <td>R$ <?= number_format((float) $row['total_sales'], 2, ',', '.') ?></td>
+                  <td>R$ <?= number_format((float) $row['total_commission'], 2, ',', '.') ?></td>
+                  <td><?= e(format_report_date($row['last_conversion_at'])) ?></td>
+                </tr>
+              <?php endforeach; ?>
+              <?php if (!$conversionRows): ?>
+                <tr>
+                  <td colspan="7" class="admin-empty-cell">Nenhuma conversao sincronizada ainda.</td>
                 </tr>
               <?php endif; ?>
             </tbody>

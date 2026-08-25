@@ -102,6 +102,7 @@ function ensure_database(PDO $pdo): void
     $pdo->exec("CREATE TABLE IF NOT EXISTS coupon_clicks (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         coupon_id INT UNSIGNED NOT NULL,
+        click_ref VARCHAR(120) DEFAULT NULL,
         event_type VARCHAR(40) NOT NULL DEFAULT 'cta',
         referer VARCHAR(500) DEFAULT NULL,
         user_agent VARCHAR(500) DEFAULT NULL,
@@ -109,8 +110,12 @@ function ensure_database(PDO $pdo): void
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY coupon_clicks_coupon_idx (coupon_id, created_at),
-        KEY coupon_clicks_event_idx (event_type, created_at)
+        KEY coupon_clicks_event_idx (event_type, created_at),
+        KEY coupon_clicks_ref_idx (click_ref)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    ensure_click_columns($pdo);
+    ensure_integration_tables($pdo);
 
     $couponCount = (int) $pdo->query('SELECT COUNT(*) FROM coupons')->fetchColumn();
     if ($couponCount > 0) {
@@ -160,9 +165,80 @@ function ensure_coupon_columns(PDO $pdo): void
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 
+function ensure_click_columns(PDO $pdo): void
+{
+    if (!coupon_click_column_exists($pdo, 'click_ref')) {
+        $pdo->exec('ALTER TABLE coupon_clicks ADD click_ref VARCHAR(120) DEFAULT NULL AFTER coupon_id');
+    }
+}
+
+function ensure_integration_tables(PDO $pdo): void
+{
+    $pdo->exec("CREATE TABLE IF NOT EXISTS integration_watchlist (
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        partner VARCHAR(60) NOT NULL,
+        external_id VARCHAR(190) NOT NULL,
+        source_id VARCHAR(120) DEFAULT NULL,
+        brand_id VARCHAR(120) DEFAULT NULL,
+        store VARCHAR(160) NOT NULL,
+        title VARCHAR(220) NOT NULL,
+        status ENUM('monitorado', 'sumiu', 'pausado') NOT NULL DEFAULT 'monitorado',
+        last_seen_at TIMESTAMP NULL DEFAULT NULL,
+        missing_since TIMESTAMP NULL DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY integration_watch_unique (partner, external_id),
+        KEY integration_watch_status_idx (partner, status)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS admin_notifications (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        type VARCHAR(60) NOT NULL,
+        title VARCHAR(180) NOT NULL,
+        body TEXT NOT NULL,
+        partner VARCHAR(60) DEFAULT NULL,
+        external_id VARCHAR(190) DEFAULT NULL,
+        read_at TIMESTAMP NULL DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY admin_notifications_read_idx (read_at, created_at),
+        KEY admin_notifications_partner_idx (partner, external_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS affiliate_conversions (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        partner VARCHAR(60) NOT NULL,
+        external_conversion_id VARCHAR(190) NOT NULL,
+        coupon_id INT UNSIGNED DEFAULT NULL,
+        external_id VARCHAR(190) DEFAULT NULL,
+        click_ref VARCHAR(120) DEFAULT NULL,
+        store VARCHAR(160) DEFAULT NULL,
+        status VARCHAR(60) NOT NULL DEFAULT 'pending',
+        sale_amount DECIMAL(12,2) DEFAULT NULL,
+        commission_amount DECIMAL(12,2) DEFAULT NULL,
+        currency VARCHAR(10) DEFAULT NULL,
+        conversion_at DATETIME DEFAULT NULL,
+        raw_json MEDIUMTEXT DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY affiliate_conversions_unique (partner, external_conversion_id),
+        KEY affiliate_conversions_coupon_idx (coupon_id, conversion_at),
+        KEY affiliate_conversions_partner_idx (partner, conversion_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
 function coupon_column_exists(PDO $pdo, string $column): bool
 {
     $statement = $pdo->prepare("SHOW COLUMNS FROM coupons LIKE ?");
+    $statement->execute([$column]);
+    return (bool) $statement->fetch();
+}
+
+function coupon_click_column_exists(PDO $pdo, string $column): bool
+{
+    $statement = $pdo->prepare("SHOW COLUMNS FROM coupon_clicks LIKE ?");
     $statement->execute([$column]);
     return (bool) $statement->fetch();
 }

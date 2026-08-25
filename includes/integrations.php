@@ -29,9 +29,161 @@ function save_integration_setting(string $key, string $value): void
     $statement->execute([$key, $value]);
 }
 
+function integration_json_setting(string $key, array $default = []): array
+{
+    $raw = integration_setting($key, '');
+    if ($raw === '') {
+        return $default;
+    }
+
+    $decoded = json_decode($raw, true);
+    return is_array($decoded) ? $decoded : $default;
+}
+
+function save_integration_json_setting(string $key, array $value): void
+{
+    save_integration_setting($key, json_encode($value, JSON_UNESCAPED_SLASHES));
+}
+
+function integration_profile(string $partner, array $default = []): array
+{
+    return integration_json_setting('profile_' . strtolower($partner), $default);
+}
+
+function save_integration_profile(string $partner, array $filters): void
+{
+    save_integration_json_setting('profile_' . strtolower($partner), $filters);
+}
+
 function text_contains(string $haystack, string $needle): bool
 {
     return $needle === '' || strpos($haystack, $needle) !== false;
+}
+
+function create_admin_notification(string $type, string $title, string $body, string $partner = '', string $externalId = ''): void
+{
+    $pdo = db();
+    if (!$pdo) {
+        return;
+    }
+
+    $recent = $pdo->prepare("SELECT id FROM admin_notifications
+        WHERE type = ? AND partner = ? AND external_id = ?
+          AND created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+        LIMIT 1");
+    $recent->execute([$type, $partner, $externalId]);
+    if ($recent->fetch()) {
+        return;
+    }
+
+    $statement = $pdo->prepare('INSERT INTO admin_notifications (type, title, body, partner, external_id) VALUES (?, ?, ?, ?, ?)');
+    $statement->execute([$type, $title, $body, $partner ?: null, $externalId ?: null]);
+}
+
+function admin_notifications(int $limit = 30, bool $onlyUnread = false): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return [];
+    }
+
+    $where = $onlyUnread ? 'WHERE read_at IS NULL' : '';
+    $statement = $pdo->prepare("SELECT * FROM admin_notifications $where ORDER BY created_at DESC LIMIT ?");
+    $statement->bindValue(1, $limit, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetchAll();
+}
+
+function unread_notification_count(): int
+{
+    $pdo = db();
+    if (!$pdo) {
+        return 0;
+    }
+
+    return (int) $pdo->query('SELECT COUNT(*) FROM admin_notifications WHERE read_at IS NULL')->fetchColumn();
+}
+
+function mark_notifications_read(): void
+{
+    $pdo = db();
+    if (!$pdo) {
+        return;
+    }
+
+    $pdo->exec('UPDATE admin_notifications SET read_at = COALESCE(read_at, NOW()) WHERE read_at IS NULL');
+}
+
+function monitor_integration_offer(string $partner, array $payload, string $sourceId = '', string $brandId = ''): void
+{
+    $pdo = db();
+    if (!$pdo || empty($payload['external_id'])) {
+        return;
+    }
+
+    $statement = $pdo->prepare("INSERT INTO integration_watchlist
+        (partner, external_id, source_id, brand_id, store, title, status, last_seen_at, missing_since)
+        VALUES (?, ?, ?, ?, ?, ?, 'monitorado', NOW(), NULL)
+        ON DUPLICATE KEY UPDATE
+          source_id = VALUES(source_id),
+          brand_id = VALUES(brand_id),
+          store = VALUES(store),
+          title = VALUES(title),
+          status = 'monitorado',
+          last_seen_at = NOW(),
+          missing_since = NULL");
+    $statement->execute([
+        $partner,
+        $payload['external_id'],
+        $sourceId ?: null,
+        $brandId ?: null,
+        $payload['store'] ?? '',
+        $payload['title'] ?? '',
+    ]);
+}
+
+function monitored_integration_offers(string $partner): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return [];
+    }
+
+    $statement = $pdo->prepare("SELECT * FROM integration_watchlist WHERE partner = ? AND status IN ('monitorado', 'sumiu') ORDER BY store ASC, title ASC");
+    $statement->execute([$partner]);
+    return $statement->fetchAll();
+}
+
+function mark_monitor_seen(string $partner, string $externalId): void
+{
+    $pdo = db();
+    if (!$pdo) {
+        return;
+    }
+
+    $statement = $pdo->prepare("UPDATE integration_watchlist SET status = 'monitorado', last_seen_at = NOW(), missing_since = NULL WHERE partner = ? AND external_id = ?");
+    $statement->execute([$partner, $externalId]);
+}
+
+function mark_monitor_missing(array $watch): void
+{
+    $pdo = db();
+    if (!$pdo) {
+        return;
+    }
+
+    $statement = $pdo->prepare("UPDATE integration_watchlist
+        SET status = 'sumiu', missing_since = COALESCE(missing_since, NOW())
+        WHERE id = ?");
+    $statement->execute([(int) $watch['id']]);
+
+    create_admin_notification(
+        'campaign_missing',
+        'Campanha saiu do feed',
+        ($watch['store'] ?? 'Parceiro') . ' - ' . ($watch['title'] ?? 'campanha') . ' nao apareceu na ultima sincronizacao.',
+        (string) $watch['partner'],
+        (string) $watch['external_id']
+    );
 }
 
 function lomadee_api_key(): string
@@ -334,6 +486,7 @@ function awin_import_offers(array $filters = []): array
 
         $existing = coupon_by_external_id($payload['external_id']);
         save_coupon($payload, $existing ? (int) $existing['id'] : null);
+        monitor_integration_offer('Lomadee', $payload, (string) $campaign['id'], (string) ($campaign['organizationId'] ?? ''));
         $existing ? $updated++ : $created++;
     }
 
@@ -708,6 +861,7 @@ function lomadee_import_campaigns(int $maxPages = 10, array $filters = []): arra
 
         $existing = coupon_by_external_id($payload['external_id']);
         save_coupon($payload, $existing ? (int) $existing['id'] : null);
+        monitor_integration_offer('Awin', $payload, (string) $offer['promotionId'], (string) (($offer['advertiser']['id'] ?? '') ?: ''));
         $existing ? $updated++ : $created++;
     }
 
@@ -717,6 +871,93 @@ function lomadee_import_campaigns(int $maxPages = 10, array $filters = []): arra
         'skipped' => $skipped,
         'total' => count($campaigns),
     ];
+}
+
+function sync_lomadee_watchlist(): array
+{
+    $profile = integration_profile('lomadee', []);
+    $filters = lomadee_normalize_filters($profile);
+    $brands = lomadee_brand_map(max($filters['max_pages'], 20));
+    $campaigns = lomadee_fetch_all('/affiliate/campaigns', [
+        'types' => implode(',', $filters['types']),
+        'status' => 'onTime',
+    ], $filters['max_pages']);
+    $seen = [];
+    $updated = 0;
+    $missing = 0;
+
+    foreach ($campaigns as $campaign) {
+        if (!is_array($campaign) || empty($campaign['id'])) {
+            continue;
+        }
+        $externalId = 'lomadee:' . (string) $campaign['id'];
+        $seen[$externalId] = true;
+
+        $payload = lomadee_campaign_payload($campaign, $brands, $filters['publish_status']);
+        if ($payload && coupon_by_external_id($externalId)) {
+            save_coupon($payload, (int) coupon_by_external_id($externalId)['id']);
+            mark_monitor_seen('Lomadee', $externalId);
+            $updated++;
+        }
+    }
+
+    foreach (monitored_integration_offers('Lomadee') as $watch) {
+        if (empty($seen[(string) $watch['external_id']])) {
+            mark_monitor_missing($watch);
+            $missing++;
+        }
+    }
+
+    return ['partner' => 'Lomadee', 'updated' => $updated, 'missing' => $missing, 'read' => count($campaigns)];
+}
+
+function sync_awin_watchlist(): array
+{
+    $profile = integration_profile('awin', []);
+    $filters = awin_normalize_filters($profile);
+    $offers = awin_promotions($filters);
+    $seen = [];
+    $updated = 0;
+    $missing = 0;
+
+    foreach ($offers as $offer) {
+        if (!is_array($offer) || empty($offer['promotionId'])) {
+            continue;
+        }
+        $externalId = 'awin:' . (string) $offer['promotionId'];
+        $seen[$externalId] = true;
+
+        $payload = awin_offer_payload($offer, $filters['publish_status']);
+        if ($payload && coupon_by_external_id($externalId)) {
+            save_coupon($payload, (int) coupon_by_external_id($externalId)['id']);
+            mark_monitor_seen('Awin', $externalId);
+            $updated++;
+        }
+    }
+
+    foreach (monitored_integration_offers('Awin') as $watch) {
+        if (empty($seen[(string) $watch['external_id']])) {
+            mark_monitor_missing($watch);
+            $missing++;
+        }
+    }
+
+    return ['partner' => 'Awin', 'updated' => $updated, 'missing' => $missing, 'read' => count($offers)];
+}
+
+function sync_all_integrations(): array
+{
+    $results = [];
+    foreach (['Lomadee' => 'sync_lomadee_watchlist', 'Awin' => 'sync_awin_watchlist'] as $partner => $callback) {
+        try {
+            $results[] = $callback();
+        } catch (Throwable $exception) {
+            create_admin_notification('sync_error', 'Erro ao sincronizar ' . $partner, $exception->getMessage(), $partner);
+            $results[] = ['partner' => $partner, 'error' => $exception->getMessage()];
+        }
+    }
+
+    return $results;
 }
 
 function lomadee_campaign_passes_filters(array $campaign, array $brand, array $filters): bool

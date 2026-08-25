@@ -36,7 +36,7 @@ function awin_posted_filters(): array
     ];
 }
 
-$filters = awin_normalize_filters([
+$filters = awin_normalize_filters(integration_profile('awin', [
     'page' => 1,
     'page_size' => 50,
     'type' => 'all',
@@ -45,7 +45,7 @@ $filters = awin_normalize_filters([
     'region' => 'BR',
     'excluded_terms' => awin_default_excluded_terms(),
     'publish_status' => 'rascunho',
-]);
+]));
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -70,6 +70,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'preview_awin') {
             $previewResult = awin_preview_offers($filters);
             $success = 'Previa da Awin carregada.';
+        }
+
+        if ($action === 'save_awin_defaults') {
+            save_integration_profile('awin', $filters);
+            $success = 'Padrao da Awin salvo para proximas buscas e sincronizacoes.';
         }
 
         if ($action === 'import_awin') {
@@ -157,7 +162,6 @@ $awinPublisherName = awin_publisher_name();
 
           <form method="post" class="coupon-admin-form admin-api-filter-form">
             <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
-            <input type="hidden" name="action" value="preview_awin" />
 
             <div class="admin-two-cols admin-two-cols-wide-left">
               <label>Buscar anunciante ou oferta
@@ -227,7 +231,8 @@ $awinPublisherName = awin_publisher_name();
             </div>
 
             <div class="admin-actions">
-              <button type="submit">Buscar ofertas da Awin</button>
+              <button type="submit" name="action" value="preview_awin">Buscar ofertas da Awin</button>
+              <button type="submit" name="action" value="save_awin_defaults">Salvar como padrao</button>
             </div>
           </form>
         </section>

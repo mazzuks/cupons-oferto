@@ -33,13 +33,13 @@ function posted_filters(): array
     ];
 }
 
-$filters = lomadee_normalize_filters([
+$filters = lomadee_normalize_filters(integration_profile('lomadee', [
     'max_pages' => 20,
     'types' => array_keys(lomadee_campaign_type_options()),
     'categories' => [],
     'excluded_terms' => 'BANNERS:',
     'publish_status' => 'rascunho',
-]);
+]));
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -59,6 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'preview_lomadee' || $action === 'import_lomadee') {
             $brandOptions = lomadee_brand_options($filters['brand_query'], 30);
+        }
+
+        if ($action === 'save_lomadee_defaults') {
+            save_integration_profile('lomadee', $filters);
+            $success = 'Padrao da Lomadee salvo para proximas buscas e sincronizacoes.';
         }
 
         if ($action === 'preview_lomadee') {
@@ -132,7 +137,6 @@ $maskedKey = $savedKey === '' ? 'Nao configurada' : substr($savedKey, 0, 14) . s
 
           <form method="post" class="coupon-admin-form admin-api-filter-form">
             <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
-            <input type="hidden" name="action" value="preview_lomadee" />
 
             <div class="admin-two-cols admin-two-cols-wide-left">
               <label>Buscar marca
@@ -201,7 +205,8 @@ $maskedKey = $savedKey === '' ? 'Nao configurada' : substr($savedKey, 0, 14) . s
             </div>
 
             <div class="admin-actions">
-              <button type="submit">Buscar campanhas</button>
+              <button type="submit" name="action" value="preview_lomadee">Buscar campanhas</button>
+              <button type="submit" name="action" value="save_lomadee_defaults">Salvar como padrao</button>
             </div>
           </form>
         </section>

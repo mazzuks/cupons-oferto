@@ -304,11 +304,11 @@ function delete_coupon(int $id): void
     $statement->execute([$id]);
 }
 
-function log_coupon_click(int $couponId, string $eventType): void
+function log_coupon_click(int $couponId, string $eventType): string
 {
     $pdo = db();
     if (!$pdo) {
-        return;
+        return '';
     }
 
     $eventType = preg_replace('/[^a-z0-9_\-]/i', '', $eventType) ?: 'cta';
@@ -316,13 +316,16 @@ function log_coupon_click(int $couponId, string $eventType): void
     $userAgent = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500);
     $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
     $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . session_id()) : null;
+    $clickRef = 'oferto_' . $couponId . '_' . bin2hex(random_bytes(8));
 
     try {
-        $statement = $pdo->prepare('INSERT INTO coupon_clicks (coupon_id, event_type, referer, user_agent, ip_hash) VALUES (?, ?, ?, ?, ?)');
-        $statement->execute([$couponId, $eventType, $referer, $userAgent, $ipHash]);
+        $statement = $pdo->prepare('INSERT INTO coupon_clicks (coupon_id, click_ref, event_type, referer, user_agent, ip_hash) VALUES (?, ?, ?, ?, ?, ?)');
+        $statement->execute([$couponId, $clickRef, $eventType, $referer, $userAgent, $ipHash]);
     } catch (Throwable $error) {
-        return;
+        return '';
     }
+
+    return $clickRef;
 }
 
 function coupon_go_url(array $coupon, string $eventType = 'cta'): string
@@ -375,6 +378,60 @@ function click_report_summary(string $startDate, string $endDate): array
         'active_offers' => (int) ($summary['active_offers'] ?? 0),
         'top_offer' => $topOffer ? $topOffer['store'] . ' - ' . $topOffer['title'] : '',
     ];
+}
+
+function conversion_report_summary(string $startDate, string $endDate): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return ['total_conversions' => 0, 'total_sales' => 0, 'total_commission' => 0, 'approved_commission' => 0];
+    }
+
+    $statement = $pdo->prepare("SELECT
+            COUNT(*) AS total_conversions,
+            COALESCE(SUM(sale_amount), 0) AS total_sales,
+            COALESCE(SUM(commission_amount), 0) AS total_commission,
+            COALESCE(SUM(CASE WHEN status IN ('approved', 'confirmed', 'paid') THEN commission_amount ELSE 0 END), 0) AS approved_commission
+        FROM affiliate_conversions
+        WHERE conversion_at >= :start_date
+          AND conversion_at < DATE_ADD(:end_date, INTERVAL 1 DAY)");
+    $statement->execute(['start_date' => $startDate, 'end_date' => $endDate]);
+    $row = $statement->fetch() ?: [];
+
+    return [
+        'total_conversions' => (int) ($row['total_conversions'] ?? 0),
+        'total_sales' => (float) ($row['total_sales'] ?? 0),
+        'total_commission' => (float) ($row['total_commission'] ?? 0),
+        'approved_commission' => (float) ($row['approved_commission'] ?? 0),
+    ];
+}
+
+function conversion_report_rows(string $startDate, string $endDate): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return [];
+    }
+
+    $statement = $pdo->prepare("SELECT
+            ac.partner,
+            ac.store,
+            ac.status,
+            COUNT(*) AS total_conversions,
+            COALESCE(SUM(ac.sale_amount), 0) AS total_sales,
+            COALESCE(SUM(ac.commission_amount), 0) AS total_commission,
+            MAX(ac.conversion_at) AS last_conversion_at,
+            c.title,
+            c.category
+        FROM affiliate_conversions ac
+        LEFT JOIN coupons c ON c.id = ac.coupon_id
+        WHERE ac.conversion_at >= :start_date
+          AND ac.conversion_at < DATE_ADD(:end_date, INTERVAL 1 DAY)
+        GROUP BY ac.partner, ac.store, ac.status, c.title, c.category
+        ORDER BY total_commission DESC, total_conversions DESC");
+    $statement->execute(['start_date' => $startDate, 'end_date' => $endDate]);
+
+    return $statement->fetchAll();
 }
 
 function click_report_rows(string $startDate, string $endDate): array

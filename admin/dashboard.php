@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/coupons.php';
+require_once __DIR__ . '/../includes/integrations.php';
 require_once __DIR__ . '/layout.php';
 
 require_admin();
@@ -15,6 +16,8 @@ $membersOnlyCoupons = array_filter($coupons, fn ($coupon) => (int) ($coupon['mem
 $today = date('Y-m-d');
 $startDate = date('Y-m-d', strtotime('-30 days'));
 $summary = click_report_summary($startDate, $today);
+$conversionSummary = conversion_report_summary($startDate, $today);
+$unreadNotifications = unread_notification_count();
 $rows = click_report_rows($startDate, $today);
 $topOffer = $rows[0] ?? null;
 ?>
@@ -43,14 +46,14 @@ $topOffer = $rows[0] ?? null;
           <small><?= (int) $summary['unique_users'] ?> usuarios unicos</small>
         </article>
         <article class="admin-kpi-card">
-          <span>Patrocinadas</span>
-          <strong><?= count($sponsoredCoupons) ?></strong>
-          <small>Campanhas com prioridade comercial</small>
+          <span>Conversoes</span>
+          <strong><?= (int) $conversionSummary['total_conversions'] ?></strong>
+          <small>R$ <?= number_format((float) $conversionSummary['total_commission'], 2, ',', '.') ?> em comissao rastreada</small>
         </article>
         <article class="admin-kpi-card">
-          <span>Somente logados</span>
-          <strong><?= count($membersOnlyCoupons) ?></strong>
-          <small>Preparadas para fidelizacao futura</small>
+          <span>Alertas</span>
+          <strong><?= (int) $unreadNotifications ?></strong>
+          <small>Notificacoes nao lidas das integracoes</small>
         </article>
       </section>
 
@@ -70,6 +73,10 @@ $topOffer = $rows[0] ?? null;
             <a href="relatorios.php" class="admin-shortcut">
               <strong>Analisar performance</strong>
               <span>Compare cliques por oferta, parceiro e tipo.</span>
+            </a>
+            <a href="notificacoes.php" class="admin-shortcut">
+              <strong>Ver notificacoes</strong>
+              <span>Campanhas que sumiram, erros de API e alertas da cron.</span>
             </a>
             <a href="usuarios.php" class="admin-shortcut">
               <strong>Gerenciar usuarios</strong>

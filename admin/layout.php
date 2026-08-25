@@ -8,6 +8,7 @@ function admin_nav_items(): array
         ['key' => 'dashboard', 'label' => 'Dashboard', 'hint' => 'Visao geral', 'href' => 'dashboard.php'],
         ['key' => 'ofertas', 'label' => 'Ofertas', 'hint' => 'Cupons e campanhas', 'href' => 'index.php'],
         ['key' => 'apis', 'label' => 'APIs', 'hint' => 'Parceiros e feeds', 'href' => 'apis.php'],
+        ['key' => 'notificacoes', 'label' => 'Notificacoes', 'hint' => 'Alertas do sistema', 'href' => 'notificacoes.php'],
         ['key' => 'relatorios', 'label' => 'Relatorios', 'hint' => 'Cliques e CSV', 'href' => 'relatorios.php'],
         ['key' => 'usuarios', 'label' => 'Usuarios', 'hint' => 'Acessos do CRM', 'href' => 'usuarios.php'],
         ['key' => 'site', 'label' => 'Ver site', 'hint' => 'Vitrine publica', 'href' => '../index.php'],
@@ -28,7 +29,7 @@ function admin_layout_start(string $title, string $activeKey, string $eyebrow = 
     <link rel="icon" href="../assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
     <link rel="stylesheet" href="../styles.css?v=20260824-campaign-flow" />
-    <link rel="stylesheet" href="admin.css?v=20260825-api-screens" />
+    <link rel="stylesheet" href="admin.css?v=20260825-monitoring" />
   </head>
   <body>
     <div class="admin-app">

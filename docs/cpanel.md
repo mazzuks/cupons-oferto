@@ -83,11 +83,33 @@ O painel permite:
 
 Somente cupons `ativo`, com `inicio <= hoje` e `fim >= hoje`, aparecem no site.
 
-## 6. Integracao Lomadee
+## 6. Integracoes de afiliados
 
-No CRM, acesse `APIs`, cole a chave da Lomadee e use `Importar da Lomadee`.
+No CRM, acesse `APIs`. Cada parceiro tem sua propria tela:
 
-A chave nao deve ser salva no GitHub. Ela fica no banco do servidor ou, se preferir, no `includes/config.php` fora do repositorio.
+- `Lomadee`: chave, busca de marcas, filtros, selecao de campanhas e importacao.
+- `Awin`: token, publisher, filtros, busca de ofertas e sincronizacao.
+
+As chaves nao devem ser salvas no GitHub. Elas ficam no banco do servidor ou, se preferir, no `includes/config.php` fora do repositorio.
+
+Quando uma oferta e importada por uma API, ela entra na lista de monitoramento. A sincronizacao diaria confere se ela continua aparecendo no feed do parceiro.
+
+## 7. Cron diaria
+
+No cPanel, abra **Cron Jobs** e crie uma tarefa diaria a meia-noite:
+
+```bash
+0 0 * * * /usr/local/bin/php /home/USUARIO/cupons-oferto/scripts/sync-integrations.php
+```
+
+Troque `/home/USUARIO/cupons-oferto` pela pasta real do clone no servidor.
+
+Essa cron:
+
+- atualiza campanhas monitoradas;
+- marca campanhas que sumiram do feed;
+- cria notificacoes no CRM;
+- registra erros de API em `Notificacoes`.
 
 ## Observacao sobre categorias
 

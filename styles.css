@@ -1820,8 +1820,35 @@ h3 {
     min-height: 48px;
   }
 
+  .site-v2-compact .v2-local-filters {
+    gap: 10px;
+    margin: 0 16px 16px;
+    padding: 12px;
+    overflow: hidden;
+  }
+
   .site-v2-compact .v2-category-strip,
-  .site-v2-compact .v2-type-strip,
+  .site-v2-compact .v2-type-strip {
+    gap: 8px;
+    margin: 0 -12px;
+    padding: 0 12px 2px;
+    scroll-padding-inline: 12px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .site-v2-compact .v2-local-filters .category-chip {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding-inline: 18px;
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+
+  .site-v2-compact .v2-local-filters .category-chip:last-child {
+    margin-right: 18px;
+  }
+
   .site-v2-compact .v2-section,
   .site-v2-compact .v2-layout,
   .site-v2-compact .v2-guides-compact {

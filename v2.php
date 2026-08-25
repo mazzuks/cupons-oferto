@@ -52,7 +52,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260824-mobile-quickbar" />
+    <link rel="stylesheet" href="styles.css?v=20260824-mobile-filters" />
   </head>
   <body class="site-v2 site-v2-compact">
     <header class="site-header v2-compact-header">

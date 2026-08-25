@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS coupons (
   tags VARCHAR(500) DEFAULT NULL,
   requirements VARCHAR(220) DEFAULT NULL,
   pixel_event VARCHAR(120) DEFAULT NULL,
+  external_id VARCHAR(190) DEFAULT NULL,
   members_only TINYINT(1) NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -53,6 +54,13 @@ CREATE TABLE IF NOT EXISTS coupon_clicks (
   PRIMARY KEY (id),
   KEY coupon_clicks_coupon_idx (coupon_id, created_at),
   KEY coupon_clicks_event_idx (event_type, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS integration_settings (
+  setting_key VARCHAR(120) NOT NULL,
+  setting_value TEXT DEFAULT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (setting_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO coupons

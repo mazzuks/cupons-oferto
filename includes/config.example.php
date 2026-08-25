@@ -13,4 +13,9 @@ return [
         'upload_dir' => dirname(__DIR__) . '/uploads/cupons',
         'upload_url' => 'uploads/cupons',
     ],
+    'integrations' => [
+        'lomadee' => [
+            'api_key' => '',
+        ],
+    ],
 ];

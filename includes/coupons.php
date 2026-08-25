@@ -261,6 +261,7 @@ function save_coupon(array $data, ?int $id = null): void
         'tags',
         'requirements',
         'pixel_event',
+        'external_id',
         'members_only',
     ];
 
@@ -276,6 +277,20 @@ function save_coupon(array $data, ?int $id = null): void
     $params = ':' . implode(', :', $fields);
     $statement = $pdo->prepare("INSERT INTO coupons ($columns) VALUES ($params)");
     $statement->execute($data);
+}
+
+function coupon_by_external_id(string $externalId): ?array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return null;
+    }
+
+    $statement = $pdo->prepare('SELECT * FROM coupons WHERE external_id = ? LIMIT 1');
+    $statement->execute([$externalId]);
+    $coupon = $statement->fetch();
+
+    return $coupon ?: null;
 }
 
 function delete_coupon(int $id): void

@@ -83,6 +83,12 @@ O painel permite:
 
 Somente cupons `ativo`, com `inicio <= hoje` e `fim >= hoje`, aparecem no site.
 
+## 6. Integracao Lomadee
+
+No CRM, acesse `APIs`, cole a chave da Lomadee e use `Importar da Lomadee`.
+
+A chave nao deve ser salva no GitHub. Ela fica no banco do servidor ou, se preferir, no `includes/config.php` fora do repositorio.
+
 ## Observacao sobre categorias
 
 Use categorias consistentes. Exemplo: Ruffles, snacks, bebidas, restaurantes e delivery entram em `Alimentação e Bebidas`.

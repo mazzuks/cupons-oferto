@@ -88,6 +88,7 @@ function ensure_database(PDO $pdo): void
         tags VARCHAR(500) DEFAULT NULL,
         requirements VARCHAR(220) DEFAULT NULL,
         pixel_event VARCHAR(120) DEFAULT NULL,
+        external_id VARCHAR(190) DEFAULT NULL,
         members_only TINYINT(1) NOT NULL DEFAULT 0,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -141,6 +142,7 @@ function ensure_coupon_columns(PDO $pdo): void
         'tags' => "ALTER TABLE coupons ADD tags VARCHAR(500) DEFAULT NULL AFTER priority",
         'requirements' => "ALTER TABLE coupons ADD requirements VARCHAR(220) DEFAULT NULL AFTER tags",
         'pixel_event' => "ALTER TABLE coupons ADD pixel_event VARCHAR(120) DEFAULT NULL AFTER requirements",
+        'external_id' => "ALTER TABLE coupons ADD external_id VARCHAR(190) DEFAULT NULL AFTER pixel_event",
         'members_only' => "ALTER TABLE coupons ADD members_only TINYINT(1) NOT NULL DEFAULT 0 AFTER pixel_event",
     ];
 
@@ -149,6 +151,13 @@ function ensure_coupon_columns(PDO $pdo): void
             $pdo->exec($sql);
         }
     }
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS integration_settings (
+        setting_key VARCHAR(120) NOT NULL,
+        setting_value TEXT DEFAULT NULL,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (setting_key)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 
 function coupon_column_exists(PDO $pdo, string $column): bool

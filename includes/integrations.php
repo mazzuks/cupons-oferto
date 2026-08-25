@@ -161,6 +161,286 @@ function awin_connect_first_publisher(): array
     ];
 }
 
+function awin_offer_type_options(): array
+{
+    return [
+        'all' => 'Todos',
+        'voucher' => 'Cupons com codigo',
+        'promotion' => 'Promocoes sem codigo',
+    ];
+}
+
+function awin_membership_options(): array
+{
+    return [
+        'joined' => 'Apenas parceiros aprovados',
+        'all' => 'Todos os anunciantes',
+        'notJoined' => 'Ainda nao aprovados',
+    ];
+}
+
+function awin_status_options(): array
+{
+    return [
+        'active' => 'Ativas',
+        'expiringSoon' => 'Vencendo em breve',
+        'upcoming' => 'Agendadas',
+    ];
+}
+
+function awin_default_excluded_terms(): string
+{
+    return 'adulto, erotico, erotica, sex shop, sexy, sensual, lingerie, cassino, bet, betting, apostas, vape, tabaco';
+}
+
+function awin_normalize_filters(array $filters): array
+{
+    $type = (string) ($filters['type'] ?? 'all');
+    $membership = (string) ($filters['membership'] ?? 'joined');
+    $status = (string) ($filters['status'] ?? 'active');
+    $publishStatus = in_array($filters['publish_status'] ?? 'rascunho', ['ativo', 'rascunho'], true) ? $filters['publish_status'] : 'rascunho';
+
+    if (!array_key_exists($type, awin_offer_type_options())) {
+        $type = 'all';
+    }
+    if (!array_key_exists($membership, awin_membership_options())) {
+        $membership = 'joined';
+    }
+    if (!array_key_exists($status, awin_status_options())) {
+        $status = 'active';
+    }
+
+    return [
+        'page' => max(1, min(50, (int) ($filters['page'] ?? 1))),
+        'page_size' => max(10, min(200, (int) ($filters['page_size'] ?? 50))),
+        'type' => $type,
+        'membership' => $membership,
+        'status' => $status,
+        'region' => strtoupper(trim((string) ($filters['region'] ?? 'BR'))),
+        'query' => trim((string) ($filters['query'] ?? '')),
+        'categories' => array_values(array_filter(array_map('trim', (array) ($filters['categories'] ?? [])))),
+        'advertiser_ids' => array_values(array_filter(array_map('intval', (array) ($filters['advertiser_ids'] ?? [])))),
+        'excluded_terms' => array_values(array_filter(array_map('trim', explode(',', (string) ($filters['excluded_terms'] ?? awin_default_excluded_terms()))))),
+        'publish_status' => $publishStatus,
+        'selected_external_ids' => array_values(array_filter(array_map('strval', (array) ($filters['selected_external_ids'] ?? [])))),
+    ];
+}
+
+function awin_promotions(array $filters): array
+{
+    $publisherId = awin_publisher_id();
+    if ($publisherId === '') {
+        awin_connect_first_publisher();
+        $publisherId = awin_publisher_id();
+    }
+    if ($publisherId === '') {
+        throw new RuntimeException('Conecte a Awin antes de buscar ofertas.');
+    }
+
+    $filters = awin_normalize_filters($filters);
+    $bodyFilters = [
+        'membership' => $filters['membership'],
+        'status' => $filters['status'],
+        'type' => $filters['type'],
+    ];
+
+    if ($filters['region'] !== '') {
+        $bodyFilters['regionCodes'] = [$filters['region']];
+    }
+    if ($filters['advertiser_ids']) {
+        $bodyFilters['advertiserIds'] = $filters['advertiser_ids'];
+    }
+
+    $response = awin_request('/publisher/' . rawurlencode($publisherId) . '/promotions', [
+        'accessToken' => awin_access_token(),
+    ], 'POST', [
+        'filters' => $bodyFilters,
+        'pagination' => [
+            'page' => $filters['page'],
+            'pageSize' => $filters['page_size'],
+        ],
+    ]);
+
+    $offers = $response['data'] ?? $response['offers'] ?? $response['promotions'] ?? $response;
+    return is_array($offers) ? array_values($offers) : [];
+}
+
+function awin_preview_offers(array $filters = []): array
+{
+    $filters = awin_normalize_filters($filters);
+    $offers = awin_promotions($filters);
+    $items = [];
+
+    foreach ($offers as $offer) {
+        if (!is_array($offer) || empty($offer['promotionId'])) {
+            continue;
+        }
+        if (!awin_offer_passes_filters($offer, $filters)) {
+            continue;
+        }
+
+        $payload = awin_offer_payload($offer, $filters['publish_status']);
+        if (!$payload) {
+            continue;
+        }
+
+        $items[] = [
+            'external_id' => $payload['external_id'],
+            'store' => $payload['store'],
+            'title' => $payload['title'],
+            'category' => $payload['category'],
+            'offer_type' => $payload['offer_type'],
+            'redemption_type' => $payload['redemption_type'],
+            'has_code' => $payload['code'] !== '',
+            'status' => $payload['status'],
+            'existing' => (bool) coupon_by_external_id($payload['external_id']),
+        ];
+    }
+
+    return [
+        'filters' => $filters,
+        'items' => $items,
+        'total' => count($offers),
+        'matched' => count($items),
+    ];
+}
+
+function awin_import_offers(array $filters = []): array
+{
+    $filters = awin_normalize_filters($filters);
+    $selectedExternalIds = $filters['selected_external_ids'];
+    $offers = awin_promotions($filters);
+    $created = 0;
+    $updated = 0;
+    $skipped = 0;
+
+    foreach ($offers as $offer) {
+        if (!is_array($offer) || empty($offer['promotionId']) || !awin_offer_passes_filters($offer, $filters)) {
+            $skipped++;
+            continue;
+        }
+
+        $externalId = 'awin:' . (string) $offer['promotionId'];
+        if ($selectedExternalIds && !in_array($externalId, $selectedExternalIds, true)) {
+            $skipped++;
+            continue;
+        }
+
+        $payload = awin_offer_payload($offer, $filters['publish_status']);
+        if (!$payload) {
+            $skipped++;
+            continue;
+        }
+
+        $existing = coupon_by_external_id($payload['external_id']);
+        save_coupon($payload, $existing ? (int) $existing['id'] : null);
+        $existing ? $updated++ : $created++;
+    }
+
+    return [
+        'created' => $created,
+        'updated' => $updated,
+        'skipped' => $skipped,
+        'total' => count($offers),
+    ];
+}
+
+function awin_offer_passes_filters(array $offer, array $filters): bool
+{
+    $advertiser = is_array($offer['advertiser'] ?? null) ? $offer['advertiser'] : [];
+    $haystack = strtolower(implode(' ', [
+        (string) ($advertiser['name'] ?? ''),
+        (string) ($offer['title'] ?? ''),
+        strip_tags((string) ($offer['description'] ?? '')),
+        strip_tags((string) ($offer['terms'] ?? '')),
+    ]));
+
+    if ($filters['query'] !== '' && !text_contains($haystack, strtolower($filters['query']))) {
+        return false;
+    }
+
+    foreach ($filters['excluded_terms'] as $term) {
+        if ($term !== '' && text_contains($haystack, strtolower($term))) {
+            return false;
+        }
+    }
+
+    if ($filters['categories']) {
+        $category = awin_offer_category($offer);
+        if (!in_array($category, $filters['categories'], true)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function awin_offer_payload(array $offer, string $status = 'rascunho'): ?array
+{
+    $advertiser = is_array($offer['advertiser'] ?? null) ? $offer['advertiser'] : [];
+    $promotionId = trim((string) ($offer['promotionId'] ?? ''));
+    $destination = trim((string) ($offer['urlTracking'] ?? $offer['url'] ?? ''));
+    if ($promotionId === '' || $destination === '') {
+        return null;
+    }
+
+    $voucher = is_array($offer['voucher'] ?? null) ? $offer['voucher'] : [];
+    $code = trim((string) ($voucher['code'] ?? ''));
+    $type = (string) ($offer['type'] ?? '');
+    $title = trim((string) ($offer['title'] ?? 'Oferta Awin'));
+
+    return [
+        'category' => awin_offer_category($offer),
+        'store' => trim((string) ($advertiser['name'] ?? 'Awin')),
+        'title' => $title,
+        'description' => awin_offer_description($offer),
+        'code' => $code,
+        'target_url' => $destination,
+        'banner_url' => 'assets/og-cupons.png',
+        'starts_at' => lomadee_date($offer['startDate'] ?? null) ?: date('Y-m-d'),
+        'ends_at' => lomadee_date($offer['endDate'] ?? null) ?: date('Y-m-d', strtotime('+30 days')),
+        'status' => $status,
+        'featured' => 0,
+        'rules' => trim(strip_tags((string) ($offer['terms'] ?? 'Confira as regras no site parceiro antes de finalizar.'))),
+        'redemption_type' => $code !== '' ? 'texto_redirect' : 'redirect',
+        'offer_type' => $type === 'voucher' ? 'cupom' : 'oferta_direta',
+        'cta_label' => $code !== '' ? 'Resgatar cupom' : 'Ver oferta',
+        'tracking_url' => $destination,
+        'partner_network' => 'Awin',
+        'payout' => null,
+        'campaign_cap' => null,
+        'sponsored' => 0,
+        'priority' => 0,
+        'tags' => 'awin,' . strtolower($type ?: 'offer'),
+        'requirements' => $code !== '' ? 'Copie o cupom e use no site parceiro' : 'Oferta disponivel no site parceiro',
+        'pixel_event' => 'awin_' . preg_replace('/[^a-z0-9_]+/i', '_', $promotionId),
+        'external_id' => 'awin:' . $promotionId,
+        'members_only' => 0,
+    ];
+}
+
+function awin_offer_category(array $offer): string
+{
+    $advertiser = is_array($offer['advertiser'] ?? null) ? $offer['advertiser'] : [];
+    $value = implode(' ', [
+        (string) ($advertiser['name'] ?? ''),
+        (string) ($offer['title'] ?? ''),
+        strip_tags((string) ($offer['description'] ?? '')),
+    ]);
+
+    return lomadee_site_category($value);
+}
+
+function awin_offer_description(array $offer): string
+{
+    $description = trim(strip_tags((string) ($offer['description'] ?? '')));
+    if ($description !== '') {
+        return $description;
+    }
+
+    return trim((string) ($offer['title'] ?? 'Oferta disponivel por tempo limitado.'));
+}
+
 function lomadee_request(string $path, array $query = [], string $method = 'GET', array $payload = []): array
 {
     $apiKey = lomadee_api_key();

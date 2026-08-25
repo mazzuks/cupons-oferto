@@ -92,7 +92,12 @@ No CRM, acesse `APIs`. Cada parceiro tem sua propria tela:
 
 As chaves nao devem ser salvas no GitHub. Elas ficam no banco do servidor ou, se preferir, no `includes/config.php` fora do repositorio.
 
-Quando uma oferta e importada por uma API, ela entra na lista de monitoramento. A sincronizacao diaria confere se ela continua aparecendo no feed do parceiro.
+Quando uma marca e salva na tela do parceiro, ela entra na lista de monitoramento. A sincronizacao diaria confere tudo que aparece daquela marca no feed do parceiro.
+
+Quando uma oferta e importada por uma API, ela tambem entra na lista de campanhas monitoradas. Assim o CRM acompanha duas coisas:
+
+- marcas que queremos garimpar sempre;
+- campanhas ja publicadas ou importadas.
 
 ## 7. Cron diaria
 
@@ -107,6 +112,7 @@ Troque `/home/USUARIO/cupons-oferto` pela pasta real do clone no servidor.
 Essa cron:
 
 - atualiza campanhas monitoradas;
+- avisa quando aparece campanha nova em marca monitorada;
 - marca campanhas que sumiram do feed;
 - cria notificacoes no CRM;
 - registra erros de API em `Notificacoes`.

@@ -83,6 +83,21 @@ CREATE TABLE IF NOT EXISTS integration_watchlist (
   KEY integration_watch_status_idx (partner, status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS integration_brand_watchlist (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  partner VARCHAR(60) NOT NULL,
+  brand_id VARCHAR(120) NOT NULL,
+  brand_name VARCHAR(180) NOT NULL,
+  segment VARCHAR(220) DEFAULT NULL,
+  status ENUM('monitorado', 'pausado') NOT NULL DEFAULT 'monitorado',
+  last_seen_at TIMESTAMP NULL DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY integration_brand_watch_unique (partner, brand_id),
+  KEY integration_brand_watch_status_idx (partner, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS admin_notifications (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   type VARCHAR(60) NOT NULL,

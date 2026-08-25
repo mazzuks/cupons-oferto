@@ -57,13 +57,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $success = 'Chave da Lomadee salva.';
         }
 
-        if ($action === 'preview_lomadee' || $action === 'import_lomadee') {
+        if ($action === 'preview_lomadee' || $action === 'import_lomadee' || $action === 'save_lomadee_defaults') {
             $brandOptions = lomadee_brand_options($filters['brand_query'], 30);
         }
 
         if ($action === 'save_lomadee_defaults') {
             save_integration_profile('lomadee', $filters);
-            $success = 'Padrao da Lomadee salvo para proximas buscas e sincronizacoes.';
+            $savedBrands = save_lomadee_monitored_brands($filters['brand_ids'], $brandOptions);
+            $success = $savedBrands > 0
+                ? 'Marcas e filtros da Lomadee salvos para buscas e sincronizacoes.'
+                : 'Filtros da Lomadee salvos. Busque e selecione marcas para monitora-las.';
+            $monitoredBrands = monitored_integration_brands('Lomadee');
         }
 
         if ($action === 'preview_lomadee') {
@@ -87,6 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $savedKey = lomadee_api_key();
 $maskedKey = $savedKey === '' ? 'Nao configurada' : substr($savedKey, 0, 14) . str_repeat('*', 12) . substr($savedKey, -6);
+$monitoredBrands = monitored_integration_brands('Lomadee');
 ?>
 <?php admin_layout_start('Lomadee - Oferto Cupons', 'apis', 'Lomadee'); ?>
       <section class="admin-hero admin-api-hero">
@@ -124,6 +129,25 @@ $maskedKey = $savedKey === '' ? 'Nao configurada' : substr($savedKey, 0, 14) . s
               <button type="submit">Salvar chave</button>
             </div>
           </form>
+        </section>
+
+        <section class="admin-panel admin-api-card">
+          <div class="admin-panel-title-row">
+            <div>
+              <p class="section-kicker">Marcas monitoradas</p>
+              <h2><?= count($monitoredBrands) ?> marcas</h2>
+              <p>A cron acompanha estas marcas e avisa quando novas campanhas aparecem ou quando algo sai do feed.</p>
+            </div>
+          </div>
+
+          <div class="admin-api-roadmap">
+            <?php foreach (array_slice($monitoredBrands, 0, 8) as $brand): ?>
+              <span><?= e($brand['brand_name']) ?><?= !empty($brand['segment']) ? ' - ' . e($brand['segment']) : '' ?></span>
+            <?php endforeach; ?>
+            <?php if (!$monitoredBrands): ?>
+              <span>Nenhuma marca monitorada ainda. Busque uma marca, selecione e salve marcas e filtros.</span>
+            <?php endif; ?>
+          </div>
         </section>
 
         <section class="admin-panel admin-api-card">
@@ -206,7 +230,7 @@ $maskedKey = $savedKey === '' ? 'Nao configurada' : substr($savedKey, 0, 14) . s
 
             <div class="admin-actions">
               <button type="submit" name="action" value="preview_lomadee">Buscar campanhas</button>
-              <button type="submit" name="action" value="save_lomadee_defaults">Salvar como padrao</button>
+              <button type="submit" name="action" value="save_lomadee_defaults">Salvar marcas e filtros</button>
             </div>
           </form>
         </section>

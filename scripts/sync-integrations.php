@@ -22,6 +22,7 @@ foreach ($results as $result) {
     echo $result['partner']
         . ': lidas=' . (int) $result['read']
         . ' atualizadas=' . (int) $result['updated']
+        . ' novas=' . (int) ($result['new'] ?? 0)
         . ' sumiram=' . (int) $result['missing']
         . "\n";
 }

@@ -84,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $importResult = awin_import_offers($filters);
             $previewResult = awin_preview_offers($filters);
+            $monitoredBrands = monitored_integration_brands('Awin');
             $success = 'Sincronizacao da Awin concluida.';
         }
     } catch (Throwable $exception) {
@@ -95,6 +96,7 @@ $savedAwinToken = awin_access_token();
 $maskedAwinToken = $savedAwinToken === '' ? 'Nao configurado' : substr($savedAwinToken, 0, 8) . str_repeat('*', 12) . substr($savedAwinToken, -6);
 $awinPublisherId = awin_publisher_id();
 $awinPublisherName = awin_publisher_name();
+$monitoredBrands = monitored_integration_brands('Awin');
 ?>
 <?php admin_layout_start('Awin - Oferto Cupons', 'apis', 'Awin'); ?>
       <section class="admin-hero admin-api-hero">
@@ -149,6 +151,25 @@ $awinPublisherName = awin_publisher_name();
               <button type="submit">Integrar Awin</button>
             </div>
           </form>
+        </section>
+
+        <section class="admin-panel admin-api-card">
+          <div class="admin-panel-title-row">
+            <div>
+              <p class="section-kicker">Anunciantes monitorados</p>
+              <h2><?= count($monitoredBrands) ?> anunciantes</h2>
+              <p>Ao sincronizar ofertas selecionadas, o anunciante entra aqui e passa a ser acompanhado pela cron.</p>
+            </div>
+          </div>
+
+          <div class="admin-api-roadmap">
+            <?php foreach (array_slice($monitoredBrands, 0, 8) as $brand): ?>
+              <span><?= e($brand['brand_name']) ?></span>
+            <?php endforeach; ?>
+            <?php if (!$monitoredBrands): ?>
+              <span>Nenhum anunciante monitorado ainda. Busque ofertas e sincronize as marcas que interessam.</span>
+            <?php endif; ?>
+          </div>
         </section>
 
         <section class="admin-panel admin-api-card">

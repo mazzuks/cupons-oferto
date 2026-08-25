@@ -880,25 +880,24 @@ function lomadee_preview_campaigns(array $filters = []): array
             continue;
         }
 
-        $payload = lomadee_campaign_payload($campaign, $brands, $filters['publish_status']);
-        if (!$payload) {
-            continue;
-        }
+        $type = (string) ($campaign['type'] ?? '');
+        $code = trim((string) ($campaign['code'] ?? ''));
+        $externalId = 'lomadee:' . (string) $campaign['id'];
 
         $items[] = [
-            'external_id' => $payload['external_id'],
+            'external_id' => $externalId,
             'campaign_id' => (string) $campaign['id'],
             'brand_id' => (string) ($campaign['organizationId'] ?? ''),
-            'store' => $payload['store'],
-            'title' => $payload['title'],
-            'category' => $payload['category'],
-            'type' => (string) ($campaign['type'] ?? ''),
-            'offer_type' => $payload['offer_type'],
-            'redemption_type' => $payload['redemption_type'],
-            'has_code' => $payload['code'] !== '',
-            'banner_url' => $payload['banner_url'],
-            'status' => $payload['status'],
-            'existing' => (bool) coupon_by_external_id($payload['external_id']),
+            'store' => trim((string) ($brand['name'] ?? 'Lomadee')),
+            'title' => trim((string) ($campaign['name'] ?? 'Oferta Lomadee')),
+            'category' => lomadee_category($campaign, $brand),
+            'type' => $type,
+            'offer_type' => in_array($type, ['GenericCoupon', 'PersonalCoupon'], true) ? 'cupom' : 'oferta_direta',
+            'redemption_type' => $code !== '' ? 'texto_redirect' : 'redirect',
+            'has_code' => $code !== '',
+            'banner_url' => lomadee_banner($campaign, $brand),
+            'status' => $filters['publish_status'],
+            'existing' => (bool) coupon_by_external_id($externalId),
         ];
     }
 

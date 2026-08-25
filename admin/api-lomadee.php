@@ -64,9 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'save_lomadee_defaults') {
             save_integration_profile('lomadee', $filters);
             $savedBrands = save_lomadee_monitored_brands($filters['brand_ids'], $brandOptions);
-            $success = $savedBrands > 0
-                ? 'Marcas e filtros da Lomadee salvos para buscas e sincronizacoes.'
-                : 'Filtros da Lomadee salvos. Busque e selecione marcas para monitora-las.';
+            if ($savedBrands > 0) {
+                $importResult = lomadee_import_campaigns($filters['max_pages'], array_merge($filters, ['selected_external_ids' => []]));
+                $success = 'Marcas salvas e ofertas atuais importadas para campanhas cadastradas.';
+            } else {
+                $success = 'Filtros da Lomadee salvos. Busque e selecione marcas para monitora-las.';
+            }
             $monitoredBrands = monitored_integration_brands('Lomadee');
         }
 
@@ -230,7 +233,7 @@ $monitoredBrands = monitored_integration_brands('Lomadee');
 
             <div class="admin-actions">
               <button type="submit" name="action" value="preview_lomadee">Buscar campanhas</button>
-              <button type="submit" name="action" value="save_lomadee_defaults">Salvar marcas e filtros</button>
+              <button type="submit" name="action" value="save_lomadee_defaults">Salvar marcas e importar atuais</button>
             </div>
           </form>
         </section>

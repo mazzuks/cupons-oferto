@@ -940,11 +940,11 @@ function lomadee_import_campaigns(int $maxPages = 10, array $filters = []): arra
 
         $existing = coupon_by_external_id($payload['external_id']);
         save_coupon($payload, $existing ? (int) $existing['id'] : null);
-        $advertiser = is_array($offer['advertiser'] ?? null) ? $offer['advertiser'] : [];
-        if (!empty($advertiser['id'])) {
-            monitor_integration_brand('Awin', (string) $advertiser['id'], (string) ($advertiser['name'] ?? $payload['store']), '');
+        if (!empty($campaign['organizationId'])) {
+            $brandName = trim((string) ($brand['name'] ?? $payload['store']));
+            monitor_integration_brand('Lomadee', (string) $campaign['organizationId'], $brandName, (string) ($brand['segment'] ?? ''));
         }
-        monitor_integration_offer('Awin', $payload, (string) $offer['promotionId'], (string) (($offer['advertiser']['id'] ?? '') ?: ''));
+        monitor_integration_offer('Lomadee', $payload, (string) $campaign['id'], (string) ($campaign['organizationId'] ?? ''));
         $existing ? $updated++ : $created++;
     }
 
@@ -993,6 +993,8 @@ function sync_lomadee_watchlist(): array
             mark_monitor_seen('Lomadee', $externalId);
             $updated++;
         } elseif ($payload && $monitoredBrandIds) {
+            save_coupon($payload);
+            monitor_integration_offer('Lomadee', $payload, (string) $campaign['id'], (string) ($campaign['organizationId'] ?? ''));
             create_admin_notification(
                 'campaign_new',
                 'Nova campanha de marca monitorada',

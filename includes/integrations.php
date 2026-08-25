@@ -29,6 +29,11 @@ function save_integration_setting(string $key, string $value): void
     $statement->execute([$key, $value]);
 }
 
+function text_contains(string $haystack, string $needle): bool
+{
+    return $needle === '' || strpos($haystack, $needle) !== false;
+}
+
 function lomadee_api_key(): string
 {
     $config = app_config();
@@ -144,7 +149,7 @@ function lomadee_brand_options(string $search = '', int $maxPages = 20): array
         $name = trim((string) ($brand['name'] ?? ''));
         $segment = trim((string) ($brand['segment'] ?? ''));
         $haystack = strtolower($name . ' ' . $segment);
-        if ($search !== '' && !str_contains($haystack, strtolower($search))) {
+        if ($search !== '' && !text_contains($haystack, strtolower($search))) {
             continue;
         }
 
@@ -320,12 +325,12 @@ function lomadee_campaign_passes_filters(array $campaign, array $brand, array $f
     $description = trim(strip_tags((string) ($campaign['description'] ?? '')));
     $haystack = strtolower($brandName . ' ' . $brandSegment . ' ' . $title . ' ' . $description);
 
-    if ($filters['brand_query'] !== '' && !$filters['brand_ids'] && !str_contains($haystack, strtolower($filters['brand_query']))) {
+    if ($filters['brand_query'] !== '' && !$filters['brand_ids'] && !text_contains($haystack, strtolower($filters['brand_query']))) {
         return false;
     }
 
     foreach ($filters['excluded_terms'] as $term) {
-        if ($term !== '' && str_contains($haystack, strtolower($term))) {
+        if ($term !== '' && text_contains($haystack, strtolower($term))) {
             return false;
         }
     }
@@ -481,7 +486,7 @@ function lomadee_site_category(string $value): string
     ];
 
     foreach ($map as $needle => $category) {
-        if (str_contains($normalized, $needle)) {
+        if (text_contains($normalized, $needle)) {
             return $category;
         }
     }

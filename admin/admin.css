@@ -584,6 +584,35 @@ body {
   background: var(--sky);
 }
 
+.admin-clear-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-clear-form button {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 105, 105, 0.42);
+  border-radius: 999px;
+  color: #ffd8d8;
+  background: rgba(158, 45, 45, 0.22);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-clear-form span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .admin-two-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -311,6 +311,11 @@ try {
             redirect('index.php?deleted=1');
         }
 
+        if ($action === 'clear_campaigns') {
+            $count = clear_campaign_data();
+            redirect('index.php?cleared=' . $count);
+        }
+
         if ($action === 'save') {
             $id = !empty($_POST['id']) ? (int) $_POST['id'] : null;
             $current = $id ? coupon_by_id($id) : null;
@@ -400,6 +405,7 @@ $form = array_merge($defaults, $editing ?: []);
         <?php if ($error): ?><p class="admin-alert"><?= e($error) ?></p><?php endif; ?>
         <?php if (isset($_GET['saved'])): ?><p class="admin-success">Oferta salva.</p><?php endif; ?>
         <?php if (isset($_GET['deleted'])): ?><p class="admin-success">Oferta excluida.</p><?php endif; ?>
+        <?php if (isset($_GET['cleared'])): ?><p class="admin-success"><?= (int) $_GET['cleared'] ?> campanhas removidas da base.</p><?php endif; ?>
         <?php if (isset($_GET['imported'])): ?><p class="admin-success"><?= (int) $_GET['imported'] ?> campanhas importadas.</p><?php endif; ?>
 
         <form method="post" enctype="multipart/form-data" class="coupon-admin-form">
@@ -554,6 +560,14 @@ $form = array_merge($defaults, $editing ?: []);
           </div>
           <a href="index.php" class="admin-primary-link">Criar nova</a>
         </div>
+        <?php if (count($coupons) > 0): ?>
+          <form method="post" class="admin-clear-form" onsubmit="return confirm('Apagar todas as campanhas cadastradas? Esta acao nao apaga usuarios, chaves de API nem marcas monitoradas.');">
+            <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
+            <input type="hidden" name="action" value="clear_campaigns" />
+            <button type="submit">Limpar campanhas cadastradas</button>
+            <span>Remove campanhas, cliques, conversoes e alertas antigos de campanha.</span>
+          </form>
+        <?php endif; ?>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>

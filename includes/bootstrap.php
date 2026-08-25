@@ -122,6 +122,11 @@ function ensure_database(PDO $pdo): void
         return;
     }
 
+    $seedDisabled = (int) $pdo->query("SELECT COUNT(*) FROM integration_settings WHERE setting_key = 'seed_coupons_disabled' AND setting_value = '1'")->fetchColumn();
+    if ($seedDisabled > 0) {
+        return;
+    }
+
     $statement = $pdo->prepare("INSERT INTO coupons
         (category, store, title, description, code, target_url, banner_url, starts_at, ends_at, status, featured, rules)
         VALUES

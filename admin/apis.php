@@ -13,6 +13,7 @@ $success = '';
 $importResult = null;
 $previewResult = null;
 $brandOptions = [];
+$awinResult = null;
 
 function posted_array(string $key): array
 {
@@ -57,6 +58,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $success = 'Chave da Lomadee salva.';
         }
 
+        if ($action === 'save_awin_key' || $action === 'connect_awin') {
+            $accessToken = trim((string) ($_POST['awin_access_token'] ?? ''));
+            if ($accessToken !== '') {
+                save_integration_setting('awin_access_token', $accessToken);
+            }
+
+            if (awin_access_token() === '') {
+                throw new RuntimeException('Informe o token da Awin.');
+            }
+
+            if ($action === 'connect_awin') {
+                $awinResult = awin_connect_first_publisher();
+                $success = 'Awin conectada com sucesso.';
+            } else {
+                $success = 'Token da Awin salvo.';
+            }
+        }
+
         if ($action === 'preview_lomadee' || $action === 'import_lomadee') {
             $brandOptions = lomadee_brand_options($filters['brand_query'], 30);
         }
@@ -82,11 +101,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $savedKey = lomadee_api_key();
 $maskedKey = $savedKey === '' ? 'Nao configurada' : substr($savedKey, 0, 14) . str_repeat('*', 12) . substr($savedKey, -6);
+$savedAwinToken = awin_access_token();
+$maskedAwinToken = $savedAwinToken === '' ? 'Nao configurado' : substr($savedAwinToken, 0, 8) . str_repeat('*', 12) . substr($savedAwinToken, -6);
+$awinPublisherId = awin_publisher_id();
+$awinPublisherName = awin_publisher_name();
 $partners = [
     ['name' => 'Lomadee', 'status' => $savedKey === '' ? 'Configurar' : 'Conectada', 'text' => 'Cupons, ofertas e marcas para curadoria.'],
+    ['name' => 'Awin', 'status' => $awinPublisherId === '' ? 'Pronta para conectar' : 'Conectada', 'text' => 'Ofertas, vouchers e tracking por publisher.'],
     ['name' => 'Amazon', 'status' => 'Em breve', 'text' => 'Associados, links e ofertas selecionadas.'],
     ['name' => 'Mercado Livre', 'status' => 'Em breve', 'text' => 'Produtos, lojas e campanhas afiliadas.'],
-    ['name' => 'Outros parceiros', 'status' => 'Planejado', 'text' => 'Awin, Offer18, Rakuten ou feeds diretos.'],
+    ['name' => 'Outros parceiros', 'status' => 'Planejado', 'text' => 'Offer18, Rakuten, Impact ou feeds diretos.'],
 ];
 ?>
 <?php admin_layout_start('APIs - Oferto Cupons', 'apis', 'Integracoes'); ?>
@@ -107,7 +131,7 @@ $partners = [
 
       <section class="admin-api-grid">
         <?php foreach ($partners as $partner): ?>
-          <article class="admin-api-partner <?= $partner['name'] === 'Lomadee' ? 'is-active' : '' ?>">
+          <article class="admin-api-partner <?= in_array($partner['name'], ['Lomadee', 'Awin'], true) ? 'is-active' : '' ?>">
             <span><?= e($partner['status']) ?></span>
             <strong><?= e($partner['name']) ?></strong>
             <p><?= e($partner['text']) ?></p>
@@ -134,6 +158,45 @@ $partners = [
             </label>
             <div class="admin-actions">
               <button type="submit">Salvar chave</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="admin-panel admin-api-card">
+          <div class="admin-panel-title-row">
+            <div>
+              <p class="section-kicker">Novo parceiro</p>
+              <h2>Awin</h2>
+              <p>Salve o token e conecte a conta publisher. A importacao de ofertas entra na proxima etapa.</p>
+            </div>
+            <span class="admin-pill"><?= e($maskedAwinToken) ?></span>
+          </div>
+
+          <?php if ($awinPublisherId !== ''): ?>
+            <div class="admin-api-connected">
+              <span>Publisher conectado</span>
+              <strong><?= e($awinPublisherName ?: 'Conta Awin') ?></strong>
+              <small>ID <?= e($awinPublisherId) ?></small>
+            </div>
+          <?php endif; ?>
+
+          <?php if ($awinResult): ?>
+            <div class="admin-api-connected">
+              <span>Conexao validada</span>
+              <strong><?= e($awinResult['publisher_name'] ?: 'Conta Awin') ?></strong>
+              <small><?= e($awinResult['publisher_id']) ?> encontrado em <?= (int) $awinResult['accounts'] ?> conta(s)</small>
+            </div>
+          <?php endif; ?>
+
+          <form method="post" class="coupon-admin-form admin-inline-form">
+            <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
+            <input type="hidden" name="action" value="connect_awin" />
+            <label>Access token
+              <input name="awin_access_token" type="password" placeholder="Cole o token da Awin" autocomplete="off" />
+              <small>Usa Bearer token e busca a conta em /accounts?type=publisher.</small>
+            </label>
+            <div class="admin-actions">
+              <button type="submit">Integrar Awin</button>
             </div>
           </form>
         </section>

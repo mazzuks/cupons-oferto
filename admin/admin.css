@@ -1205,6 +1205,10 @@ body {
   min-height: 100%;
 }
 
+.admin-api-card:last-child {
+  grid-column: 1 / -1;
+}
+
 .admin-inline-form {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
@@ -1266,6 +1270,35 @@ body {
 
 .admin-api-result-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-api-connected {
+  display: grid;
+  gap: 4px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  background: rgba(20, 83, 45, 0.22);
+  border: 1px solid rgba(74, 222, 128, 0.22);
+  border-radius: 8px;
+}
+
+.admin-api-connected span {
+  color: #86efac;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-api-connected strong {
+  color: #ffffff;
+  font-family: Kanit, Inter, sans-serif;
+  font-size: 24px;
+  line-height: 1.08;
+}
+
+.admin-api-connected small {
+  color: #bbf7d0;
+  font-weight: 800;
 }
 
 .admin-api-preview {

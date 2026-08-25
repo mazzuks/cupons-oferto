@@ -17,5 +17,9 @@ return [
         'lomadee' => [
             'api_key' => '',
         ],
+        'awin' => [
+            'access_token' => '',
+            'publisher_id' => '',
+        ],
     ],
 ];

@@ -45,6 +45,122 @@ function lomadee_api_key(): string
     return trim(integration_setting('lomadee_api_key'));
 }
 
+function awin_access_token(): string
+{
+    $config = app_config();
+    $fromConfig = trim((string) ($config['integrations']['awin']['access_token'] ?? ''));
+    if ($fromConfig !== '') {
+        return $fromConfig;
+    }
+
+    return trim(integration_setting('awin_access_token'));
+}
+
+function awin_publisher_id(): string
+{
+    $config = app_config();
+    $fromConfig = trim((string) ($config['integrations']['awin']['publisher_id'] ?? ''));
+    if ($fromConfig !== '') {
+        return $fromConfig;
+    }
+
+    return trim(integration_setting('awin_publisher_id'));
+}
+
+function awin_publisher_name(): string
+{
+    return trim(integration_setting('awin_publisher_name'));
+}
+
+function awin_request(string $path, array $query = [], string $method = 'GET', array $payload = []): array
+{
+    $token = awin_access_token();
+    if ($token === '') {
+        throw new RuntimeException('Informe o token da Awin antes de integrar.');
+    }
+
+    $url = 'https://api.awin.com' . $path;
+    if ($query) {
+        $url .= '?' . http_build_query($query);
+    }
+
+    if (!function_exists('curl_init')) {
+        throw new RuntimeException('A extensao cURL do PHP precisa estar ativa para usar a Awin.');
+    }
+
+    $headers = [
+        'Authorization: Bearer ' . $token,
+        'Accept: application/json',
+    ];
+    $options = [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTPHEADER => $headers,
+    ];
+
+    if ($method === 'POST') {
+        $headers[] = 'Content-Type: application/json';
+        $options[CURLOPT_POST] = true;
+        $options[CURLOPT_POSTFIELDS] = json_encode($payload);
+        $options[CURLOPT_HTTPHEADER] = $headers;
+    }
+
+    $curl = curl_init($url);
+    curl_setopt_array($curl, $options);
+
+    $body = curl_exec($curl);
+    $error = curl_error($curl);
+    $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+    curl_close($curl);
+
+    if ($body === false || $error) {
+        throw new RuntimeException('Falha ao chamar a Awin: ' . $error);
+    }
+
+    $decoded = json_decode((string) $body, true);
+    if (!is_array($decoded)) {
+        throw new RuntimeException('Resposta invalida da Awin.');
+    }
+
+    if ($status < 200 || $status >= 300) {
+        $message = $decoded['message'] ?? $decoded['error'] ?? 'Erro HTTP ' . $status;
+        throw new RuntimeException('Awin recusou a chamada: ' . $message);
+    }
+
+    return $decoded;
+}
+
+function awin_publisher_accounts(): array
+{
+    $response = awin_request('/accounts', ['type' => 'publisher']);
+    $accounts = $response['accounts'] ?? [];
+    return is_array($accounts) ? array_values($accounts) : [];
+}
+
+function awin_connect_first_publisher(): array
+{
+    $accounts = awin_publisher_accounts();
+    if (!$accounts) {
+        throw new RuntimeException('Awin autenticou, mas nao retornou conta publisher para este token.');
+    }
+
+    $account = $accounts[0];
+    $publisherId = trim((string) ($account['accountId'] ?? ''));
+    $publisherName = trim((string) ($account['accountName'] ?? ''));
+    if ($publisherId === '') {
+        throw new RuntimeException('Awin retornou uma conta sem publisherId.');
+    }
+
+    save_integration_setting('awin_publisher_id', $publisherId);
+    save_integration_setting('awin_publisher_name', $publisherName);
+
+    return [
+        'publisher_id' => $publisherId,
+        'publisher_name' => $publisherName,
+        'accounts' => count($accounts),
+    ];
+}
+
 function lomadee_request(string $path, array $query = [], string $method = 'GET', array $payload = []): array
 {
     $apiKey = lomadee_api_key();

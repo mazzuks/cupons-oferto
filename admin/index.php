@@ -30,7 +30,7 @@ function coupon_payload(array $source, string $bannerUrl): array
         'rules' => trim($source['rules'] ?? ''),
         'redemption_type' => $redemptionType,
         'offer_type' => $offerType,
-        'cta_label' => trim($source['cta_label'] ?? '') ?: default_cta_label($offerType, $redemptionType === 'texto' ? $code : ''),
+        'cta_label' => trim($source['cta_label'] ?? '') ?: default_cta_label($offerType, in_array($redemptionType, ['texto', 'texto_redirect'], true) ? $code : ''),
         'tracking_url' => trim($source['tracking_url'] ?? ''),
         'partner_network' => trim($source['partner_network'] ?? ''),
         'payout' => decimal_or_null($source['payout'] ?? ''),
@@ -55,6 +55,14 @@ function normalize_redemption_type(string $type): string
         'texto_codigo' => 'texto',
         'texto_código' => 'texto',
         'copiar' => 'texto',
+        'copiar_e_site' => 'texto_redirect',
+        'copiar_e_abrir_site' => 'texto_redirect',
+        'copiar_e_redirecionar' => 'texto_redirect',
+        'codigo_e_site' => 'texto_redirect',
+        'código_e_site' => 'texto_redirect',
+        'cupom_e_site' => 'texto_redirect',
+        'texto_redirect' => 'texto_redirect',
+        'texto_redirecionamento' => 'texto_redirect',
         'site' => 'redirect',
         'cadastro' => 'redirect',
         'link' => 'redirect',
@@ -185,9 +193,9 @@ function import_campaigns_from_csv(): int
                 throw new RuntimeException('Linha ' . ($imported + 2) . ': preencha categoria, loja, titulo, descricao, URL, banner, inicio e fim.');
             }
         }
-        if ($payload['redemption_type'] === 'texto' && !$payload['code']) {
+        if (in_array($payload['redemption_type'], ['texto', 'texto_redirect'], true) && !$payload['code']) {
             fclose($handle);
-            throw new RuntimeException('Linha ' . ($imported + 2) . ': resgate por texto/codigo precisa do campo codigo preenchido.');
+            throw new RuntimeException('Linha ' . ($imported + 2) . ': resgate com cupom para copiar precisa do campo codigo preenchido.');
         }
 
         save_coupon($payload, null);
@@ -314,8 +322,8 @@ try {
                     throw new RuntimeException('Preencha os campos obrigatorios.');
                 }
             }
-            if ($payload['redemption_type'] === 'texto' && !$payload['code']) {
-                throw new RuntimeException('Quando o resgate for por texto/codigo, preencha o texto do cupom.');
+            if (in_array($payload['redemption_type'], ['texto', 'texto_redirect'], true) && !$payload['code']) {
+                throw new RuntimeException('Quando o resgate tiver cupom para copiar, preencha o texto do cupom.');
             }
 
             save_coupon($payload, $id);
@@ -444,7 +452,7 @@ $form = array_merge($defaults, $editing ?: []);
             <div class="admin-two-cols">
               <label>Texto/codigo para copiar
                 <input name="code" value="<?= e($form['code']) ?>" placeholder="Ex: YBOX, OFERTO10 ou instrucao curta" />
-                <small>Use quando o resgate for por texto/codigo. Para cadastro em site, pode ficar vazio.</small>
+                <small>Obrigatorio quando o usuario precisa copiar um cupom. Para oferta apenas com link, pode ficar vazio.</small>
               </label>
               <label class="admin-check"><input name="members_only" type="checkbox" value="1" <?= (int) $form['members_only'] === 1 ? 'checked' : '' ?> /> Somente usuarios conectados</label>
             </div>

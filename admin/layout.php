@@ -27,7 +27,7 @@ function admin_layout_start(string $title, string $activeKey, string $eyebrow = 
     <link rel="icon" href="../assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
     <link rel="stylesheet" href="../styles.css?v=20260824-campaign-flow" />
-    <link rel="stylesheet" href="admin.css?v=20260824-campaign-flow" />
+    <link rel="stylesheet" href="admin.css?v=20260825-redemption-modes" />
   </head>
   <body>
     <div class="admin-app">

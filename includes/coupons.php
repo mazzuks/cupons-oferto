@@ -69,8 +69,9 @@ function fallback_coupons(): array
 function redemption_types(): array
 {
     return [
-        'texto' => 'Mostra texto/codigo para copiar',
-        'redirect' => 'Abre site/cadastro sem mostrar codigo',
+        'texto' => 'So copiar cupom',
+        'texto_redirect' => 'Copiar + resgatar',
+        'redirect' => 'So resgatar oferta',
     ];
 }
 
@@ -136,24 +137,17 @@ function coupon_has_code(array $coupon): bool
 
 function coupon_uses_text_redemption(array $coupon): bool
 {
-    return ($coupon['redemption_type'] ?? 'texto') === 'texto' && coupon_has_code($coupon);
+    return in_array($coupon['redemption_type'] ?? 'texto', ['texto', 'texto_redirect'], true) && coupon_has_code($coupon);
 }
 
 function coupon_shows_public_code(array $coupon): bool
 {
-    if (!coupon_uses_text_redemption($coupon)) {
-        return false;
-    }
+    return coupon_uses_text_redemption($coupon);
+}
 
-    $cta = strtolower(trim((string) ($coupon['cta_label'] ?? '')));
-    $externalTerms = ['oferta', 'cadastro', 'cadastrar', 'cadastre', 'participar', 'ver ', 'acessar', 'site'];
-    foreach ($externalTerms as $term) {
-        if ($cta !== '' && strpos($cta, $term) !== false) {
-            return false;
-        }
-    }
-
-    return true;
+function coupon_shows_rescue_button(array $coupon): bool
+{
+    return in_array($coupon['redemption_type'] ?? 'texto', ['redirect', 'texto_redirect'], true);
 }
 
 function coupon_mechanic_label(array $coupon): string

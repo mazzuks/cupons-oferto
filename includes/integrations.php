@@ -60,6 +60,11 @@ function text_contains(string $haystack, string $needle): bool
     return $needle === '' || strpos($haystack, $needle) !== false;
 }
 
+function text_ends_with(string $haystack, string $needle): bool
+{
+    return $needle === '' || substr($haystack, -strlen($needle)) === $needle;
+}
+
 function create_admin_notification(string $type, string $title, string $body, string $partner = '', string $externalId = ''): void
 {
     $pdo = db();
@@ -1144,7 +1149,9 @@ function lomadee_campaign_payload(array $campaign, array $brands, string $status
     $brand = $brands[$organizationId] ?? [];
     $type = (string) ($campaign['type'] ?? '');
     $code = trim((string) ($campaign['code'] ?? ''));
-    $destination = lomadee_campaign_url($campaign, $brand);
+    $targetUrl = lomadee_campaign_target_url($campaign, $brand);
+    $trackingUrl = lomadee_campaign_tracking_url($campaign, $brand, $targetUrl);
+    $destination = $targetUrl !== '' ? $targetUrl : $trackingUrl;
 
     if ($destination === '') {
         return null;
@@ -1170,7 +1177,7 @@ function lomadee_campaign_payload(array $campaign, array $brands, string $status
         'redemption_type' => $code !== '' ? 'texto_redirect' : 'redirect',
         'offer_type' => in_array($type, ['GenericCoupon', 'PersonalCoupon'], true) ? 'cupom' : 'oferta_direta',
         'cta_label' => $code !== '' ? 'Resgatar cupom' : 'Ver oferta',
-        'tracking_url' => $destination,
+        'tracking_url' => $trackingUrl !== '' ? $trackingUrl : $destination,
         'partner_network' => 'Lomadee',
         'payout' => null,
         'campaign_cap' => null,
@@ -1184,23 +1191,82 @@ function lomadee_campaign_payload(array $campaign, array $brands, string $status
     ];
 }
 
-function lomadee_campaign_url(array $campaign, array $brand): string
+function lomadee_campaign_target_url(array $campaign, array $brand): string
 {
-    foreach (($campaign['channels'] ?? []) as $channel) {
-        $shortUrls = $channel['shortUrls'] ?? [];
-        if (is_array($shortUrls) && !empty($shortUrls[0])) {
-            return trim((string) $shortUrls[0]);
-        }
-    }
-
-    foreach (['url', 'site'] as $field) {
+    foreach (['url', 'site', 'destinationUrl', 'destination_url'] as $field) {
         $value = trim((string) ($campaign[$field] ?? $brand[$field] ?? ''));
-        if ($value !== '') {
-            return lomadee_shorten_campaign($campaign, $value) ?: $value;
+        if (lomadee_is_usable_url($value)) {
+            return $value;
         }
     }
 
     return '';
+}
+
+function lomadee_campaign_tracking_url(array $campaign, array $brand, string $targetUrl = ''): string
+{
+    $targetUrl = $targetUrl !== '' ? $targetUrl : lomadee_campaign_target_url($campaign, $brand);
+    if ($targetUrl !== '') {
+        $shortened = lomadee_shorten_campaign($campaign, $targetUrl);
+        if ($shortened !== '') {
+            return $shortened;
+        }
+    }
+
+    return lomadee_find_tracking_url($campaign);
+}
+
+function lomadee_find_tracking_url($value): string
+{
+    if (is_string($value)) {
+        $value = trim($value);
+        return lomadee_is_tracking_url($value) ? $value : '';
+    }
+
+    if (!is_array($value)) {
+        return '';
+    }
+
+    $preferredKeys = ['shortUrls', 'shortUrl', 'trackingUrl', 'tracking_url', 'affiliateUrl', 'affiliate_url'];
+    foreach ($preferredKeys as $key) {
+        if (!array_key_exists($key, $value)) {
+            continue;
+        }
+
+        $found = lomadee_find_tracking_url($value[$key]);
+        if ($found !== '') {
+            return $found;
+        }
+    }
+
+    foreach ($value as $item) {
+        $found = lomadee_find_tracking_url($item);
+        if ($found !== '') {
+            return $found;
+        }
+    }
+
+    return '';
+}
+
+function lomadee_is_tracking_url(string $url): bool
+{
+    if (!lomadee_is_usable_url($url)) {
+        return false;
+    }
+
+    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+    return $host === 'acesse.vc' || text_ends_with($host, '.acesse.vc');
+}
+
+function lomadee_is_usable_url(string $url): bool
+{
+    if (!preg_match('/^https?:\/\//i', $url)) {
+        return false;
+    }
+
+    $path = strtolower((string) parse_url($url, PHP_URL_PATH));
+    return !preg_match('/\.(jpe?g|png|gif|webp|svg)(\?.*)?$/i', $path);
 }
 
 function lomadee_shorten_campaign(array $campaign, string $url): string

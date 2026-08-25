@@ -20,7 +20,7 @@ function showInstallButton(label = "Instalar app") {
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch((error) => {
+    navigator.serviceWorker.register("/sw.js?v=20260825-cache-fix").catch((error) => {
       console.warn("Service worker indisponível.", error);
     });
   });

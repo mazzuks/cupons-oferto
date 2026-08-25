@@ -1,10 +1,5 @@
-const CACHE_NAME = "oferto-cupons-v1";
+const CACHE_NAME = "oferto-cupons-v2";
 const PRECACHE_URLS = [
-  "/",
-  "/index.php",
-  "/styles.css",
-  "/php-site.js",
-  "/app.js",
   "/assets/favicon.png",
   "/assets/icon-180.png",
   "/assets/icon-192.png",
@@ -35,6 +30,11 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
 
   if (request.method !== "GET" || url.origin !== self.location.origin || url.pathname.startsWith("/admin/")) {
+    return;
+  }
+
+  if (request.mode === "navigate" || ["script", "style"].includes(request.destination)) {
+    event.respondWith(fetch(request));
     return;
   }
 

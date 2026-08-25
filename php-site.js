@@ -36,6 +36,36 @@ function applyFilters() {
   empty.hidden = visible > 0;
 }
 
+async function copyText(value) {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(value);
+      return true;
+    } catch (error) {
+      // Some mobile browsers block Clipboard API even on HTTPS.
+    }
+  }
+
+  const field = document.createElement("textarea");
+  field.value = value;
+  field.setAttribute("readonly", "");
+  field.style.position = "fixed";
+  field.style.top = "-1000px";
+  field.style.opacity = "0";
+  document.body.appendChild(field);
+  field.select();
+  field.setSelectionRange(0, field.value.length);
+
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } finally {
+    field.remove();
+  }
+
+  return copied;
+}
+
 document.addEventListener("click", (event) => {
   const categoryChip = event.target.closest("[data-category]");
   if (categoryChip) {
@@ -60,11 +90,12 @@ grid?.addEventListener("click", async (event) => {
   const button = event.target.closest(".copy-button");
   if (!button || !button.dataset.code) return;
 
-  await navigator.clipboard.writeText(button.dataset.code);
+  const originalText = button.textContent;
+  const copied = await copyText(button.dataset.code);
   button.classList.add("is-copied");
-  button.textContent = "Código copiado";
+  button.textContent = copied ? "Código copiado" : "Copie: " + button.dataset.code;
   setTimeout(() => {
     button.classList.remove("is-copied");
-    button.textContent = "Copiar código";
+    button.textContent = originalText;
   }, 1800);
 });

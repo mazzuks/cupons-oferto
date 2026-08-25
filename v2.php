@@ -270,7 +270,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <strong>Oferto Cupons V2</strong>
       <span>Ambiente de teste, sem alterar a home atual.</span>
     </footer>
-    <script src="php-site.js?v=20260824-v2-filter-default"></script>
+    <script src="php-site.js?v=20260825-copy-fix"></script>
     <script>
       (() => {
         const search = document.querySelector("#coupon-search");
@@ -292,6 +292,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         });
       })();
     </script>
-    <script src="pwa.js"></script>
+    <script src="pwa.js?v=20260825-cache-fix"></script>
   </body>
 </html>

@@ -52,7 +52,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260824-mobile-filter-polish" />
+    <link rel="stylesheet" href="styles.css?v=20260824-mobile-featured" />
   </head>
   <body class="site-v2 site-v2-compact">
     <header class="site-header v2-compact-header">
@@ -105,7 +105,8 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <div class="section-heading">
             <div>
               <p class="section-kicker">Destaques</p>
-              <h2>Ofertas para ver primeiro</h2>
+              <h2>Destaques da vez</h2>
+              <p class="v2-section-subtitle">Cupons e promocoes para olhar agora.</p>
             </div>
             <a class="text-action" href="#cupons">Ver ofertas</a>
           </div>
@@ -113,8 +114,11 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <?php foreach ($topCoupons as $coupon): ?>
               <a class="v2-store-card" href="<?= e(coupon_go_url($coupon, 'v2_featured')) ?>" target="_blank" rel="noopener">
                 <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="" />
-                <span><?= e($coupon['store']) ?></span>
-                <strong><?= e(validity_label($coupon['ends_at'])) ?></strong>
+                <div class="v2-store-card-copy">
+                  <span><?= e($coupon['store']) ?></span>
+                  <p><?= e($coupon['title']) ?></p>
+                  <strong><?= e(validity_label($coupon['ends_at'])) ?></strong>
+                </div>
               </a>
             <?php endforeach; ?>
           </div>

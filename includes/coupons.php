@@ -127,27 +127,32 @@ function coupon_cta_label(array $coupon): string
 function coupon_destination_url(array $coupon): string
 {
     $tracking = trim((string) ($coupon['tracking_url'] ?? ''));
+    $target = trim((string) ($coupon['target_url'] ?? ''));
     $partner = strtolower(trim((string) ($coupon['partner_network'] ?? '')));
 
     if ($partner === 'lomadee') {
-        return coupon_is_lomadee_tracking_url($tracking) ? $tracking : '';
+        return coupon_is_partner_tracking_url($tracking, $target) ? $tracking : '';
     }
 
     if ($partner === 'awin') {
         return coupon_is_awin_tracking_url($tracking) ? $tracking : '';
     }
 
-    return $tracking !== '' ? $tracking : trim((string) ($coupon['target_url'] ?? ''));
+    return $tracking !== '' ? $tracking : $target;
 }
 
-function coupon_is_lomadee_tracking_url(string $url): bool
+function coupon_is_partner_tracking_url(string $url, string $targetUrl = ''): bool
 {
     if (!is_remote_banner_url($url)) {
         return false;
     }
 
-    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
-    return $host === 'acesse.vc' || substr($host, -10) === '.acesse.vc';
+    return trim_trailing_url_slash($url) !== trim_trailing_url_slash($targetUrl);
+}
+
+function trim_trailing_url_slash(string $url): string
+{
+    return rtrim(trim($url), '/');
 }
 
 function coupon_is_awin_tracking_url(string $url): bool

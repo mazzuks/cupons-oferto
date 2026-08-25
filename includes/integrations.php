@@ -1152,10 +1152,9 @@ function lomadee_campaign_payload(array $campaign, array $brands, string $status
     $code = trim((string) ($campaign['code'] ?? ''));
     $targetUrl = lomadee_campaign_target_url($campaign, $brand);
     $trackingUrl = lomadee_campaign_tracking_url($campaign, $brand, $targetUrl);
-    if (!lomadee_is_tracking_url($trackingUrl)) {
+    if (!lomadee_is_tracking_url($trackingUrl, $targetUrl)) {
         return null;
     }
-    $destination = $targetUrl !== '' ? $targetUrl : $trackingUrl;
 
     $endsAt = lomadee_date($campaign['period']['endAt'] ?? null) ?: date('Y-m-d', strtotime('+30 days'));
     $startsAt = lomadee_date($campaign['period']['startAt'] ?? null) ?: date('Y-m-d');
@@ -1167,7 +1166,7 @@ function lomadee_campaign_payload(array $campaign, array $brands, string $status
         'title' => trim((string) ($campaign['name'] ?? 'Oferta Lomadee')),
         'description' => lomadee_description($campaign, $brand),
         'code' => $code,
-        'target_url' => $destination,
+        'target_url' => $targetUrl,
         'banner_url' => lomadee_banner($campaign, $brand),
         'starts_at' => $startsAt,
         'ends_at' => $endsAt,
@@ -1205,22 +1204,19 @@ function lomadee_campaign_target_url(array $campaign, array $brand): string
 
 function lomadee_campaign_tracking_url(array $campaign, array $brand, string $targetUrl = ''): string
 {
-    $targetUrl = $targetUrl !== '' ? $targetUrl : lomadee_campaign_target_url($campaign, $brand);
-    if ($targetUrl !== '') {
-        $shortened = lomadee_shorten_campaign($campaign, $targetUrl);
-        if ($shortened !== '') {
-            return $shortened;
-        }
+    $shortened = lomadee_shorten_campaign($campaign, $targetUrl);
+    if ($shortened !== '') {
+        return $shortened;
     }
 
-    return lomadee_find_tracking_url($campaign);
+    return lomadee_find_tracking_url($campaign, $targetUrl);
 }
 
-function lomadee_find_tracking_url($value): string
+function lomadee_find_tracking_url($value, string $targetUrl = '', bool $trustedValue = false): string
 {
     if (is_string($value)) {
         $value = trim($value);
-        return lomadee_is_tracking_url($value) ? $value : '';
+        return $trustedValue && lomadee_is_tracking_url($value, $targetUrl) ? $value : '';
     }
 
     if (!is_array($value)) {
@@ -1233,14 +1229,18 @@ function lomadee_find_tracking_url($value): string
             continue;
         }
 
-        $found = lomadee_find_tracking_url($value[$key]);
+        $found = lomadee_find_tracking_url($value[$key], $targetUrl, true);
         if ($found !== '') {
             return $found;
         }
     }
 
     foreach ($value as $item) {
-        $found = lomadee_find_tracking_url($item);
+        if (!$trustedValue && !is_array($item)) {
+            continue;
+        }
+
+        $found = lomadee_find_tracking_url($item, $targetUrl, $trustedValue);
         if ($found !== '') {
             return $found;
         }
@@ -1249,14 +1249,13 @@ function lomadee_find_tracking_url($value): string
     return '';
 }
 
-function lomadee_is_tracking_url(string $url): bool
+function lomadee_is_tracking_url(string $url, string $targetUrl = ''): bool
 {
     if (!lomadee_is_usable_url($url)) {
         return false;
     }
 
-    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
-    return $host === 'acesse.vc' || text_ends_with($host, '.acesse.vc');
+    return lomadee_normalize_url($url) !== lomadee_normalize_url($targetUrl);
 }
 
 function lomadee_is_usable_url(string $url): bool
@@ -1269,28 +1268,61 @@ function lomadee_is_usable_url(string $url): bool
     return !preg_match('/\.(jpe?g|png|gif|webp|svg)(\?.*)?$/i', $path);
 }
 
-function lomadee_shorten_campaign(array $campaign, string $url): string
+function lomadee_normalize_url(string $url): string
+{
+    return rtrim(trim($url), '/');
+}
+
+function lomadee_shorten_campaign(array $campaign, string $targetUrl = ''): string
 {
     $organizationId = trim((string) ($campaign['organizationId'] ?? ''));
     $featureId = trim((string) ($campaign['id'] ?? ''));
-    if ($organizationId === '' || $featureId === '' || $url === '') {
+    $type = lomadee_shortener_type($campaign);
+    if ($organizationId === '' || $type === '') {
         return '';
     }
 
+    $payload = [
+        'organizationId' => $organizationId,
+        'type' => $type,
+        'mdasc' => 'oferto-cupons',
+    ];
+
+    if ($type === 'Custom') {
+        if ($targetUrl === '') {
+            return '';
+        }
+
+        $payload['url'] = $targetUrl;
+    } else {
+        if ($featureId === '') {
+            return '';
+        }
+
+        $payload['featureId'] = $featureId;
+    }
+
     try {
-        $response = lomadee_request('/affiliate/shortener/url', [], 'POST', [
-            'organizationId' => $organizationId,
-            'featureId' => $featureId,
-            'url' => $url,
-            'mdasc' => 'oferto-cupons',
-        ]);
+        $response = lomadee_request('/affiliate/shortener/url', [], 'POST', $payload);
     } catch (Throwable $exception) {
         return '';
     }
 
-    $first = $response[0] ?? null;
-    $shortUrls = is_array($first) ? ($first['shortUrls'] ?? []) : [];
-    return is_array($shortUrls) && !empty($shortUrls[0]) ? trim((string) $shortUrls[0]) : '';
+    return lomadee_find_tracking_url($response, $targetUrl);
+}
+
+function lomadee_shortener_type(array $campaign): string
+{
+    $type = trim((string) ($campaign['type'] ?? ''));
+    if (in_array($type, ['GenericCoupon', 'PersonalCoupon'], true)) {
+        return 'Coupon';
+    }
+
+    if ($type === 'Offer') {
+        return 'Offer';
+    }
+
+    return '';
 }
 
 function lomadee_banner(array $campaign, array $brand): string

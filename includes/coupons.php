@@ -127,6 +127,14 @@ function coupon_cta_label(array $coupon): string
 function coupon_destination_url(array $coupon): string
 {
     $tracking = trim((string) ($coupon['tracking_url'] ?? ''));
+    if (
+        strcasecmp(trim((string) ($coupon['partner_network'] ?? '')), 'Lomadee') === 0
+        && stripos((string) ($coupon['store'] ?? ''), 'China in Box') !== false
+        && stripos($tracking, 'acesse.vc') === false
+    ) {
+        return 'https://acesse.vc/2eiUPc1jh2ul';
+    }
+
     return $tracking !== '' ? $tracking : trim((string) ($coupon['target_url'] ?? ''));
 }
 

@@ -1205,6 +1205,11 @@ function lomadee_campaign_target_url(array $campaign, array $brand): string
 
 function lomadee_campaign_tracking_url(array $campaign, array $brand, string $targetUrl = ''): string
 {
+    $brandName = trim((string) ($brand['name'] ?? ''));
+    if (stripos($brandName, 'China in Box') !== false) {
+        return 'https://acesse.vc/2eiUPc1jh2ul';
+    }
+
     $targetUrl = $targetUrl !== '' ? $targetUrl : lomadee_campaign_target_url($campaign, $brand);
     if ($targetUrl !== '') {
         $shortened = lomadee_shorten_campaign($campaign, $targetUrl);

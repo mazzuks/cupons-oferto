@@ -1761,6 +1761,10 @@ h3 {
 }
 
 @media (max-width: 620px) {
+  .site-v2-compact .v2-quick-bar {
+    display: none;
+  }
+
   .site-v2-compact .v2-compact-hero {
     gap: 18px;
     padding: 24px 16px 20px;

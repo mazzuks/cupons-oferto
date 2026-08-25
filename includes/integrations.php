@@ -627,8 +627,9 @@ function awin_offer_payload(array $offer, string $status = 'rascunho'): ?array
 {
     $advertiser = is_array($offer['advertiser'] ?? null) ? $offer['advertiser'] : [];
     $promotionId = trim((string) ($offer['promotionId'] ?? ''));
-    $destination = trim((string) ($offer['urlTracking'] ?? $offer['url'] ?? ''));
-    if ($promotionId === '' || $destination === '') {
+    $targetUrl = trim((string) ($offer['url'] ?? ''));
+    $trackingUrl = trim((string) ($offer['urlTracking'] ?? ''));
+    if ($promotionId === '' || !coupon_is_awin_tracking_url($trackingUrl)) {
         return null;
     }
 
@@ -643,7 +644,7 @@ function awin_offer_payload(array $offer, string $status = 'rascunho'): ?array
         'title' => $title,
         'description' => awin_offer_description($offer),
         'code' => $code,
-        'target_url' => $destination,
+        'target_url' => $targetUrl !== '' ? $targetUrl : $trackingUrl,
         'banner_url' => 'assets/og-cupons.png',
         'starts_at' => lomadee_date($offer['startDate'] ?? null) ?: date('Y-m-d'),
         'ends_at' => lomadee_date($offer['endDate'] ?? null) ?: date('Y-m-d', strtotime('+30 days')),
@@ -653,7 +654,7 @@ function awin_offer_payload(array $offer, string $status = 'rascunho'): ?array
         'redemption_type' => $code !== '' ? 'texto_redirect' : 'redirect',
         'offer_type' => $type === 'voucher' ? 'cupom' : 'oferta_direta',
         'cta_label' => $code !== '' ? 'Resgatar cupom' : 'Ver oferta',
-        'tracking_url' => $destination,
+        'tracking_url' => $trackingUrl,
         'partner_network' => 'Awin',
         'payout' => null,
         'campaign_cap' => null,
@@ -1151,11 +1152,10 @@ function lomadee_campaign_payload(array $campaign, array $brands, string $status
     $code = trim((string) ($campaign['code'] ?? ''));
     $targetUrl = lomadee_campaign_target_url($campaign, $brand);
     $trackingUrl = lomadee_campaign_tracking_url($campaign, $brand, $targetUrl);
-    $destination = $targetUrl !== '' ? $targetUrl : $trackingUrl;
-
-    if ($destination === '') {
+    if (!lomadee_is_tracking_url($trackingUrl)) {
         return null;
     }
+    $destination = $targetUrl !== '' ? $targetUrl : $trackingUrl;
 
     $endsAt = lomadee_date($campaign['period']['endAt'] ?? null) ?: date('Y-m-d', strtotime('+30 days'));
     $startsAt = lomadee_date($campaign['period']['startAt'] ?? null) ?: date('Y-m-d');
@@ -1177,7 +1177,7 @@ function lomadee_campaign_payload(array $campaign, array $brands, string $status
         'redemption_type' => $code !== '' ? 'texto_redirect' : 'redirect',
         'offer_type' => in_array($type, ['GenericCoupon', 'PersonalCoupon'], true) ? 'cupom' : 'oferta_direta',
         'cta_label' => $code !== '' ? 'Resgatar cupom' : 'Ver oferta',
-        'tracking_url' => $trackingUrl !== '' ? $trackingUrl : $destination,
+        'tracking_url' => $trackingUrl,
         'partner_network' => 'Lomadee',
         'payout' => null,
         'campaign_cap' => null,
@@ -1205,11 +1205,6 @@ function lomadee_campaign_target_url(array $campaign, array $brand): string
 
 function lomadee_campaign_tracking_url(array $campaign, array $brand, string $targetUrl = ''): string
 {
-    $brandName = trim((string) ($brand['name'] ?? ''));
-    if (stripos($brandName, 'China in Box') !== false) {
-        return 'https://acesse.vc/2eiUPc1jh2ul';
-    }
-
     $targetUrl = $targetUrl !== '' ? $targetUrl : lomadee_campaign_target_url($campaign, $brand);
     if ($targetUrl !== '') {
         $shortened = lomadee_shorten_campaign($campaign, $targetUrl);

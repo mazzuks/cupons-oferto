@@ -127,15 +127,42 @@ function coupon_cta_label(array $coupon): string
 function coupon_destination_url(array $coupon): string
 {
     $tracking = trim((string) ($coupon['tracking_url'] ?? ''));
-    if (
-        strcasecmp(trim((string) ($coupon['partner_network'] ?? '')), 'Lomadee') === 0
-        && stripos((string) ($coupon['store'] ?? ''), 'China in Box') !== false
-        && stripos($tracking, 'acesse.vc') === false
-    ) {
-        return 'https://acesse.vc/2eiUPc1jh2ul';
+    $partner = strtolower(trim((string) ($coupon['partner_network'] ?? '')));
+
+    if ($partner === 'lomadee') {
+        return coupon_is_lomadee_tracking_url($tracking) ? $tracking : '';
+    }
+
+    if ($partner === 'awin') {
+        return coupon_is_awin_tracking_url($tracking) ? $tracking : '';
     }
 
     return $tracking !== '' ? $tracking : trim((string) ($coupon['target_url'] ?? ''));
+}
+
+function coupon_is_lomadee_tracking_url(string $url): bool
+{
+    if (!is_remote_banner_url($url)) {
+        return false;
+    }
+
+    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+    return $host === 'acesse.vc' || substr($host, -10) === '.acesse.vc';
+}
+
+function coupon_is_awin_tracking_url(string $url): bool
+{
+    if (!is_remote_banner_url($url)) {
+        return false;
+    }
+
+    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+    return $host === 'awin1.com'
+        || substr($host, -10) === '.awin1.com'
+        || $host === 'awstrack.me'
+        || substr($host, -12) === '.awstrack.me'
+        || $host === 'awin.com'
+        || substr($host, -9) === '.awin.com';
 }
 
 function coupon_has_code(array $coupon): bool

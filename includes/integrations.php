@@ -869,10 +869,7 @@ function lomadee_preview_campaigns(array $filters = []): array
 {
     $filters = lomadee_normalize_filters($filters);
     $brands = lomadee_brand_map(max($filters['max_pages'], 20));
-    $campaigns = lomadee_fetch_all('/affiliate/campaigns', [
-        'types' => implode(',', $filters['types']),
-        'status' => 'onTime',
-    ], $filters['max_pages']);
+    $campaigns = lomadee_campaigns_for_filters($filters);
 
     $items = [];
     foreach ($campaigns as $campaign) {
@@ -914,16 +911,50 @@ function lomadee_preview_campaigns(array $filters = []): array
     ];
 }
 
+function lomadee_campaigns_for_filters(array $filters): array
+{
+    $filters = lomadee_normalize_filters($filters);
+    $baseQuery = [
+        'types' => implode(',', $filters['types']),
+        'status' => 'onTime',
+    ];
+
+    if (!$filters['brand_ids']) {
+        return lomadee_fetch_all('/affiliate/campaigns', $baseQuery, $filters['max_pages']);
+    }
+
+    $campaigns = [];
+    $seen = [];
+    foreach ($filters['brand_ids'] as $brandId) {
+        $items = lomadee_fetch_all('/affiliate/campaigns', array_merge($baseQuery, [
+            'organizationId' => $brandId,
+        ]), $filters['max_pages']);
+
+        foreach ($items as $item) {
+            if (!is_array($item) || empty($item['id'])) {
+                continue;
+            }
+
+            $id = (string) $item['id'];
+            if (isset($seen[$id])) {
+                continue;
+            }
+
+            $seen[$id] = true;
+            $campaigns[] = $item;
+        }
+    }
+
+    return $campaigns;
+}
+
 function lomadee_import_campaigns(int $maxPages = 10, array $filters = []): array
 {
     $filters['max_pages'] = $maxPages;
     $filters = lomadee_normalize_filters($filters);
     $selectedExternalIds = $filters['selected_external_ids'];
     $brands = lomadee_brand_map(max($maxPages, 20));
-    $campaigns = lomadee_fetch_all('/affiliate/campaigns', [
-        'types' => implode(',', $filters['types']),
-        'status' => 'onTime',
-    ], $maxPages);
+    $campaigns = lomadee_campaigns_for_filters($filters);
 
     $created = 0;
     $updated = 0;
@@ -982,10 +1013,7 @@ function sync_lomadee_watchlist(): array
         $filters['brand_ids'] = $monitoredBrandIds;
     }
     $brands = lomadee_brand_map(max($filters['max_pages'], 20));
-    $campaigns = lomadee_fetch_all('/affiliate/campaigns', [
-        'types' => implode(',', $filters['types']),
-        'status' => 'onTime',
-    ], $filters['max_pages']);
+    $campaigns = lomadee_campaigns_for_filters($filters);
     $seen = [];
     $updated = 0;
     $missing = 0;

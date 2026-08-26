@@ -59,7 +59,7 @@ $whatsappShareUrl = 'https://wa.me/?text=' . rawurlencode($guide['title'] . ' - 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260820-guides" />
+    <link rel="stylesheet" href="styles.css?v=20260826-china-guides" />
   </head>
   <body>
     <header class="site-header">
@@ -94,6 +94,23 @@ $whatsappShareUrl = 'https://wa.me/?text=' . rawurlencode($guide['title'] . ' - 
             <h2><?= e($section['title']) ?></h2>
             <p><?= e($section['body']) ?></p>
           <?php endforeach; ?>
+
+          <?php if (!empty($guide['coupon_box'])): ?>
+            <section class="guide-coupon-box">
+              <p class="section-kicker"><?= e($guide['coupon_box']['kicker'] ?? 'Cupons ativos') ?></p>
+              <h2><?= e($guide['coupon_box']['title'] ?? 'Cupons para testar') ?></h2>
+              <p><?= e($guide['coupon_box']['body'] ?? '') ?></p>
+              <div class="guide-coupon-list">
+                <?php foreach (($guide['coupon_box']['coupons'] ?? []) as $coupon): ?>
+                  <div>
+                    <strong><?= e($coupon['code']) ?></strong>
+                    <span><?= e($coupon['description']) ?></span>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+              <a class="primary-action" href="index.php#cupons">Ver cupons China in Box</a>
+            </section>
+          <?php endif; ?>
 
           <?php if (!empty($guide['tip'])): ?>
             <div class="guide-tip"><?= e($guide['tip']) ?></div>

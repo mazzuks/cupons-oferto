@@ -1223,11 +1223,6 @@ function lomadee_campaign_tracking_url(array $campaign, array $brand, string $ta
         return $transactionUrl;
     }
 
-    $generated = lomadee_generate_tracking_url($campaign, $targetUrl, $mdasc);
-    if ($generated !== '') {
-        return $generated;
-    }
-
     return '';
 }
 
@@ -1246,7 +1241,7 @@ function lomadee_find_transaction_url($value, string $targetUrl = '', string $md
         return '';
     }
 
-    $preferredKeys = [
+    $parameterizedKeys = [
         'trackingUrl',
         'tracking_url',
         'urlTracking',
@@ -1261,12 +1256,23 @@ function lomadee_find_transaction_url($value, string $targetUrl = '', string $md
         'deeplink',
     ];
 
-    foreach ($preferredKeys as $key) {
+    foreach ($parameterizedKeys as $key) {
         if (!array_key_exists($key, $value)) {
             continue;
         }
 
         $found = lomadee_find_transaction_url($value[$key], $targetUrl, $mdasc, true);
+        if ($found !== '') {
+            return $found;
+        }
+    }
+
+    foreach (['shortUrls', 'shortUrl'] as $key) {
+        if (!array_key_exists($key, $value)) {
+            continue;
+        }
+
+        $found = lomadee_find_transaction_url($value[$key], $targetUrl, '', true);
         if ($found !== '') {
             return $found;
         }
@@ -1278,42 +1284,6 @@ function lomadee_find_transaction_url($value, string $targetUrl = '', string $md
         }
 
         $found = lomadee_find_transaction_url($item, $targetUrl, $mdasc, $trustedValue);
-        if ($found !== '') {
-            return $found;
-        }
-    }
-
-    return '';
-}
-
-function lomadee_find_generated_short_url($value, string $targetUrl = ''): string
-{
-    if (is_string($value)) {
-        $value = trim($value);
-        return lomadee_is_tracking_url($value, $targetUrl) ? $value : '';
-    }
-
-    if (!is_array($value)) {
-        return '';
-    }
-
-    foreach (['shortUrls', 'shortUrl'] as $key) {
-        if (!array_key_exists($key, $value)) {
-            continue;
-        }
-
-        $found = lomadee_find_generated_short_url($value[$key], $targetUrl);
-        if ($found !== '') {
-            return $found;
-        }
-    }
-
-    foreach ($value as $item) {
-        if (!is_array($item)) {
-            continue;
-        }
-
-        $found = lomadee_find_generated_short_url($item, $targetUrl);
         if ($found !== '') {
             return $found;
         }
@@ -1368,61 +1338,6 @@ function lomadee_add_mdasc(string $url, string $mdasc): string
 
     $separator = strpos($url, '?') === false ? '?' : '&';
     return $url . $separator . 'mdasc=' . rawurlencode($mdasc);
-}
-
-function lomadee_generate_tracking_url(array $campaign, string $targetUrl = '', string $mdasc = ''): string
-{
-    $organizationId = trim((string) ($campaign['organizationId'] ?? ''));
-    $featureId = trim((string) ($campaign['id'] ?? ''));
-    $type = lomadee_shortener_type($campaign);
-    if ($organizationId === '' || $type === '') {
-        return '';
-    }
-
-    $payload = [
-        'organizationId' => $organizationId,
-        'type' => $type,
-    ];
-
-    if ($mdasc !== '') {
-        $payload['mdasc'] = $mdasc;
-    }
-
-    if ($type === 'Custom') {
-        if ($targetUrl === '') {
-            return '';
-        }
-
-        $payload['url'] = $targetUrl;
-    } else {
-        if ($featureId === '') {
-            return '';
-        }
-
-        $payload['featureId'] = $featureId;
-    }
-
-    try {
-        $response = lomadee_request('/affiliate/shortener/url', [], 'POST', $payload);
-    } catch (Throwable $exception) {
-        return '';
-    }
-
-    return lomadee_find_generated_short_url($response, $targetUrl);
-}
-
-function lomadee_shortener_type(array $campaign): string
-{
-    $type = trim((string) ($campaign['type'] ?? ''));
-    if (in_array($type, ['GenericCoupon', 'PersonalCoupon'], true)) {
-        return 'Coupon';
-    }
-
-    if ($type === 'Offer') {
-        return 'Offer';
-    }
-
-    return '';
 }
 
 function lomadee_banner(array $campaign, array $brand): string

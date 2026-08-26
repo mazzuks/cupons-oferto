@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" role="img" aria-label="Oferta de saude e beleza">
+  <rect width="600" height="320" rx="28" fill="#fff0f6"/>
+  <circle cx="98" cy="82" r="54" fill="#bdeff4"/>
+  <circle cx="504" cy="242" r="66" fill="#ffc62b"/>
+  <rect x="132" y="96" width="110" height="148" rx="24" fill="#092454"/>
+  <rect x="160" y="62" width="54" height="52" rx="16" fill="#26bde2"/>
+  <rect x="294" y="86" width="142" height="158" rx="24" fill="#ffffff"/>
+  <path d="M330 134h70M330 166h54M330 198h82" stroke="#1d4d8f" stroke-width="12" stroke-linecap="round"/>
+  <text x="120" y="282" fill="#092454" font-family="Arial, sans-serif" font-size="32" font-weight="800">SAUDE E BELEZA</text>
+</svg>

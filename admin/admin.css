@@ -1366,6 +1366,29 @@ body {
   -webkit-line-clamp: 2;
 }
 
+.admin-brand-logo {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 5px;
+  color: #21c1e8;
+  background: #071024;
+  border: 1px solid rgba(65, 205, 242, 0.3);
+  border-radius: 10px;
+  font-family: Kanit, Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.admin-brand-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
 .admin-api-result-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }

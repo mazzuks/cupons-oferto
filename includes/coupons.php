@@ -16,6 +16,7 @@ function fallback_coupons(): array
             'code' => 'PIZZAOFERTA',
             'target_url' => 'https://oferto.digital/',
             'banner_url' => 'https://oferto.digital/wp-content/uploads/2024/08/1-1.jpg',
+            'logo_url' => '',
             'starts_at' => '2026-08-10',
             'ends_at' => '2026-08-22',
             'status' => 'ativo',
@@ -44,6 +45,7 @@ function fallback_coupons(): array
             'code' => 'RUFFLES10',
             'target_url' => 'https://oferto.digital/',
             'banner_url' => 'assets/ruffles-coupon.svg',
+            'logo_url' => '',
             'starts_at' => '2026-08-18',
             'ends_at' => '2026-08-24',
             'status' => 'ativo',
@@ -146,6 +148,69 @@ function coupon_banner_status_label(array $coupon): string
     return coupon_uses_fallback_banner($coupon) ? 'Fallback' : 'Original';
 }
 
+function coupon_logo_src(array $coupon): string
+{
+    $logo = trim((string) ($coupon['logo_url'] ?? ''));
+    if (coupon_is_image_url($logo)) {
+        return $logo;
+    }
+
+    $domain = coupon_brand_domain($coupon);
+    if ($domain !== '') {
+        return 'https://www.google.com/s2/favicons?domain=' . rawurlencode($domain) . '&sz=128';
+    }
+
+    return '';
+}
+
+function coupon_brand_initials(array $coupon): string
+{
+    $store = trim((string) ($coupon['store'] ?? 'Oferto'));
+    $words = preg_split('/\s+/', preg_replace('/[^A-Za-z0-9 ]+/', ' ', $store) ?: '') ?: [];
+    $initials = '';
+    foreach ($words as $word) {
+        if ($word === '') {
+            continue;
+        }
+        $initials .= strtoupper(substr($word, 0, 1));
+        if (strlen($initials) >= 2) {
+            break;
+        }
+    }
+
+    return $initials !== '' ? $initials : 'OF';
+}
+
+function coupon_brand_domain(array $coupon): string
+{
+    $store = normalize_search_text((string) ($coupon['store'] ?? ''));
+    $known = [
+        'shopee' => 'shopee.com.br',
+        'china in box' => 'chinainbox.com.br',
+        'loja rede' => 'lojarede.com.br',
+        'casa bergan' => 'casabergan.com.br',
+        'kakau seguros' => 'kakau.co',
+        'pizza hut' => 'pizzahut.com.br',
+        'ruffles' => 'ruffles.com.br',
+    ];
+
+    foreach ($known as $name => $domain) {
+        if (strpos($store, $name) !== false) {
+            return $domain;
+        }
+    }
+
+    foreach (['target_url', 'tracking_url'] as $field) {
+        $host = strtolower((string) parse_url((string) ($coupon[$field] ?? ''), PHP_URL_HOST));
+        $host = preg_replace('/^www\./', '', $host) ?: '';
+        if ($host !== '' && !preg_match('/(lmdee|acesse|awin|awstrack|go2speed|oferto)/', $host)) {
+            return $host;
+        }
+    }
+
+    return '';
+}
+
 function banner_url_or_fallback(string $url, string $category): string
 {
     $url = trim($url);
@@ -154,6 +219,12 @@ function banner_url_or_fallback(string $url, string $category): string
     }
 
     return $url;
+}
+
+function coupon_is_image_url(string $url): bool
+{
+    $url = trim($url);
+    return $url !== '' && (is_remote_banner_url($url) || strpos($url, 'assets/') === 0 || strpos($url, 'uploads/') === 0);
 }
 
 function canonical_category(string $value, string $context = ''): string
@@ -513,6 +584,7 @@ function save_coupon(array $data, ?int $id = null): void
         (string) ($data['requirements'] ?? ''),
     ]));
     $data['banner_url'] = banner_url_or_fallback((string) ($data['banner_url'] ?? ''), (string) $data['category']);
+    $data['logo_url'] = trim((string) ($data['logo_url'] ?? ''));
 
     $fields = [
         'category',
@@ -522,6 +594,7 @@ function save_coupon(array $data, ?int $id = null): void
         'code',
         'target_url',
         'banner_url',
+        'logo_url',
         'starts_at',
         'ends_at',
         'status',

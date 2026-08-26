@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS coupons (
   code VARCHAR(80) DEFAULT NULL,
   target_url VARCHAR(500) NOT NULL,
   banner_url VARCHAR(500) NOT NULL,
+  logo_url VARCHAR(500) DEFAULT NULL,
   starts_at DATE NOT NULL,
   ends_at DATE NOT NULL,
   status ENUM('ativo', 'rascunho', 'pausado') NOT NULL DEFAULT 'rascunho',

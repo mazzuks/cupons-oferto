@@ -30,6 +30,7 @@ function coupon_payload(array $source, string $bannerUrl): array
         'code' => $code,
         'target_url' => trim($source['target_url'] ?? ''),
         'banner_url' => banner_url_or_fallback($bannerUrl, $category),
+        'logo_url' => trim($source['logo_url'] ?? ''),
         'starts_at' => $source['starts_at'] ?? date('Y-m-d'),
         'ends_at' => $source['ends_at'] ?? date('Y-m-d'),
         'status' => $source['status'] ?? 'rascunho',
@@ -266,6 +267,9 @@ function normalize_csv_header(string $header): string
         'banner' => 'banner_url',
         'imagem' => 'banner_url',
         'url_do_banner' => 'banner_url',
+        'logo' => 'logo_url',
+        'url_logo' => 'logo_url',
+        'url_do_logo' => 'logo_url',
         'inicio' => 'starts_at',
         'data_inicio' => 'starts_at',
         'data_de_inicio' => 'starts_at',
@@ -388,6 +392,7 @@ $defaults = [
     'code' => '',
     'target_url' => '',
     'banner_url' => '',
+    'logo_url' => '',
     'starts_at' => date('Y-m-d'),
     'ends_at' => date('Y-m-d', strtotime('+7 days')),
     'status' => 'rascunho',
@@ -508,6 +513,7 @@ $form = array_merge($defaults, $editing ?: []);
             <label>URL final da campanha<input name="target_url" type="url" value="<?= e($form['target_url']) ?>" required /></label>
             <label>URL de tracking/afiliado<input name="tracking_url" type="url" value="<?= e($form['tracking_url']) ?>" placeholder="Opcional. Se preenchida, o botao publico usa esta URL." /></label>
             <label>URL do banner<input name="banner_url" type="text" value="<?= e($form['banner_url']) ?>" placeholder="Opcional. Se ficar vazio, usamos um banner por categoria." /></label>
+            <label>URL do logo da marca<input name="logo_url" type="text" value="<?= e($form['logo_url'] ?? '') ?>" placeholder="Opcional. Se ficar vazio, buscamos pelo dominio da marca." /></label>
             <label>Upload do banner<input name="banner_file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
           </div>
 
@@ -604,6 +610,7 @@ $form = array_merge($defaults, $editing ?: []);
             <thead>
               <tr>
                 <th>Loja</th>
+                <th>Logo</th>
                 <th>Tipo</th>
                 <th>Resgate</th>
                 <th>Categoria</th>
@@ -620,6 +627,15 @@ $form = array_merge($defaults, $editing ?: []);
               <?php foreach ($coupons as $coupon): ?>
                 <tr>
                   <td><strong><?= e($coupon['store']) ?></strong><br /><span><?= e($coupon['title']) ?></span></td>
+                  <td>
+                    <span class="admin-brand-logo" aria-label="Logo <?= e($coupon['store']) ?>">
+                      <?php if (coupon_logo_src($coupon)): ?>
+                        <img src="<?= e(coupon_logo_src($coupon)) ?>" alt="" />
+                      <?php else: ?>
+                        <?= e(coupon_brand_initials($coupon)) ?>
+                      <?php endif; ?>
+                    </span>
+                  </td>
                   <td><span class="admin-pill admin-pill-type"><?= e(offer_type_label($coupon['offer_type'] ?? 'cupom')) ?></span></td>
                   <td><span class="admin-pill"><?= e(redemption_type_label($coupon['redemption_type'] ?? 'texto')) ?></span></td>
                   <td><?= e($coupon['category']) ?></td>

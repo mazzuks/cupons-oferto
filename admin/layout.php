@@ -29,8 +29,8 @@ function admin_layout_start(string $title, string $activeKey, string $eyebrow = 
     <title><?= e($title) ?></title>
     <link rel="icon" href="../assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../styles.css?v=20260824-campaign-flow" />
-    <link rel="stylesheet" href="admin.css?v=20260825-monitoring" />
+    <link rel="stylesheet" href="../styles.css?v=20260826-brand-logos" />
+    <link rel="stylesheet" href="admin.css?v=20260826-brand-logos" />
   </head>
   <body>
     <div class="admin-app">

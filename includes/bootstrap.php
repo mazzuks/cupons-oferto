@@ -71,6 +71,7 @@ function ensure_database(PDO $pdo): void
         code VARCHAR(80) DEFAULT NULL,
         target_url VARCHAR(500) NOT NULL,
         banner_url VARCHAR(500) NOT NULL,
+        logo_url VARCHAR(500) DEFAULT NULL,
         starts_at DATE NOT NULL,
         ends_at DATE NOT NULL,
         status ENUM('ativo', 'rascunho', 'pausado') NOT NULL DEFAULT 'rascunho',
@@ -154,6 +155,7 @@ function ensure_coupon_columns(PDO $pdo): void
         'pixel_event' => "ALTER TABLE coupons ADD pixel_event VARCHAR(120) DEFAULT NULL AFTER requirements",
         'external_id' => "ALTER TABLE coupons ADD external_id VARCHAR(190) DEFAULT NULL AFTER pixel_event",
         'members_only' => "ALTER TABLE coupons ADD members_only TINYINT(1) NOT NULL DEFAULT 0 AFTER pixel_event",
+        'logo_url' => "ALTER TABLE coupons ADD logo_url VARCHAR(500) DEFAULT NULL AFTER banner_url",
     ];
 
     foreach ($columns as $column => $sql) {

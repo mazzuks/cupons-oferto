@@ -657,6 +657,7 @@ function awin_offer_payload(array $offer, string $status = 'rascunho'): ?array
         'code' => $code,
         'target_url' => $targetUrl !== '' ? $targetUrl : $trackingUrl,
         'banner_url' => 'assets/og-cupons.png',
+        'logo_url' => awin_advertiser_logo($offer),
         'starts_at' => lomadee_date($offer['startDate'] ?? null) ?: date('Y-m-d'),
         'ends_at' => lomadee_date($offer['endDate'] ?? null) ?: date('Y-m-d', strtotime('+30 days')),
         'status' => $status,
@@ -677,6 +678,19 @@ function awin_offer_payload(array $offer, string $status = 'rascunho'): ?array
         'external_id' => 'awin:' . $promotionId,
         'members_only' => 0,
     ];
+}
+
+function awin_advertiser_logo(array $offer): string
+{
+    $advertiser = is_array($offer['advertiser'] ?? null) ? $offer['advertiser'] : [];
+    foreach (['logoUrl', 'logo', 'imageUrl'] as $field) {
+        $value = trim((string) ($advertiser[$field] ?? $offer[$field] ?? ''));
+        if (coupon_is_image_url($value)) {
+            return $value;
+        }
+    }
+
+    return '';
 }
 
 function awin_offer_category(array $offer): string
@@ -1245,6 +1259,7 @@ function lomadee_campaign_payload(array $campaign, array $brands, string $status
         'code' => $code,
         'target_url' => $targetUrl,
         'banner_url' => lomadee_banner($campaign, $brand),
+        'logo_url' => lomadee_brand_logo($campaign, $brand),
         'starts_at' => $startsAt,
         'ends_at' => $endsAt,
         'status' => $status,
@@ -1265,6 +1280,18 @@ function lomadee_campaign_payload(array $campaign, array $brands, string $status
         'external_id' => 'lomadee:' . (string) $campaign['id'],
         'members_only' => 0,
     ];
+}
+
+function lomadee_brand_logo(array $campaign, array $brand): string
+{
+    foreach (['logo', 'logoUrl', 'image', 'imageUrl'] as $field) {
+        $value = trim((string) ($brand[$field] ?? $campaign[$field] ?? ''));
+        if (coupon_is_image_url($value)) {
+            return $value;
+        }
+    }
+
+    return '';
 }
 
 function lomadee_campaign_target_url(array $campaign, array $brand): string

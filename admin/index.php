@@ -46,6 +46,7 @@ function coupon_payload(array $source, string $bannerUrl): array
         'tags' => trim($source['tags'] ?? ''),
         'requirements' => trim($source['requirements'] ?? ''),
         'pixel_event' => trim($source['pixel_event'] ?? ''),
+        'external_id' => trim($source['external_id'] ?? ''),
         'members_only' => truthy($source['members_only'] ?? '') ? 1 : 0,
     ];
 }
@@ -440,6 +441,7 @@ $form = array_merge($defaults, $editing ?: []);
           <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
           <input type="hidden" name="action" value="save" />
           <input type="hidden" name="id" value="<?= e((string) $form['id']) ?>" />
+          <input type="hidden" name="external_id" value="<?= e((string) ($form['external_id'] ?? '')) ?>" />
 
           <div class="admin-form-grid">
           <div class="admin-fieldset admin-fieldset-main">

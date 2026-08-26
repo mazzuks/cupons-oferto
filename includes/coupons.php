@@ -342,6 +342,10 @@ function coupon_destination_url(array $coupon): string
         return coupon_is_offer18_tracking_url($tracking) ? $tracking : '';
     }
 
+    if ($partner === 'hasoffers') {
+        return coupon_is_hasoffers_tracking_url($tracking) ? $tracking : '';
+    }
+
     return $tracking !== '' ? $tracking : $target;
 }
 
@@ -363,7 +367,7 @@ function coupon_tracking_label(array $coupon): string
         return 'Sem botao externo';
     }
 
-    if (in_array($partner, ['lomadee', 'awin', 'offer18'], true)) {
+    if (in_array($partner, ['lomadee', 'awin', 'offer18', 'hasoffers'], true)) {
         return coupon_has_valid_destination($coupon) ? 'Tracking ok' : 'Sem tracking';
     }
 
@@ -474,19 +478,44 @@ function coupon_is_offer18_tracking_url(string $url): bool
         || strpos($path, '/c') === 0;
 }
 
+function coupon_is_hasoffers_tracking_url(string $url): bool
+{
+    if (!is_remote_banner_url($url)) {
+        return false;
+    }
+
+    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+    $query = strtolower((string) parse_url($url, PHP_URL_QUERY));
+    return strpos($host, 'hasoffers') !== false
+        || strpos($host, 'tune') !== false
+        || strpos($query, 'offer_id=') !== false
+        || strpos($query, 'aff_id=') !== false
+        || strpos($query, 'affiliate_id=') !== false;
+}
+
 function coupon_url_with_click_ref(string $url, string $clickRef, array $coupon): string
 {
     $partner = strtolower(trim((string) ($coupon['partner_network'] ?? '')));
-    if ($url === '' || $clickRef === '' || $partner !== 'offer18') {
+    if ($url === '' || $clickRef === '' || !in_array($partner, ['offer18', 'hasoffers'], true)) {
+        return $url;
+    }
+
+    $params = $partner === 'hasoffers'
+        ? ['aff_sub' => $clickRef, 'aff_sub2' => 'oferto']
+        : ['aff_sub1' => $clickRef, 'aff_sub2' => 'oferto', 'source' => 'cupons_oferto'];
+
+    foreach ($params as $key => $value) {
+        if (preg_match('/(?:\\?|&)' . preg_quote($key, '/') . '=/i', $url)) {
+            unset($params[$key]);
+        }
+    }
+
+    if (!$params) {
         return $url;
     }
 
     $separator = strpos($url, '?') === false ? '?' : '&';
-    return $url . $separator . http_build_query([
-        'aff_sub1' => $clickRef,
-        'aff_sub2' => 'oferto',
-        'source' => 'cupons_oferto',
-    ]);
+    return $url . $separator . http_build_query($params);
 }
 
 function coupon_has_code(array $coupon): bool

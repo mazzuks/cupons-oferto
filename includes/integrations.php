@@ -878,6 +878,437 @@ function offer18_decimal_or_null(string $value): ?string
     return is_numeric($value) ? number_format((float) $value, 2, '.', '') : null;
 }
 
+function hasoffers_accounts(): array
+{
+    $config = app_config();
+    $fromConfig = $config['integrations']['hasoffers']['accounts'] ?? [];
+    if (is_array($fromConfig) && $fromConfig) {
+        return array_values($fromConfig);
+    }
+
+    return integration_json_setting('hasoffers_accounts', []);
+}
+
+function save_hasoffers_account(array $account): void
+{
+    $accounts = hasoffers_accounts();
+    $account = [
+        'label' => trim((string) ($account['label'] ?? 'HasOffers')),
+        'network_id' => hasoffers_normalize_network_id((string) ($account['network_id'] ?? '')),
+        'api_key' => trim((string) ($account['api_key'] ?? '')),
+        'affiliate_id' => trim((string) ($account['affiliate_id'] ?? '')),
+    ];
+    if ($account['network_id'] === '' || $account['api_key'] === '') {
+        throw new RuntimeException('Informe nome da conta, Network ID e API key do HasOffers.');
+    }
+
+    $key = hasoffers_account_key($account);
+    $updated = false;
+    foreach ($accounts as $index => $existing) {
+        if (hasoffers_account_key($existing) === $key) {
+            $accounts[$index] = $account;
+            $updated = true;
+            break;
+        }
+    }
+    if (!$updated) {
+        $accounts[] = $account;
+    }
+
+    save_integration_json_setting('hasoffers_accounts', $accounts);
+}
+
+function hasoffers_account_key(array $account): string
+{
+    return normalize_search_text((string) ($account['label'] ?? '')) . ':' . trim((string) ($account['network_id'] ?? ''));
+}
+
+function hasoffers_normalize_network_id(string $value): string
+{
+    $value = strtolower(trim($value));
+    $host = parse_url($value, PHP_URL_HOST);
+    if (is_string($host) && $host !== '') {
+        $value = $host;
+    }
+    $value = preg_replace('/^https?:\/\//', '', $value) ?: $value;
+    $value = preg_replace('/\.api\.hasoffers\.com.*$/', '', $value) ?: $value;
+    $value = preg_replace('/\.hasoffers\.com.*$/', '', $value) ?: $value;
+
+    return trim($value, "/ \t\n\r\0\x0B");
+}
+
+function hasoffers_account(int $index = 0): array
+{
+    $accounts = hasoffers_accounts();
+    return $accounts[$index] ?? [];
+}
+
+function hasoffers_status_options(): array
+{
+    return [
+        'active' => 'Ativas',
+        'pending' => 'Pendentes',
+        'paused' => 'Pausadas',
+        'expired' => 'Encerradas',
+    ];
+}
+
+function hasoffers_default_excluded_terms(): string
+{
+    return awin_default_excluded_terms();
+}
+
+function hasoffers_normalize_filters(array $filters): array
+{
+    $status = (string) ($filters['status'] ?? 'active');
+    $publishStatus = in_array($filters['publish_status'] ?? 'rascunho', ['ativo', 'rascunho'], true) ? $filters['publish_status'] : 'rascunho';
+
+    return [
+        'account_index' => max(0, (int) ($filters['account_index'] ?? 0)),
+        'page' => max(1, min(50, (int) ($filters['page'] ?? 1))),
+        'limit' => max(10, min(200, (int) ($filters['limit'] ?? 100))),
+        'status' => array_key_exists($status, hasoffers_status_options()) ? $status : 'active',
+        'query' => trim((string) ($filters['query'] ?? '')),
+        'categories' => array_values(array_unique(array_filter(array_map(
+            fn ($category) => canonical_category((string) $category),
+            (array) ($filters['categories'] ?? [])
+        )))),
+        'excluded_terms' => array_values(array_filter(array_map('trim', explode(',', (string) ($filters['excluded_terms'] ?? hasoffers_default_excluded_terms()))))),
+        'publish_status' => $publishStatus,
+        'selected_external_ids' => array_values(array_filter(array_map('strval', (array) ($filters['selected_external_ids'] ?? [])))),
+    ];
+}
+
+function hasoffers_request(array $account, string $target, string $method, array $query = []): array
+{
+    if (empty($account['network_id']) || empty($account['api_key'])) {
+        throw new RuntimeException('Configure uma conta HasOffers antes de buscar ofertas.');
+    }
+
+    $query = array_merge([
+        'api_key' => $account['api_key'],
+        'Target' => $target,
+        'Method' => $method,
+    ], $query);
+
+    $url = 'https://' . $account['network_id'] . '.api.hasoffers.com/Apiv3/json?' . hasoffers_query_string($query);
+    if (!function_exists('curl_init')) {
+        throw new RuntimeException('A extensao cURL do PHP precisa estar ativa para usar HasOffers.');
+    }
+
+    $curl = curl_init($url);
+    curl_setopt_array($curl, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTPHEADER => ['Accept: application/json'],
+    ]);
+    $body = curl_exec($curl);
+    $error = curl_error($curl);
+    $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+    curl_close($curl);
+
+    if ($body === false || $error) {
+        throw new RuntimeException('Falha ao chamar HasOffers: ' . $error);
+    }
+
+    $decoded = json_decode((string) $body, true);
+    if (!is_array($decoded)) {
+        throw new RuntimeException('Resposta invalida do HasOffers.');
+    }
+    if ($status < 200 || $status >= 300) {
+        throw new RuntimeException('HasOffers recusou a chamada: HTTP ' . $status);
+    }
+
+    $response = is_array($decoded['response'] ?? null) ? $decoded['response'] : $decoded;
+    $ok = (int) ($response['status'] ?? 1);
+    if ($ok !== 1) {
+        $errors = $response['errors'] ?? $response['errorMessage'] ?? 'Erro na API';
+        throw new RuntimeException('HasOffers recusou a chamada: ' . (is_array($errors) ? implode(', ', array_map('strval', $errors)) : (string) $errors));
+    }
+
+    return $response;
+}
+
+function hasoffers_query_string(array $query): string
+{
+    $parts = [];
+    foreach ($query as $key => $value) {
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                $parts[] = rawurlencode((string) $key) . '=' . rawurlencode((string) $item);
+            }
+            continue;
+        }
+
+        $parts[] = rawurlencode((string) $key) . '=' . rawurlencode((string) $value);
+    }
+
+    return implode('&', $parts);
+}
+
+function hasoffers_offers(array $filters): array
+{
+    $filters = hasoffers_normalize_filters($filters);
+    $account = hasoffers_account($filters['account_index']);
+    $query = [
+        'limit' => $filters['limit'],
+        'page' => $filters['page'],
+        'filters[status]' => $filters['status'],
+        'contain[]' => ['Advertiser', 'OfferCategory', 'Thumbnail', 'TrackingLink'],
+        'fields[]' => ['id', 'name', 'description', 'preview_url', 'expiration_date', 'status', 'default_payout', 'percent_payout', 'payout_type', 'terms_and_conditions'],
+    ];
+    if ($filters['query'] !== '') {
+        $query['filters[name][LIKE]'] = '%' . $filters['query'] . '%';
+    }
+
+    $response = hasoffers_request($account, 'Affiliate_Offer', 'findAll', $query);
+    $data = $response['data'] ?? [];
+    return is_array($data) ? array_values($data) : [];
+}
+
+function hasoffers_preview_offers(array $filters = []): array
+{
+    $filters = hasoffers_normalize_filters($filters);
+    $offers = hasoffers_offers($filters);
+    $items = [];
+    foreach ($offers as $offer) {
+        if (!is_array($offer) || !hasoffers_offer_passes_filters($offer, $filters)) {
+            continue;
+        }
+        $payload = hasoffers_offer_payload($offer, $filters['publish_status'], $filters['account_index']);
+        if (!$payload) {
+            continue;
+        }
+        $items[] = [
+            'external_id' => $payload['external_id'],
+            'store' => $payload['store'],
+            'title' => $payload['title'],
+            'category' => $payload['category'],
+            'offer_type' => $payload['offer_type'],
+            'redemption_type' => $payload['redemption_type'],
+            'status' => $payload['status'],
+            'existing' => (bool) coupon_by_external_id($payload['external_id']),
+        ];
+    }
+
+    return ['filters' => $filters, 'items' => $items, 'total' => count($offers), 'matched' => count($items)];
+}
+
+function hasoffers_import_offers(array $filters = []): array
+{
+    $filters = hasoffers_normalize_filters($filters);
+    $selectedExternalIds = $filters['selected_external_ids'];
+    $offers = hasoffers_offers($filters);
+    $created = 0;
+    $updated = 0;
+    $skipped = 0;
+    foreach ($offers as $offer) {
+        if (!is_array($offer) || !hasoffers_offer_passes_filters($offer, $filters)) {
+            $skipped++;
+            continue;
+        }
+        $payload = hasoffers_offer_payload($offer, $filters['publish_status'], $filters['account_index']);
+        if (!$payload || ($selectedExternalIds && !in_array($payload['external_id'], $selectedExternalIds, true))) {
+            $skipped++;
+            continue;
+        }
+        $existing = coupon_by_external_id($payload['external_id']);
+        save_coupon($payload, $existing ? (int) $existing['id'] : null);
+        monitor_integration_brand('HasOffers', hasoffers_value($offer, ['Advertiser.id', 'advertiser_id'], $payload['store']), $payload['store'], $payload['category']);
+        monitor_integration_offer('HasOffers', $payload, hasoffers_offer_id($offer), hasoffers_value($offer, ['Advertiser.id', 'advertiser_id'], ''));
+        $existing ? $updated++ : $created++;
+    }
+
+    create_system_log('hasoffers_import', 'Importacao HasOffers', $created . ' criadas, ' . $updated . ' atualizadas e ' . $skipped . ' ignoradas.', 'HasOffers');
+    return ['created' => $created, 'updated' => $updated, 'skipped' => $skipped, 'total' => count($offers)];
+}
+
+function sync_hasoffers_watchlist(): array
+{
+    $profile = integration_profile('hasoffers', []);
+    $filters = hasoffers_normalize_filters($profile);
+    $offers = hasoffers_offers($filters);
+    $seen = [];
+    $updated = 0;
+    $new = 0;
+    foreach ($offers as $offer) {
+        if (!is_array($offer) || !hasoffers_offer_passes_filters($offer, $filters)) {
+            continue;
+        }
+        $payload = hasoffers_offer_payload($offer, $filters['publish_status'], $filters['account_index']);
+        if (!$payload) {
+            continue;
+        }
+        $seen[$payload['external_id']] = true;
+        $existing = coupon_by_external_id($payload['external_id']);
+        save_coupon($payload, $existing ? (int) $existing['id'] : null);
+        monitor_integration_offer('HasOffers', $payload, hasoffers_offer_id($offer), hasoffers_value($offer, ['Advertiser.id', 'advertiser_id'], ''));
+        $existing ? $updated++ : $new++;
+    }
+
+    $missing = 0;
+    foreach (monitored_integration_offers('HasOffers') as $watch) {
+        if (!isset($seen[(string) $watch['external_id']])) {
+            mark_monitor_missing($watch);
+            $missing++;
+        } else {
+            mark_monitor_seen('HasOffers', (string) $watch['external_id']);
+        }
+    }
+
+    return ['partner' => 'HasOffers', 'read' => count($offers), 'updated' => $updated, 'new' => $new, 'missing' => $missing];
+}
+
+function hasoffers_offer_payload(array $row, string $status = 'rascunho', int $accountIndex = 0): ?array
+{
+    $offer = hasoffers_offer_data($row);
+    $offerId = hasoffers_offer_id($row);
+    $trackingUrl = hasoffers_tracking_url($row, $accountIndex);
+    if ($offerId === '' || !coupon_is_hasoffers_tracking_url($trackingUrl)) {
+        return null;
+    }
+
+    $title = hasoffers_value($row, ['Offer.name', 'name'], 'Oferta HasOffers');
+    $store = hasoffers_value($row, ['Advertiser.company', 'Advertiser.name', 'advertiser_name'], 'HasOffers');
+    $category = hasoffers_offer_category($row);
+    $code = hasoffers_value($row, ['Offer.coupon_code', 'coupon_code', 'code']);
+
+    return [
+        'category' => $category,
+        'store' => $store,
+        'title' => $title,
+        'description' => hasoffers_description($row, $store),
+        'code' => $code,
+        'target_url' => hasoffers_value($row, ['Offer.preview_url', 'preview_url'], $trackingUrl),
+        'banner_url' => hasoffers_banner($row),
+        'logo_url' => hasoffers_value($row, ['Thumbnail.url', 'Offer.thumbnail_url', 'thumbnail_url']),
+        'starts_at' => date('Y-m-d'),
+        'ends_at' => lomadee_date(hasoffers_value($row, ['Offer.expiration_date', 'expiration_date'])) ?: date('Y-m-d', strtotime('+30 days')),
+        'status' => $status,
+        'featured' => 0,
+        'rules' => trim(strip_tags(hasoffers_value($row, ['Offer.terms_and_conditions', 'terms_and_conditions'], 'Confira as regras no site parceiro antes de finalizar.'))),
+        'redemption_type' => $code !== '' ? 'texto_redirect' : 'redirect',
+        'offer_type' => $code !== '' ? 'cupom' : 'oferta_direta',
+        'cta_label' => $code !== '' ? 'Resgatar cupom' : 'Resgatar oferta',
+        'tracking_url' => $trackingUrl,
+        'partner_network' => 'HasOffers',
+        'payout' => offer18_decimal_or_null(hasoffers_value($row, ['Offer.default_payout', 'default_payout'])),
+        'campaign_cap' => null,
+        'sponsored' => 0,
+        'priority' => 0,
+        'tags' => 'hasoffers,' . strtolower(hasoffers_value($offer, ['payout_type'], 'offer')),
+        'requirements' => $code !== '' ? 'Copie o cupom e use no site parceiro' : 'Resgate no site parceiro',
+        'pixel_event' => 'hasoffers_' . preg_replace('/[^a-z0-9_]+/i', '_', $offerId),
+        'external_id' => 'hasoffers:' . hasoffers_account_key(hasoffers_account($accountIndex)) . ':' . $offerId,
+        'members_only' => 0,
+    ];
+}
+
+function hasoffers_offer_passes_filters(array $row, array $filters): bool
+{
+    $haystack = strtolower(implode(' ', [
+        hasoffers_value($row, ['Offer.name', 'name']),
+        hasoffers_value($row, ['Advertiser.company', 'Advertiser.name', 'advertiser_name']),
+        hasoffers_value($row, ['OfferCategory.name', 'OfferCategory.0.name']),
+        strip_tags(hasoffers_value($row, ['Offer.description', 'description', 'Offer.terms_and_conditions'])),
+    ]));
+    if ($filters['query'] !== '' && !normalized_text_contains($haystack, $filters['query'])) {
+        return false;
+    }
+    foreach ($filters['excluded_terms'] as $term) {
+        if ($term !== '' && normalized_text_contains($haystack, $term)) {
+            return false;
+        }
+    }
+    if (awin_should_filter_categories($filters['categories'])) {
+        $category = hasoffers_offer_category($row);
+        if (!in_array($category, $filters['categories'], true)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function hasoffers_tracking_url(array $row, int $accountIndex = 0): string
+{
+    $direct = hasoffers_value($row, ['TrackingLink.click_url', 'TrackingLink.tracking_url', 'tracking_link', 'tracking_url']);
+    if (coupon_is_hasoffers_tracking_url($direct)) {
+        return $direct;
+    }
+
+    $offerId = hasoffers_offer_id($row);
+    if ($offerId === '') {
+        return '';
+    }
+
+    try {
+        $response = hasoffers_request(hasoffers_account($accountIndex), 'Affiliate_Offer', 'generateTrackingLink', [
+            'offer_id' => $offerId,
+            'params[aff_sub2]' => 'oferto',
+            'options[tiny_url]' => '0',
+        ]);
+    } catch (Throwable $exception) {
+        return '';
+    }
+
+    $data = is_array($response['data'] ?? null) ? $response['data'] : [];
+    return hasoffers_value($data, ['click_url', 'tracking_link', 'tracking_url', 'url']);
+}
+
+function hasoffers_offer_id(array $row): string
+{
+    return hasoffers_value($row, ['Offer.id', 'id', 'offer_id']);
+}
+
+function hasoffers_offer_data(array $row): array
+{
+    return is_array($row['Offer'] ?? null) ? $row['Offer'] : $row;
+}
+
+function hasoffers_offer_category(array $row): string
+{
+    return canonical_category(hasoffers_value($row, ['OfferCategory.name', 'OfferCategory.0.name', 'category']), implode(' ', [
+        hasoffers_value($row, ['Offer.name', 'name']),
+        hasoffers_value($row, ['Advertiser.company', 'Advertiser.name']),
+        strip_tags(hasoffers_value($row, ['Offer.description', 'description'])),
+    ]));
+}
+
+function hasoffers_description(array $row, string $store): string
+{
+    $description = trim(strip_tags(hasoffers_value($row, ['Offer.description', 'description', 'Offer.terms_and_conditions'])));
+    return $description !== '' ? $description : 'Oferta disponivel na ' . $store . ' por tempo limitado.';
+}
+
+function hasoffers_banner(array $row): string
+{
+    return hasoffers_value($row, ['Thumbnail.url', 'Offer.thumbnail_url', 'thumbnail_url', 'Offer.image_url'], 'assets/og-cupons.png') ?: 'assets/og-cupons.png';
+}
+
+function hasoffers_value(array $source, array $paths, string $default = ''): string
+{
+    foreach ($paths as $path) {
+        $value = $source;
+        foreach (explode('.', $path) as $part) {
+            if (!is_array($value) || !array_key_exists($part, $value)) {
+                $value = null;
+                break;
+            }
+            $value = $value[$part];
+        }
+        if (is_array($value)) {
+            $value = $value['name'] ?? $value['company'] ?? $value['url'] ?? '';
+        }
+        $value = trim((string) $value);
+        if ($value !== '') {
+            return $value;
+        }
+    }
+
+    return $default;
+}
+
 function awin_normalize_filters(array $filters): array
 {
     $type = (string) ($filters['type'] ?? 'all');
@@ -1646,7 +2077,7 @@ function sync_awin_watchlist(): array
 function sync_all_integrations(): array
 {
     $results = [];
-    foreach (['Lomadee' => 'sync_lomadee_watchlist', 'Awin' => 'sync_awin_watchlist', 'Offer18' => 'sync_offer18_watchlist'] as $partner => $callback) {
+    foreach (['Lomadee' => 'sync_lomadee_watchlist', 'Awin' => 'sync_awin_watchlist', 'Offer18' => 'sync_offer18_watchlist', 'HasOffers' => 'sync_hasoffers_watchlist'] as $partner => $callback) {
         try {
             $results[] = $callback();
         } catch (Throwable $exception) {

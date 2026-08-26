@@ -24,5 +24,8 @@ return [
         'offer18' => [
             'accounts' => [],
         ],
+        'hasoffers' => [
+            'accounts' => [],
+        ],
     ],
 ];

@@ -13,6 +13,7 @@ $savedAwinToken = awin_access_token();
 $awinPublisherId = awin_publisher_id();
 $awinPublisherName = awin_publisher_name();
 $offer18Accounts = offer18_accounts();
+$hasoffersAccounts = hasoffers_accounts();
 
 $partners = [
     [
@@ -37,6 +38,13 @@ $partners = [
         'text' => 'Cadastre qualquer conta Offer18, busque campanhas aprovadas e importe com tracking preservado.',
         'href' => 'api-offer18.php',
         'action' => 'Abrir Offer18',
+    ],
+    [
+        'name' => 'HasOffers',
+        'status' => $hasoffersAccounts ? count($hasoffersAccounts) . ' conta(s)' : 'Pronta para conectar',
+        'text' => 'Integre redes HasOffers/TUNE, gere tracking link e importe ofertas aprovadas.',
+        'href' => 'api-hasoffers.php',
+        'action' => 'Abrir HasOffers',
     ],
     [
         'name' => 'Amazon',
@@ -69,7 +77,7 @@ $partners = [
           <p>Cada parceiro tem sua propria tela de busca, filtros e publicacao. Assim o CRM cresce sem virar uma lista confusa.</p>
         </div>
         <div class="admin-hero-stats" aria-label="Resumo das integracoes">
-          <span><strong>3</strong> parceiros iniciados</span>
+          <span><strong>4</strong> parceiros iniciados</span>
           <span><strong>1</strong> curadoria ativa</span>
         </div>
       </section>

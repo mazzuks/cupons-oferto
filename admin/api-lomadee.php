@@ -283,7 +283,15 @@ $monitoredBrands = monitored_integration_brands('Lomadee');
                 </thead>
                 <tbody>
                   <?php if (!$previewResult['items']): ?>
-                    <tr><td colspan="6" class="admin-empty-cell">Nenhuma campanha encontrada com estes filtros.</td></tr>
+                    <tr>
+                      <td colspan="6" class="admin-empty-cell">
+                        <?php if (!empty($brandOptions)): ?>
+                          Marca encontrada, mas nenhuma campanha ativa foi retornada pela Lomadee com estes filtros.
+                        <?php else: ?>
+                          Nenhuma campanha encontrada com estes filtros.
+                        <?php endif; ?>
+                      </td>
+                    </tr>
                   <?php endif; ?>
 
                   <?php foreach ($previewResult['items'] as $item): ?>

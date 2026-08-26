@@ -101,6 +101,55 @@ function category_options(): array
     ];
 }
 
+function fallback_banner_by_category(string $category): string
+{
+    $category = canonical_category($category);
+    $banners = [
+        'Alimentação e Bebidas' => 'assets/fallback-food.svg',
+        'Moda Feminina' => 'assets/fallback-fashion.svg',
+        'Moda Masculina' => 'assets/fallback-fashion.svg',
+        'Moda Infantil' => 'assets/fallback-kids.svg',
+        'Moda Infantil Menina' => 'assets/fallback-kids.svg',
+        'Moda Infantil Menino' => 'assets/fallback-kids.svg',
+        'Games' => 'assets/fallback-games.svg',
+        'Educação' => 'assets/fallback-education.svg',
+        'Entretenimento' => 'assets/fallback-entertainment.svg',
+        'Kids' => 'assets/fallback-kids.svg',
+        'Serviços' => 'assets/fallback-services.svg',
+        'Viagem' => 'assets/fallback-travel.svg',
+        'Compras' => 'assets/fallback-shopping.svg',
+        'Outros' => 'assets/fallback-shopping.svg',
+    ];
+
+    return $banners[$category] ?? $banners['Outros'];
+}
+
+function coupon_fallback_banner_src(array $coupon): string
+{
+    return fallback_banner_by_category((string) ($coupon['category'] ?? 'Outros'));
+}
+
+function coupon_uses_fallback_banner(array $coupon): bool
+{
+    $url = trim((string) ($coupon['banner_url'] ?? ''));
+    return $url === '' || strpos($url, 'assets/fallback-') === 0;
+}
+
+function coupon_banner_status_label(array $coupon): string
+{
+    return coupon_uses_fallback_banner($coupon) ? 'Fallback' : 'Original';
+}
+
+function banner_url_or_fallback(string $url, string $category): string
+{
+    $url = trim($url);
+    if ($url === '' || $url === 'assets/og-cupons.png') {
+        return fallback_banner_by_category($category);
+    }
+
+    return $url;
+}
+
 function canonical_category(string $value, string $context = ''): string
 {
     $text = normalize_search_text($value . ' ' . $context);
@@ -447,6 +496,15 @@ function save_coupon(array $data, ?int $id = null): void
         throw new RuntimeException('Banco de dados indisponivel.');
     }
 
+    $data['category'] = canonical_category((string) ($data['category'] ?? ''), implode(' ', [
+        (string) ($data['store'] ?? ''),
+        (string) ($data['title'] ?? ''),
+        (string) ($data['description'] ?? ''),
+        (string) ($data['tags'] ?? ''),
+        (string) ($data['requirements'] ?? ''),
+    ]));
+    $data['banner_url'] = banner_url_or_fallback((string) ($data['banner_url'] ?? ''), (string) $data['category']);
+
     $fields = [
         'category',
         'store',
@@ -705,7 +763,7 @@ function click_report_rows(string $startDate, string $endDate): array
 
 function coupon_banner_src(array $coupon): string
 {
-    $url = trim((string) ($coupon['banner_url'] ?? ''));
+    $url = banner_url_or_fallback(trim((string) ($coupon['banner_url'] ?? '')), (string) ($coupon['category'] ?? 'Outros'));
     $id = (int) ($coupon['id'] ?? 0);
 
     if ($id <= 0 || !is_remote_banner_url($url) || !db()) {

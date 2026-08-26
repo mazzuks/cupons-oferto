@@ -14,21 +14,22 @@ function coupon_payload(array $source, string $bannerUrl): array
     $code = trim($source['code'] ?? '');
     $offerType = normalize_offer_type($source['offer_type'] ?? 'cupom');
     $redemptionType = normalize_redemption_type($source['redemption_type'] ?? ($code !== '' ? 'texto' : 'redirect'));
+    $category = canonical_category(trim($source['category'] ?? ''), implode(' ', [
+        (string) ($source['store'] ?? ''),
+        (string) ($source['title'] ?? ''),
+        (string) ($source['description'] ?? ''),
+        (string) ($source['tags'] ?? ''),
+        (string) ($source['requirements'] ?? ''),
+    ]));
 
     return [
-        'category' => canonical_category(trim($source['category'] ?? ''), implode(' ', [
-            (string) ($source['store'] ?? ''),
-            (string) ($source['title'] ?? ''),
-            (string) ($source['description'] ?? ''),
-            (string) ($source['tags'] ?? ''),
-            (string) ($source['requirements'] ?? ''),
-        ])),
+        'category' => $category,
         'store' => trim($source['store'] ?? ''),
         'title' => trim($source['title'] ?? ''),
         'description' => trim($source['description'] ?? ''),
         'code' => $code,
         'target_url' => trim($source['target_url'] ?? ''),
-        'banner_url' => $bannerUrl,
+        'banner_url' => banner_url_or_fallback($bannerUrl, $category),
         'starts_at' => $source['starts_at'] ?? date('Y-m-d'),
         'ends_at' => $source['ends_at'] ?? date('Y-m-d'),
         'status' => $source['status'] ?? 'rascunho',
@@ -210,10 +211,10 @@ function import_campaigns_from_csv(): int
         $source = csv_row_to_coupon_source($headers, $row);
         $payload = coupon_payload($source, trim($source['banner_url'] ?? ''));
 
-        foreach (['category', 'store', 'title', 'description', 'target_url', 'banner_url', 'starts_at', 'ends_at'] as $field) {
+        foreach (['category', 'store', 'title', 'description', 'target_url', 'starts_at', 'ends_at'] as $field) {
             if (!$payload[$field]) {
                 fclose($handle);
-                throw new RuntimeException('Linha ' . ($imported + 2) . ': preencha categoria, loja, titulo, descricao, URL, banner, inicio e fim.');
+                throw new RuntimeException('Linha ' . ($imported + 2) . ': preencha categoria, loja, titulo, descricao, URL, inicio e fim.');
             }
         }
         validate_coupon_payload($payload, 'Linha ' . ($imported + 2));
@@ -345,7 +346,7 @@ try {
             $bannerUrl = uploaded_banner_url($current['banner_url'] ?? null);
             $payload = coupon_payload($_POST, $bannerUrl);
 
-            foreach (['category', 'store', 'title', 'description', 'target_url', 'banner_url', 'starts_at', 'ends_at'] as $field) {
+            foreach (['category', 'store', 'title', 'description', 'target_url', 'starts_at', 'ends_at'] as $field) {
                 if (!$payload[$field]) {
                     throw new RuntimeException('Preencha os campos obrigatorios.');
                 }
@@ -506,7 +507,7 @@ $form = array_merge($defaults, $editing ?: []);
             </div>
             <label>URL final da campanha<input name="target_url" type="url" value="<?= e($form['target_url']) ?>" required /></label>
             <label>URL de tracking/afiliado<input name="tracking_url" type="url" value="<?= e($form['tracking_url']) ?>" placeholder="Opcional. Se preenchida, o botao publico usa esta URL." /></label>
-            <label>URL do banner<input name="banner_url" type="text" value="<?= e($form['banner_url']) ?>" placeholder="Ou envie um arquivo abaixo" /></label>
+            <label>URL do banner<input name="banner_url" type="text" value="<?= e($form['banner_url']) ?>" placeholder="Opcional. Se ficar vazio, usamos um banner por categoria." /></label>
             <label>Upload do banner<input name="banner_file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
           </div>
 
@@ -609,6 +610,7 @@ $form = array_merge($defaults, $editing ?: []);
                 <th>Status</th>
                 <th>Acesso</th>
                 <th>Tracking</th>
+                <th>Banner</th>
                 <th>Parceiro</th>
                 <th>Validade</th>
                 <th></th>
@@ -624,6 +626,7 @@ $form = array_merge($defaults, $editing ?: []);
                   <td><span class="status-pill status-<?= e($coupon['status']) ?>"><?= e($coupon['status']) ?></span></td>
                   <td><span class="admin-pill <?= (int) ($coupon['members_only'] ?? 0) === 1 ? 'admin-pill-locked' : '' ?>"><?= (int) ($coupon['members_only'] ?? 0) === 1 ? 'Conectados' : 'Publico' ?></span></td>
                   <td><span class="status-pill <?= e(coupon_tracking_status_class($coupon)) ?>"><?= e(coupon_tracking_label($coupon)) ?></span></td>
+                  <td><span class="admin-pill <?= coupon_uses_fallback_banner($coupon) ? 'admin-pill-fallback' : '' ?>"><?= e(coupon_banner_status_label($coupon)) ?></span></td>
                   <td><?= e($coupon['partner_network'] ?? '') ?></td>
                   <td><?= e(date('d/m/Y', strtotime($coupon['ends_at']))) ?></td>
                   <td class="row-actions">

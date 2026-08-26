@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" role="img" aria-label="Oferta de educacao">
+  <rect width="600" height="320" rx="28" fill="#eef8ed"/>
+  <circle cx="510" cy="90" r="56" fill="#ffc62b"/>
+  <circle cx="110" cy="250" r="60" fill="#bdeff4"/>
+  <path d="M122 106l178-58 178 58-178 64z" fill="#092454"/>
+  <path d="M190 154v70c64 34 156 34 220 0v-70" fill="#1d4d8f"/>
+  <text x="230" y="220" fill="#ffffff" font-family="Arial, sans-serif" font-size="30" font-weight="800">CURSO</text>
+</svg>

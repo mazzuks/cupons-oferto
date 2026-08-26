@@ -817,6 +817,12 @@ body {
   background: #f2ecff;
 }
 
+.admin-pill-fallback {
+  color: #7a5200;
+  background: #fff4cc;
+  border-color: rgba(255, 198, 43, 0.45);
+}
+
 .row-actions {
   display: flex;
   gap: 10px;
@@ -1153,6 +1159,12 @@ body {
 .admin-pill-locked {
   color: #ddd6fe;
   background: rgba(91, 33, 182, 0.28);
+}
+
+.admin-pill-fallback {
+  color: #fde68a;
+  background: rgba(146, 64, 14, 0.34);
+  border-color: rgba(251, 191, 36, 0.32);
 }
 
 .row-actions a,

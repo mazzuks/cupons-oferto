@@ -142,7 +142,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <div class="v2-store-grid">
             <?php foreach ($topCoupons as $coupon): ?>
               <a class="v2-store-card" href="<?= e(coupon_go_url($coupon, 'v2_featured')) ?>" target="_blank" rel="noopener">
-                <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="" />
+                <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="" onerror="this.onerror=null;this.src='<?= e(coupon_fallback_banner_src($coupon)) ?>';" />
                 <div class="v2-store-card-copy">
                   <span><?= e($coupon['store']) ?></span>
                   <p><?= e($coupon['title']) ?></p>
@@ -218,7 +218,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <?php foreach ($coupons as $coupon): ?>
               <article class="coupon-card v2-list-card" <?= $defaultCategory !== 'Todos' && $coupon['category'] !== $defaultCategory ? 'hidden' : '' ?> data-category="<?= e($coupon['category']) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'cupom') ?>" data-search="<?= e(normalize_search_text($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'] . ' ' . ($coupon['tags'] ?? '') . ' ' . ($coupon['requirements'] ?? '') . ' ' . ($coupon['rules'] ?? '') . ' ' . ($coupon['partner_network'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'cupom') . ' ' . redemption_type_label($coupon['redemption_type'] ?? 'texto'))) ?>">
                 <div class="v2-list-logo">
-                  <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="Banner da oferta <?= e($coupon['store']) ?>" />
+                  <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="Banner da oferta <?= e($coupon['store']) ?>" onerror="this.onerror=null;this.src='<?= e(coupon_fallback_banner_src($coupon)) ?>';" />
                 </div>
                 <div class="v2-list-content">
                   <div class="coupon-meta">

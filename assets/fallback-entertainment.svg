@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" role="img" aria-label="Oferta de entretenimento">
+  <rect width="600" height="320" rx="28" fill="#fff0f3"/>
+  <circle cx="92" cy="88" r="50" fill="#bdeff4"/>
+  <circle cx="500" cy="248" r="64" fill="#ffc62b"/>
+  <rect x="138" y="98" width="324" height="134" rx="26" fill="#092454"/>
+  <path d="M242 130l92 36-92 36z" fill="#26bde2"/>
+  <path d="M166 132h36M398 132h36M166 198h36M398 198h36" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+</svg>

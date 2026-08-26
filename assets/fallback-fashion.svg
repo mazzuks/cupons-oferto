@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" role="img" aria-label="Oferta de moda">
+  <rect width="600" height="320" rx="28" fill="#f1edff"/>
+  <circle cx="500" cy="238" r="62" fill="#ffc62b"/>
+  <circle cx="94" cy="82" r="52" fill="#bdeff4"/>
+  <path d="M230 78h140l70 58-42 54-34-28v92H236v-92l-34 28-42-54z" fill="#092454"/>
+  <path d="M254 78c12 24 80 24 92 0" fill="none" stroke="#26bde2" stroke-width="12" stroke-linecap="round"/>
+  <text x="214" y="178" fill="#ffffff" font-family="Arial, sans-serif" font-size="32" font-weight="800">MODA</text>
+</svg>

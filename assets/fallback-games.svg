@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" role="img" aria-label="Oferta de games">
+  <rect width="600" height="320" rx="28" fill="#e7f0ff"/>
+  <circle cx="92" cy="90" r="48" fill="#ffc62b"/>
+  <circle cx="506" cy="238" r="70" fill="#bdeff4"/>
+  <rect x="130" y="112" width="340" height="118" rx="46" fill="#092454"/>
+  <circle cx="210" cy="170" r="25" fill="#26bde2"/>
+  <path d="M210 142v56M182 170h56" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="390" cy="156" r="13" fill="#ffc62b"/>
+  <circle cx="426" cy="184" r="13" fill="#04a928"/>
+  <text x="252" y="181" fill="#ffffff" font-family="Arial, sans-serif" font-size="34" font-weight="800">GAME</text>
+</svg>

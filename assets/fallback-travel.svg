@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" role="img" aria-label="Oferta de viagem">
+  <rect width="600" height="320" rx="28" fill="#eaf9fb"/>
+  <circle cx="500" cy="94" r="58" fill="#ffc62b"/>
+  <circle cx="104" cy="238" r="62" fill="#dcefa6"/>
+  <path d="M126 190l348-96c26-8 42 24 18 38l-90 52 28 76-40 12-58-58-96 56-34-18 82-76-124 28z" fill="#092454"/>
+  <text x="210" y="104" fill="#1d4d8f" font-family="Arial, sans-serif" font-size="34" font-weight="800">VIAGEM</text>
+</svg>

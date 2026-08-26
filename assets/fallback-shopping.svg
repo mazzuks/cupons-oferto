@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" role="img" aria-label="Oferta de compras">
+  <rect width="600" height="320" rx="28" fill="#eaf3ff"/>
+  <circle cx="500" cy="82" r="54" fill="#ffc62b"/>
+  <circle cx="94" cy="250" r="62" fill="#bdeff4"/>
+  <path d="M144 118h196l-20 108H164z" fill="#1d4d8f"/>
+  <path d="M178 118c0-42 28-70 64-70s64 28 64 70" fill="none" stroke="#092454" stroke-width="18" stroke-linecap="round"/>
+  <rect x="360" y="110" width="150" height="92" rx="20" fill="#ffffff"/>
+  <text x="168" y="186" fill="#ffffff" font-family="Arial, sans-serif" font-size="34" font-weight="800">OFF</text>
+  <text x="386" y="162" fill="#092454" font-family="Arial, sans-serif" font-size="30" font-weight="800">Achado</text>
+</svg>

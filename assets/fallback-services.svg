@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" role="img" aria-label="Oferta de servicos">
+  <rect width="600" height="320" rx="28" fill="#edf7ff"/>
+  <circle cx="486" cy="82" r="54" fill="#bdeff4"/>
+  <circle cx="112" cy="240" r="62" fill="#ffc62b"/>
+  <rect x="118" y="86" width="364" height="154" rx="28" fill="#092454"/>
+  <rect x="152" y="122" width="132" height="82" rx="18" fill="#ffffff"/>
+  <path d="M322 132h112M322 164h88M322 196h124" stroke="#26bde2" stroke-width="12" stroke-linecap="round"/>
+  <text x="170" y="178" fill="#1d4d8f" font-family="Arial, sans-serif" font-size="30" font-weight="800">OK</text>
+</svg>

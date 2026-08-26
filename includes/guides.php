@@ -49,8 +49,8 @@ function all_guides(): array
                 ],
             ],
             'coupon_box' => china_in_box_coupon_box(
-                'Bateu vontade de comer yakisoba?',
-                'Antes de pedir, veja se um dos cupons ativos do China in Box deixa seu jantar mais barato.'
+                'China in Box com cupom para pedir yakisoba',
+                'Copie um cupom ativo do China in Box e resgate a oferta no site parceiro.'
             ),
             'tip' => 'Fontes consultadas: Receitas Nestle, Superinteressante e Discover Nikkei.',
         ],
@@ -79,8 +79,8 @@ function all_guides(): array
                 ],
             ],
             'coupon_box' => china_in_box_coupon_box(
-                'Rolinho primavera combina com desconto',
-                'Se a ideia e completar o pedido com uma entrada crocante, aproveite para copiar o cupom e resgatar a oferta.'
+                'China in Box com cupom para pedir rolinho primavera',
+                'Copie um cupom ativo do China in Box e resgate a oferta no site parceiro.'
             ),
             'tip' => 'Fontes consultadas: China Today, Oxford Companion to Food e South China Morning Post.',
         ],
@@ -109,8 +109,8 @@ function all_guides(): array
                 ],
             ],
             'coupon_box' => china_in_box_coupon_box(
-                'Hoje pode ser dia de comida chinesa',
-                'Escolha seu prato favorito, copie um cupom ativo e siga para o China in Box para resgatar a oferta.'
+                'China in Box com cupom para comida chinesa',
+                'Copie um cupom ativo do China in Box e resgate a oferta no site parceiro.'
             ),
             'tip' => 'Fontes consultadas: Xinhua, The World Economy/Wiley e Foodstar.',
         ],

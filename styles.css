@@ -857,17 +857,29 @@ h3 {
   border-radius: 8px;
 }
 
-.guide-coupon-list strong {
-  color: var(--blue);
-  font-family: Kanit, Inter, sans-serif;
-  font-size: 22px;
-  line-height: 1;
-}
-
 .guide-coupon-list span {
   color: var(--muted);
   font-weight: 700;
   line-height: 1.35;
+}
+
+.guide-coupon-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.guide-coupon-actions .copy-button,
+.guide-coupon-actions .use-button {
+  min-height: 48px;
+  padding-inline: 14px;
+  text-align: center;
+}
+
+.guide-coupon-actions .copy-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .guide-sidebar {
@@ -945,6 +957,10 @@ h3 {
   }
 
   .guide-coupon-list {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-coupon-actions {
     grid-template-columns: 1fr;
   }
 

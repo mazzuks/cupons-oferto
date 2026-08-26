@@ -24,6 +24,35 @@ $shareSlug = $guide['slug'] ?? $slug;
 $shareUrl = $shareSlug ? 'https://cupons.oferto.digital/guia.php?tema=' . rawurlencode($shareSlug) : 'https://cupons.oferto.digital/guias';
 $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
 $whatsappShareUrl = 'https://wa.me/?text=' . rawurlencode($guide['title'] . ' - ' . $shareUrl);
+$guideCouponMatches = guide_coupon_matches($guide['coupon_box']['coupons'] ?? []);
+
+function guide_coupon_matches(array $couponRefs): array
+{
+    $matches = [];
+    if (!$couponRefs) {
+        return $matches;
+    }
+
+    $wantedCodes = array_map(
+        fn (array $coupon): string => normalize_search_text((string) ($coupon['code'] ?? '')),
+        $couponRefs
+    );
+
+    foreach (active_coupons() as $coupon) {
+        if (normalize_search_text((string) ($coupon['store'] ?? '')) !== 'china in box') {
+            continue;
+        }
+
+        $code = normalize_search_text((string) ($coupon['code'] ?? ''));
+        if ($code === '' || !in_array($code, $wantedCodes, true)) {
+            continue;
+        }
+
+        $matches[$code] = $coupon;
+    }
+
+    return $matches;
+}
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -59,7 +88,7 @@ $whatsappShareUrl = 'https://wa.me/?text=' . rawurlencode($guide['title'] . ' - 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260826-china-guides" />
+    <link rel="stylesheet" href="styles.css?v=20260826-guide-coupon-actions" />
   </head>
   <body>
     <header class="site-header">
@@ -101,14 +130,19 @@ $whatsappShareUrl = 'https://wa.me/?text=' . rawurlencode($guide['title'] . ' - 
               <h2><?= e($guide['coupon_box']['title'] ?? 'Cupons para testar') ?></h2>
               <p><?= e($guide['coupon_box']['body'] ?? '') ?></p>
               <div class="guide-coupon-list">
-                <?php foreach (($guide['coupon_box']['coupons'] ?? []) as $coupon): ?>
-                  <div>
-                    <strong><?= e($coupon['code']) ?></strong>
-                    <span><?= e($coupon['description']) ?></span>
+                <?php foreach (($guide['coupon_box']['coupons'] ?? []) as $couponRef): ?>
+                  <?php $matchedCoupon = $guideCouponMatches[normalize_search_text((string) ($couponRef['code'] ?? ''))] ?? null; ?>
+                  <div class="guide-coupon-item">
+                    <span><?= e($couponRef['description']) ?></span>
+                    <div class="guide-coupon-actions">
+                      <button class="copy-button" type="button" data-code="<?= e($couponRef['code']) ?>">Copiar cupom</button>
+                      <?php if ($matchedCoupon && coupon_shows_rescue_button($matchedCoupon)): ?>
+                        <a class="use-button" href="<?= e(coupon_go_url($matchedCoupon, 'guide_cta')) ?>" target="_blank" rel="noopener">Resgatar oferta</a>
+                      <?php endif; ?>
+                    </div>
                   </div>
                 <?php endforeach; ?>
               </div>
-              <a class="primary-action" href="index.php#cupons">Ver cupons China in Box</a>
             </section>
           <?php endif; ?>
 
@@ -150,6 +184,24 @@ $whatsappShareUrl = 'https://wa.me/?text=' . rawurlencode($guide['title'] . ' - 
       <strong>Oferto Cupons</strong>
       <span>Compras inteligentes, ofertas imperdíveis.</span>
     </footer>
+    <script>
+      document.addEventListener('click', async (event) => {
+        const button = event.target.closest('.copy-button');
+        if (!button) return;
+
+        const code = button.dataset.code;
+        if (!code) return;
+
+        await navigator.clipboard.writeText(code);
+        const originalText = button.textContent;
+        button.classList.add('is-copied');
+        button.textContent = 'Cupom copiado';
+        setTimeout(() => {
+          button.classList.remove('is-copied');
+          button.textContent = originalText;
+        }, 1800);
+      });
+    </script>
     <script src="pwa.js"></script>
   </body>
 </html>

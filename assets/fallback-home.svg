@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" role="img" aria-label="Oferta de casa e utensilios">
+  <rect width="600" height="320" rx="28" fill="#eef7ff"/>
+  <circle cx="92" cy="82" r="52" fill="#bdeff4"/>
+  <circle cx="500" cy="242" r="64" fill="#ffc62b"/>
+  <path d="M126 154 300 64l174 90v112H170V178z" fill="#092454"/>
+  <path d="M220 266v-84h78v84" fill="#26bde2"/>
+  <rect x="328" y="178" width="74" height="58" rx="10" fill="#ffffff"/>
+  <path d="M148 156 300 76l152 80" fill="none" stroke="#1d4d8f" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="176" y="132" fill="#ffffff" font-family="Arial, sans-serif" font-size="28" font-weight="800">CASA</text>
+  <text x="316" y="132" fill="#ffffff" font-family="Arial, sans-serif" font-size="28" font-weight="800">E UTENSILIOS</text>
+</svg>

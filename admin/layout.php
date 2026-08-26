@@ -9,6 +9,7 @@ function admin_nav_items(): array
         ['key' => 'ofertas', 'label' => 'Ofertas', 'hint' => 'Cupons e campanhas', 'href' => 'index.php'],
         ['key' => 'apis', 'label' => 'APIs', 'hint' => 'Parceiros e feeds', 'href' => 'apis.php'],
         ['key' => 'notificacoes', 'label' => 'Notificacoes', 'hint' => 'Alertas do sistema', 'href' => 'notificacoes.php'],
+        ['key' => 'logs', 'label' => 'Logs', 'hint' => 'Alteracoes e eventos', 'href' => 'logs.php'],
         ['key' => 'relatorios', 'label' => 'Relatorios', 'hint' => 'Cliques e CSV', 'href' => 'relatorios.php'],
         ['key' => 'usuarios', 'label' => 'Usuarios', 'hint' => 'Acessos do CRM', 'href' => 'usuarios.php'],
         ['key' => 'site', 'label' => 'Ver site', 'hint' => 'Vitrine publica', 'href' => '../index.php'],

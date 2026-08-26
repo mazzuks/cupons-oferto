@@ -16,7 +16,13 @@ function coupon_payload(array $source, string $bannerUrl): array
     $redemptionType = normalize_redemption_type($source['redemption_type'] ?? ($code !== '' ? 'texto' : 'redirect'));
 
     return [
-        'category' => trim($source['category'] ?? ''),
+        'category' => canonical_category(trim($source['category'] ?? ''), implode(' ', [
+            (string) ($source['store'] ?? ''),
+            (string) ($source['title'] ?? ''),
+            (string) ($source['description'] ?? ''),
+            (string) ($source['tags'] ?? ''),
+            (string) ($source['requirements'] ?? ''),
+        ])),
         'store' => trim($source['store'] ?? ''),
         'title' => trim($source['title'] ?? ''),
         'description' => trim($source['description'] ?? ''),
@@ -320,12 +326,15 @@ try {
         $action = $_POST['action'] ?? '';
 
         if ($action === 'delete') {
+            $deleted = coupon_by_id((int) $_POST['id']);
             delete_coupon((int) $_POST['id']);
+            create_system_log('coupon_deleted', 'Campanha excluida', ($deleted['store'] ?? 'Oferta') . ' - ' . ($deleted['title'] ?? 'campanha') . ' foi removida do CRM.');
             redirect('index.php?deleted=1');
         }
 
         if ($action === 'clear_campaigns') {
             $count = clear_campaign_data();
+            create_system_log('campaigns_cleared', 'Campanhas limpas', $count . ' campanhas foram removidas da base pelo CRM.');
             redirect('index.php?cleared=' . $count);
         }
 
@@ -343,11 +352,19 @@ try {
             validate_coupon_payload($payload);
 
             save_coupon($payload, $id);
+            create_system_log(
+                $id ? 'coupon_updated' : 'coupon_created',
+                $id ? 'Campanha atualizada' : 'Campanha criada',
+                $payload['store'] . ' - ' . $payload['title'] . ' foi salva como ' . $payload['status'] . '.',
+                $payload['partner_network'] ?? '',
+                $id ? (string) $id : ''
+            );
             redirect('index.php?saved=1');
         }
 
         if ($action === 'import_csv') {
             $count = import_campaigns_from_csv();
+            create_system_log('csv_imported', 'CSV importado', $count . ' campanhas foram importadas por arquivo CSV.');
             redirect('index.php?imported=' . $count);
         }
     }
@@ -443,7 +460,7 @@ $form = array_merge($defaults, $editing ?: []);
               </label>
               <label>Categoria
                 <select name="category" required>
-                  <?php foreach (['Alimentação e Bebidas', 'Compras', 'Games', 'Educação', 'Entretenimento', 'Kids', 'Serviços', 'Outros'] as $category): ?>
+                  <?php foreach (category_options() as $category): ?>
                     <option <?= $form['category'] === $category ? 'selected' : '' ?>><?= e($category) ?></option>
                   <?php endforeach; ?>
                 </select>

@@ -81,6 +81,77 @@ function redemption_type_label(?string $type): string
     return $types[$type ?: 'texto'] ?? $types['texto'];
 }
 
+function category_options(): array
+{
+    return [
+        'Alimentação e Bebidas',
+        'Moda Feminina',
+        'Moda Masculina',
+        'Moda Infantil',
+        'Moda Infantil Menina',
+        'Moda Infantil Menino',
+        'Compras',
+        'Games',
+        'Educação',
+        'Entretenimento',
+        'Kids',
+        'Serviços',
+        'Viagem',
+        'Outros',
+    ];
+}
+
+function canonical_category(string $value, string $context = ''): string
+{
+    $text = normalize_search_text($value . ' ' . $context);
+    $rules = [
+        'Alimentação e Bebidas' => ['china in box', 'temaki', 'yakisoba', 'pizza', 'restaurante', 'delivery', 'ifood', 'food', 'beverage', 'bebida', 'aliment', 'snack', 'salgad', 'lanche'],
+        'Moda Infantil Menina' => ['moda infantil menina', 'moda infantil feminina', 'roupa infantil menina', 'roupa menina', 'vestido infantil', 'saia infantil', 'calcinha infantil'],
+        'Moda Infantil Menino' => ['moda infantil menino', 'moda infantil masculina', 'roupa infantil menino', 'roupa menino', 'bermuda infantil', 'cueca infantil'],
+        'Moda Infantil' => ['moda infantil', 'roupa infantil', 'calcado infantil', 'calçado infantil'],
+        'Moda Feminina' => ['moda feminina', 'roupa feminina', 'vestido', 'saia', 'blusa feminina', 'calcinha', 'lingerie', 'salto feminino'],
+        'Moda Masculina' => ['moda masculina', 'roupa masculina', 'terno', 'blazer', 'cueca', 'polo', 'camisa masculina', 'sapato masculino'],
+        'Games' => ['game', 'games', 'gift card', 'playstation', 'xbox', 'nintendo', 'steam'],
+        'Educação' => ['educa', 'education', 'curso', 'faculdade', 'idioma', 'ensino'],
+        'Serviços' => ['service', 'servic', 'seguro', 'insurance', 'banco', 'financeiro', 'celular', 'internet'],
+        'Entretenimento' => ['entreten', 'cinema', 'streaming', 'show', 'evento'],
+        'Viagem' => ['travel', 'viagem', 'hotel', 'passagem', 'turismo'],
+        'Kids' => ['kids', 'brinquedo', 'bebe', 'bebê', 'infantil'],
+        'Compras' => ['shopping', 'compras', 'marketplace', 'mercado', 'loja', 'ecommerce', 'eletronico', 'eletro'],
+    ];
+
+    foreach ($rules as $category => $needles) {
+        foreach ($needles as $needle) {
+            if ($needle !== '' && strpos($text, normalize_search_text($needle)) !== false) {
+                return $category;
+            }
+        }
+    }
+
+    foreach (category_options() as $category) {
+        if (normalize_search_text($value) === normalize_search_text($category)) {
+            return $category;
+        }
+    }
+
+    return 'Outros';
+}
+
+function normalize_search_text(string $value): string
+{
+    $value = strtolower(trim($value));
+    $value = strtr($value, [
+        'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a',
+        'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
+        'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
+        'ó' => 'o', 'ò' => 'o', 'õ' => 'o', 'ô' => 'o', 'ö' => 'o',
+        'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
+        'ç' => 'c',
+    ]);
+
+    return preg_replace('/\s+/', ' ', $value) ?: '';
+}
+
 function offer_types(): array
 {
     return [
@@ -182,6 +253,30 @@ function coupon_tracking_status_class(array $coupon): string
     }
 
     return 'status-rascunho';
+}
+
+function create_system_log(string $type, string $title, string $body, string $partner = '', string $externalId = ''): void
+{
+    $pdo = db();
+    if (!$pdo) {
+        return;
+    }
+
+    $statement = $pdo->prepare('INSERT INTO admin_notifications (type, title, body, partner, external_id) VALUES (?, ?, ?, ?, ?)');
+    $statement->execute([$type, $title, $body, $partner ?: null, $externalId ?: null]);
+}
+
+function system_logs(int $limit = 120): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return [];
+    }
+
+    $statement = $pdo->prepare('SELECT * FROM admin_notifications ORDER BY created_at DESC, id DESC LIMIT ?');
+    $statement->bindValue(1, $limit, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetchAll();
 }
 
 function coupon_is_partner_tracking_url(string $url, string $targetUrl = ''): bool
@@ -294,7 +389,7 @@ function active_coupons(): array
 {
     $pdo = db();
     if (!$pdo) {
-        return fallback_coupons();
+        return array_map('normalize_coupon_record', fallback_coupons());
     }
 
     $sql = "SELECT * FROM coupons
@@ -305,7 +400,7 @@ function active_coupons(): array
               AND title NOT LIKE 'BANNER:%'
             ORDER BY featured DESC, priority DESC, ends_at ASC, store ASC";
 
-    return array_values(array_filter($pdo->query($sql)->fetchAll(), 'coupon_is_ready_for_public_site'));
+    return array_values(array_filter(array_map('normalize_coupon_record', $pdo->query($sql)->fetchAll()), 'coupon_is_ready_for_public_site'));
 }
 
 function all_coupons(): array
@@ -315,7 +410,7 @@ function all_coupons(): array
         return [];
     }
 
-    return $pdo->query('SELECT * FROM coupons ORDER BY created_at DESC, id DESC')->fetchAll();
+    return array_map('normalize_coupon_record', $pdo->query('SELECT * FROM coupons ORDER BY created_at DESC, id DESC')->fetchAll());
 }
 
 function coupon_by_id(int $id): ?array
@@ -329,7 +424,20 @@ function coupon_by_id(int $id): ?array
     $statement->execute([$id]);
     $coupon = $statement->fetch();
 
-    return $coupon ?: null;
+    return $coupon ? normalize_coupon_record($coupon) : null;
+}
+
+function normalize_coupon_record(array $coupon): array
+{
+    $coupon['category'] = canonical_category((string) ($coupon['category'] ?? ''), implode(' ', [
+        (string) ($coupon['store'] ?? ''),
+        (string) ($coupon['title'] ?? ''),
+        (string) ($coupon['description'] ?? ''),
+        (string) ($coupon['tags'] ?? ''),
+        (string) ($coupon['requirements'] ?? ''),
+    ]));
+
+    return $coupon;
 }
 
 function save_coupon(array $data, ?int $id = null): void

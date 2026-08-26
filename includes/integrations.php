@@ -60,6 +60,11 @@ function text_contains(string $haystack, string $needle): bool
     return $needle === '' || strpos($haystack, $needle) !== false;
 }
 
+function normalized_text_contains(string $haystack, string $needle): bool
+{
+    return text_contains(normalize_search_text($haystack), normalize_search_text($needle));
+}
+
 function text_ends_with(string $haystack, string $needle): bool
 {
     return $needle === '' || substr($haystack, -strlen($needle)) === $needle;
@@ -425,7 +430,10 @@ function awin_normalize_filters(array $filters): array
         'status' => $status,
         'region' => strtoupper(trim((string) ($filters['region'] ?? 'BR'))),
         'query' => trim((string) ($filters['query'] ?? '')),
-        'categories' => array_values(array_filter(array_map('trim', (array) ($filters['categories'] ?? [])))),
+        'categories' => array_values(array_unique(array_filter(array_map(
+            fn ($category) => canonical_category((string) $category),
+            (array) ($filters['categories'] ?? [])
+        )))),
         'advertiser_ids' => array_values(array_filter(array_map('intval', (array) ($filters['advertiser_ids'] ?? [])))),
         'excluded_terms' => array_values(array_filter(array_map('trim', explode(',', (string) ($filters['excluded_terms'] ?? awin_default_excluded_terms()))))),
         'publish_status' => $publishStatus,
@@ -567,12 +575,15 @@ function awin_import_offers(array $filters = []): array
 
         $existing = coupon_by_external_id($payload['external_id']);
         save_coupon($payload, $existing ? (int) $existing['id'] : null);
-        if (!empty($campaign['organizationId'])) {
-            monitor_integration_brand('Lomadee', (string) $campaign['organizationId'], (string) ($payload['store'] ?? 'Lomadee'), (string) ($brand['segment'] ?? ''));
+        $advertiser = is_array($offer['advertiser'] ?? null) ? $offer['advertiser'] : [];
+        if (!empty($advertiser['id'])) {
+            monitor_integration_brand('Awin', (string) $advertiser['id'], (string) ($payload['store'] ?? 'Awin'), '');
         }
-        monitor_integration_offer('Lomadee', $payload, (string) $campaign['id'], (string) ($campaign['organizationId'] ?? ''));
+        monitor_integration_offer('Awin', $payload, (string) $offer['promotionId'], (string) ($advertiser['id'] ?? ''));
         $existing ? $updated++ : $created++;
     }
+
+    create_system_log('awin_import', 'Importacao Awin', $created . ' criadas, ' . $updated . ' atualizadas e ' . $skipped . ' ignoradas.', 'Awin');
 
     return [
         'created' => $created,
@@ -592,12 +603,12 @@ function awin_offer_passes_filters(array $offer, array $filters): bool
         strip_tags((string) ($offer['terms'] ?? '')),
     ]));
 
-    if ($filters['query'] !== '' && !text_contains($haystack, strtolower($filters['query']))) {
+    if ($filters['query'] !== '' && !normalized_text_contains($haystack, $filters['query'])) {
         return false;
     }
 
     foreach ($filters['excluded_terms'] as $term) {
-        if ($term !== '' && text_contains($haystack, strtolower($term))) {
+        if ($term !== '' && normalized_text_contains($haystack, $term)) {
             return false;
         }
     }
@@ -794,7 +805,7 @@ function lomadee_brand_options(string $search = '', int $maxPages = 20): array
         $name = trim((string) ($brand['name'] ?? ''));
         $segment = trim((string) ($brand['segment'] ?? ''));
         $haystack = strtolower($name . ' ' . $segment);
-        if ($search !== '' && !text_contains($haystack, strtolower($search))) {
+        if ($search !== '' && !normalized_text_contains($haystack, $search)) {
             continue;
         }
 
@@ -826,16 +837,7 @@ function lomadee_default_campaign_types(): array
 
 function lomadee_category_options(): array
 {
-    return [
-        'Alimentacao e Bebidas',
-        'Compras',
-        'Games',
-        'Educacao',
-        'Servicos',
-        'Entretenimento',
-        'Kids',
-        'Viagem',
-    ];
+    return category_options();
 }
 
 function lomadee_normalize_filters(array $filters): array
@@ -843,7 +845,10 @@ function lomadee_normalize_filters(array $filters): array
     $types = $filters['types'] ?? lomadee_default_campaign_types();
     $types = array_values(array_intersect((array) $types, array_keys(lomadee_campaign_type_options())));
 
-    $categories = array_values(array_filter(array_map('trim', (array) ($filters['categories'] ?? []))));
+    $categories = array_values(array_unique(array_filter(array_map(
+        fn ($category) => canonical_category((string) $category),
+        (array) ($filters['categories'] ?? [])
+    ))));
     $brandIds = array_values(array_filter(array_map('strval', (array) ($filters['brand_ids'] ?? []))));
     $excludedTerms = array_values(array_filter(array_map('trim', explode(',', (string) ($filters['excluded_terms'] ?? 'BANNERS:')))));
     $status = in_array($filters['publish_status'] ?? 'rascunho', ['ativo', 'rascunho'], true) ? $filters['publish_status'] : 'rascunho';
@@ -958,6 +963,8 @@ function lomadee_import_campaigns(int $maxPages = 10, array $filters = []): arra
         $existing ? $updated++ : $created++;
     }
 
+    create_system_log('lomadee_import', 'Importacao Lomadee', $created . ' criadas, ' . $updated . ' atualizadas e ' . $skipped . ' ignoradas.', 'Lomadee');
+
     return [
         'created' => $created,
         'updated' => $updated,
@@ -1012,6 +1019,7 @@ function sync_lomadee_watchlist(): array
                 'Lomadee',
                 $externalId
             );
+            create_system_log('lomadee_campaign_new', 'Nova campanha Lomadee', ($payload['store'] ?? 'Lomadee') . ' - ' . ($payload['title'] ?? 'campanha') . ' foi adicionada pela sincronizacao.', 'Lomadee', $externalId);
             $new++;
         }
     }
@@ -1019,6 +1027,7 @@ function sync_lomadee_watchlist(): array
     foreach (monitored_integration_offers('Lomadee') as $watch) {
         if (empty($seen[(string) $watch['external_id']])) {
             mark_monitor_missing($watch);
+            create_system_log('lomadee_campaign_missing', 'Campanha sumiu da Lomadee', ($watch['store'] ?? 'Lomadee') . ' - ' . ($watch['title'] ?? 'campanha') . ' nao apareceu na sincronizacao.', 'Lomadee', (string) $watch['external_id']);
             $missing++;
         }
     }
@@ -1067,6 +1076,7 @@ function sync_awin_watchlist(): array
                 'Awin',
                 $externalId
             );
+            create_system_log('awin_campaign_new', 'Nova oferta Awin', ($payload['store'] ?? 'Awin') . ' - ' . ($payload['title'] ?? 'oferta') . ' foi adicionada pela sincronizacao.', 'Awin', $externalId);
             $new++;
         }
     }
@@ -1074,6 +1084,7 @@ function sync_awin_watchlist(): array
     foreach (monitored_integration_offers('Awin') as $watch) {
         if (empty($seen[(string) $watch['external_id']])) {
             mark_monitor_missing($watch);
+            create_system_log('awin_campaign_missing', 'Oferta sumiu da Awin', ($watch['store'] ?? 'Awin') . ' - ' . ($watch['title'] ?? 'oferta') . ' nao apareceu na sincronizacao.', 'Awin', (string) $watch['external_id']);
             $missing++;
         }
     }
@@ -1089,6 +1100,7 @@ function sync_all_integrations(): array
             $results[] = $callback();
         } catch (Throwable $exception) {
             create_admin_notification('sync_error', 'Erro ao sincronizar ' . $partner, $exception->getMessage(), $partner);
+            create_system_log('integration_error', 'Erro ao sincronizar ' . $partner, $exception->getMessage(), $partner);
             $results[] = ['partner' => $partner, 'error' => $exception->getMessage()];
         }
     }
@@ -1113,12 +1125,12 @@ function lomadee_campaign_passes_filters(array $campaign, array $brand, array $f
         return false;
     }
 
-    if ($filters['brand_query'] !== '' && !$filters['brand_ids'] && !text_contains($haystack, strtolower($filters['brand_query']))) {
+    if ($filters['brand_query'] !== '' && !$filters['brand_ids'] && !normalized_text_contains($haystack, $filters['brand_query'])) {
         return false;
     }
 
     foreach ($filters['excluded_terms'] as $term) {
-        if ($term !== '' && text_contains($haystack, strtolower($term))) {
+        if ($term !== '' && normalized_text_contains($haystack, $term)) {
             return false;
         }
     }
@@ -1137,7 +1149,7 @@ function lomadee_is_media_material(string $title, string $description = ''): boo
 {
     $text = strtolower(trim($title . ' ' . $description));
     foreach (['banners:', 'banner:', 'material de divulgacao', 'material de divulgação'] as $term) {
-        if ($term !== '' && text_contains($text, $term)) {
+        if ($term !== '' && normalized_text_contains($text, $term)) {
             return true;
         }
     }
@@ -1425,52 +1437,22 @@ function lomadee_banner(array $campaign, array $brand): string
 
 function lomadee_category(array $campaign, array $brand): string
 {
+    $context = implode(' ', [
+        (string) ($brand['name'] ?? ''),
+        (string) ($campaign['name'] ?? ''),
+        strip_tags((string) ($campaign['description'] ?? '')),
+    ]);
     $categories = $campaign['categories'] ?? [];
     if (is_array($categories) && !empty($categories[0])) {
-        return lomadee_site_category(trim((string) $categories[0]));
+        return lomadee_site_category(trim((string) $categories[0]), $context);
     }
 
-    return lomadee_site_category(trim((string) ($brand['segment'] ?? 'Ofertas')));
+    return lomadee_site_category(trim((string) ($brand['segment'] ?? 'Ofertas')), $context);
 }
 
-function lomadee_site_category(string $value): string
+function lomadee_site_category(string $value, string $context = ''): string
 {
-    $normalized = strtolower($value);
-    $map = [
-        'food' => 'Alimentacao e Bebidas',
-        'beverage' => 'Alimentacao e Bebidas',
-        'bebida' => 'Alimentacao e Bebidas',
-        'aliment' => 'Alimentacao e Bebidas',
-        'yakisoba' => 'Alimentacao e Bebidas',
-        'restaurant' => 'Alimentacao e Bebidas',
-        'games' => 'Games',
-        'game' => 'Games',
-        'education' => 'Educacao',
-        'educa' => 'Educacao',
-        'course' => 'Educacao',
-        'kids' => 'Kids',
-        'infantil' => 'Kids',
-        'travel' => 'Viagem',
-        'viagem' => 'Viagem',
-        'service' => 'Servicos',
-        'servic' => 'Servicos',
-        'insurance' => 'Servicos',
-        'seguro' => 'Servicos',
-        'entertainment' => 'Entretenimento',
-        'entreten' => 'Entretenimento',
-        'shopping' => 'Compras',
-        'compras' => 'Compras',
-        'fashion' => 'Compras',
-        'moda' => 'Compras',
-    ];
-
-    foreach ($map as $needle => $category) {
-        if (text_contains($normalized, $needle)) {
-            return $category;
-        }
-    }
-
-    return 'Compras';
+    return canonical_category($value, $context);
 }
 
 function lomadee_description(array $campaign, array $brand): string

@@ -5,7 +5,7 @@ declare(strict_types=1);
 function china_in_box_coupon_box(string $title, string $body): array
 {
     return [
-        'kicker' => 'Cupons China in Box',
+        'kicker' => '',
         'title' => $title,
         'body' => $body,
         'coupons' => [

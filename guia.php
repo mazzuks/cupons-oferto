@@ -126,7 +126,9 @@ function guide_coupon_matches(array $couponRefs): array
 
           <?php if (!empty($guide['coupon_box'])): ?>
             <section class="guide-coupon-box">
-              <p class="section-kicker"><?= e($guide['coupon_box']['kicker'] ?? 'Cupons ativos') ?></p>
+              <?php if (!empty($guide['coupon_box']['kicker'])): ?>
+                <p class="section-kicker"><?= e($guide['coupon_box']['kicker']) ?></p>
+              <?php endif; ?>
               <h2><?= e($guide['coupon_box']['title'] ?? 'Cupons para testar') ?></h2>
               <p><?= e($guide['coupon_box']['body'] ?? '') ?></p>
               <div class="guide-coupon-list">

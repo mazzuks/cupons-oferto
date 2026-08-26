@@ -914,21 +914,22 @@ function lomadee_preview_campaigns(array $filters = []): array
 function lomadee_campaigns_for_filters(array $filters): array
 {
     $filters = lomadee_normalize_filters($filters);
-    $baseQuery = [
-        'types' => implode(',', $filters['types']),
-        'status' => 'onTime',
-    ];
+    $brandIds = $filters['brand_ids'];
+    if (!$brandIds && $filters['brand_query'] !== '') {
+        $brandIds = array_values(array_map(
+            fn (array $brand): string => (string) $brand['id'],
+            lomadee_brand_options($filters['brand_query'], max($filters['max_pages'], 20))
+        ));
+    }
 
-    if (!$filters['brand_ids']) {
-        return lomadee_fetch_all('/affiliate/campaigns', $baseQuery, $filters['max_pages']);
+    if (!$brandIds) {
+        return lomadee_fetch_campaigns_resilient($filters);
     }
 
     $campaigns = [];
     $seen = [];
-    foreach ($filters['brand_ids'] as $brandId) {
-        $items = lomadee_fetch_all('/affiliate/campaigns', array_merge($baseQuery, [
-            'organizationId' => $brandId,
-        ]), $filters['max_pages']);
+    foreach ($brandIds as $brandId) {
+        $items = lomadee_fetch_campaigns_resilient($filters, $brandId);
 
         foreach ($items as $item) {
             if (!is_array($item) || empty($item['id'])) {
@@ -946,6 +947,41 @@ function lomadee_campaigns_for_filters(array $filters): array
     }
 
     return $campaigns;
+}
+
+function lomadee_fetch_campaigns_resilient(array $filters, string $brandId = ''): array
+{
+    $query = [
+        'types' => implode(',', $filters['types']),
+        'status' => 'onTime',
+    ];
+    if ($brandId !== '') {
+        $query['organizationId'] = $brandId;
+    }
+
+    try {
+        return lomadee_fetch_all('/affiliate/campaigns', $query, $filters['max_pages']);
+    } catch (RuntimeException $error) {
+        if (count($filters['types']) <= 1 || stripos($error->getMessage(), 'campaigns_request_failed') === false) {
+            throw $error;
+        }
+    }
+
+    $items = [];
+    foreach ($filters['types'] as $type) {
+        $typeQuery = $query;
+        $typeQuery['types'] = $type;
+
+        try {
+            $items = array_merge($items, lomadee_fetch_all('/affiliate/campaigns', $typeQuery, $filters['max_pages']));
+        } catch (RuntimeException $error) {
+            if (stripos($error->getMessage(), 'campaigns_request_failed') === false) {
+                throw $error;
+            }
+        }
+    }
+
+    return $items;
 }
 
 function lomadee_import_campaigns(int $maxPages = 10, array $filters = []): array

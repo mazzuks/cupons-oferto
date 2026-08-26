@@ -21,9 +21,141 @@ function china_in_box_coupon_box(string $title, string $body): array
     ];
 }
 
+function shopee_coupon_box(string $title, string $body): array
+{
+    return [
+        'store' => 'Shopee',
+        'kicker' => '',
+        'title' => $title,
+        'body' => $body,
+        'limit' => 4,
+        'coupons' => [],
+    ];
+}
+
 function all_guides(): array
 {
     return [
+        [
+            'slug' => 'origem-da-shopee',
+            'category' => 'Shopee',
+            'title' => 'A origem da Shopee: como o app virou parada obrigatoria para garimpar ofertas',
+            'summary' => 'Conheca a historia da Shopee e veja como usar cupons antes de fechar a compra.',
+            'intro' => 'A Shopee virou parte da rotina de quem gosta de pesquisar preço, comparar vendedores e encontrar aquele produto util que parecia escondido no meio da internet. De capinha de celular a item de cozinha, de presente simples a acessorio gamer, a plataforma cresceu justamente por juntar variedade, preço competitivo e uma experiencia de compra feita para o celular.',
+            'sections' => [
+                [
+                    'title' => 'De marketplace regional a app conhecido no Brasil',
+                    'body' => 'A Shopee nasceu no Sudeste Asiatico dentro do grupo Sea, inicialmente como um marketplace pensado para conectar vendedores e compradores em uma experiencia mobile. A proposta era simples: facilitar a venda online para pequenos e grandes lojistas e deixar a compra mais rapida para quem ja fazia quase tudo pelo celular. Essa combinacao ajudou a marca a crescer em paises como Singapura, Indonesia, Tailandia, Malasia, Vietna e Filipinas antes de ganhar força em outros mercados.',
+                ],
+                [
+                    'title' => 'Por que ela pegou tao forte por aqui',
+                    'body' => 'No Brasil, a Shopee encontrou um publico que ja gostava de pesquisar, pechinchar e esperar promoçao. O app se encaixou bem nesse comportamento porque oferece muitas opcoes para o mesmo tipo de produto, avaliações de compradores, cupons frequentes e campanhas de frete ou desconto. Para muita gente, comprar na Shopee virou um habito de garimpo: a pessoa abre o app sem pressa, pesquisa varias lojas e salva itens para decidir depois.',
+                ],
+                [
+                    'title' => 'Como comprar melhor sem cair no impulso',
+                    'body' => 'O lado bom da variedade tambem exige cuidado. Como existem muitos vendedores e produtos parecidos, o melhor caminho e comparar preço, reputacao da loja, prazo de entrega, avaliações com foto e politica de devolucao. O cupom ajuda, mas nao deve ser o unico criterio. Um desconto pequeno em uma loja confiavel pode valer mais que uma promessa enorme em uma pagina sem avaliações suficientes.',
+                ],
+                [
+                    'title' => 'Cupom entra no final, mas a escolha começa antes',
+                    'body' => 'Antes de finalizar uma compra na Shopee, vale fazer uma checagem rapida: o produto realmente atende ao que voce procura, a loja tem bom historico, o prazo faz sentido e o valor final ficou melhor depois do cupom? Quando essas respostas batem, o desconto vira um empurrao positivo, nao uma compra por ansiedade. Por isso, reunir cupons ativos em uma pagina ajuda: voce pesquisa a oferta, copia o codigo disponivel e segue para resgatar sem perder tempo procurando em varios lugares.',
+                ],
+            ],
+            'coupon_box' => shopee_coupon_box(
+                'Vai comprar na Shopee? Veja se tem cupom ativo',
+                'Escolha um cupom da Shopee, copie o codigo e siga para resgatar a oferta com o tracking correto.'
+            ),
+            'tip' => 'Dica: compare sempre o valor final com frete, prazo e reputacao do vendedor antes de concluir a compra.',
+        ],
+        [
+            'slug' => 'produtos-mais-vendidos-na-shopee',
+            'category' => 'Shopee',
+            'title' => 'Produtos mais vendidos na Shopee: o que costuma aparecer nas buscas de quem quer economizar',
+            'summary' => 'Veja categorias populares na Shopee e como usar cupons para melhorar o valor final.',
+            'intro' => 'Quando alguem fala em Shopee, muita gente pensa logo em achadinhos. A plataforma ficou conhecida por reunir produtos baratos, itens importados, lojas nacionais e vendedores especializados em nichos bem diferentes. Nem sempre o produto mais vendido sera o melhor para voce, mas entender as categorias mais procuradas ajuda a comprar com mais criterio.',
+            'sections' => [
+                [
+                    'title' => 'Acessorios de celular e tecnologia simples',
+                    'body' => 'Capinhas, peliculas, carregadores, suportes, cabos, fones simples e adaptadores costumam ter bastante procura porque sao itens de reposicao ou compra recorrente. Muita gente prefere pagar menos nesses produtos, principalmente quando nao precisa de uma marca especifica. Ainda assim, vale olhar comentarios, fotos reais e quantidade de vendas, porque acessorio barato demais pode sair caro se quebrar rapido ou nao funcionar bem.',
+                ],
+                [
+                    'title' => 'Casa, cozinha e organizacao',
+                    'body' => 'Outro grupo forte envolve itens para casa: potes, organizadores, utensilios de cozinha, panos, luminarias, suportes, caixas, cabides e pequenos acessorios de decoracao. Esses produtos costumam viralizar porque prometem resolver problemas pequenos do dia a dia. A melhor compra e aquela que melhora a rotina sem virar acumulacao. Se voce ja estava procurando algo para organizar gaveta, pia, armario ou mesa, um cupom pode deixar o carrinho mais interessante.',
+                ],
+                [
+                    'title' => 'Beleza, moda e pequenos presentes',
+                    'body' => 'Maquiagem, necessaires, escovas, acessorios de cabelo, bijuterias, camisetas, meias, bolsas pequenas e itens para presente tambem aparecem bastante. Nessa parte, o cuidado com avaliação e ainda mais importante, porque tamanho, textura, cor e acabamento podem variar. Antes de comprar, leia os comentarios negativos tambem. Eles ajudam a entender se o problema e pontual ou se acontece com muita gente.',
+                ],
+                [
+                    'title' => 'Como usar cupom sem comprar besteira',
+                    'body' => 'A regra mais honesta e simples: cupom bom e aquele que reduz o preço de algo que voce ja queria comprar. Se o desconto te fez colocar cinco itens extras no carrinho sem necessidade, a economia desapareceu. Para usar melhor os cupons da Shopee, monte o carrinho primeiro, confira frete e prazo, depois aplique o codigo. Assim voce entende o desconto real e decide se vale fechar agora ou esperar uma promocao melhor.',
+                ],
+            ],
+            'coupon_box' => shopee_coupon_box(
+                'Cupons da Shopee para testar no carrinho',
+                'Copie um cupom ativo e confira o desconto no valor final antes de pagar.'
+            ),
+            'tip' => 'Produtos populares mudam com campanhas, datas comemorativas e tendencias. O melhor filtro continua sendo preço final, avaliações e prazo.',
+        ],
+        [
+            'slug' => 'produtos-mais-desejados-na-shopee',
+            'category' => 'Shopee',
+            'title' => 'Produtos mais desejados na Shopee: como transformar vontade em compra inteligente',
+            'summary' => 'Entenda como lidar com lista de desejos, achadinhos e cupons sem comprar por impulso.',
+            'intro' => 'A lista de desejos da Shopee tem um papel curioso: ela guarda aquilo que chamou sua atencao, mas tambem pode virar armadilha para compras por impulso. O segredo esta em usar essa lista como filtro, nao como desculpa. Quando voce salva um produto e espera um pouco, consegue comparar melhor, olhar avaliações novas e aproveitar cupons com mais calma.',
+            'sections' => [
+                [
+                    'title' => 'Desejado nao quer dizer urgente',
+                    'body' => 'Muitos produtos desejados sao itens de conforto, estilo ou curiosidade: organizadores bonitos, luminarias, utensilios diferentes, roupas, acessorios gamer, produtos de beleza, itens para pet e presentes criativos. Eles podem ser legais, mas nem sempre precisam ser comprados na hora. Esperar alguns dias ajuda a separar o desejo real do impulso criado por uma foto bonita ou por uma oferta com contador.',
+                ],
+                [
+                    'title' => 'Use favoritos para comparar vendedores',
+                    'body' => 'Salvar o mesmo tipo de produto de lojas diferentes pode ser uma boa estrategia. Depois, compare preço, prazo, nota do vendedor, fotos de clientes, quantidade de pedidos e comentarios recentes. Muitas vezes, dois produtos parecem iguais, mas um tem acabamento melhor, envio mais rapido ou menos reclamacoes. O cupom deve entrar depois dessa primeira peneira.',
+                ],
+                [
+                    'title' => 'Datas promocionais podem ajudar',
+                    'body' => 'Marketplaces costumam trabalhar com campanhas de datas duplas, viradas de mes, frete reduzido e cupons por categoria. Quem nao tem pressa pode se beneficiar disso. Se um produto esta na sua lista de desejos, acompanhe por alguns dias e veja se o preço muda. Quando aparecer cupom, confira se ele vale para aquela categoria e se o desconto supera qualquer variacao de frete.',
+                ],
+                [
+                    'title' => 'Como decidir se vale comprar agora',
+                    'body' => 'Uma pergunta simples resolve muita coisa: se o cupom nao existisse, voce ainda compraria esse produto? Se a resposta for sim, o desconto ajuda. Se a resposta for nao, talvez o cupom esteja mandando mais que a sua necessidade. Para comprar melhor na Shopee, use cupons como ferramenta de economia, nao como motivo principal da compra. Escolha o produto, valide a loja, aplique o codigo e so depois finalize.',
+                ],
+            ],
+            'coupon_box' => shopee_coupon_box(
+                'Achou algo na lista de desejos? Teste um cupom da Shopee',
+                'Veja os cupons ativos, copie o codigo e resgate a oferta antes de finalizar.'
+            ),
+            'tip' => 'Uma boa lista de desejos economiza dinheiro quando ela ajuda voce a esperar, comparar e comprar melhor.',
+        ],
+        [
+            'slug' => 'como-funciona-a-logistica-da-shopee',
+            'category' => 'Shopee',
+            'title' => 'Como funciona a logistica da Shopee e por que o prazo muda tanto de uma compra para outra',
+            'summary' => 'Entenda por que frete, vendedor, origem do produto e cupom influenciam a compra.',
+            'intro' => 'Quem compra na Shopee ja percebeu que dois produtos parecidos podem ter prazos bem diferentes. Um chega rapido, outro demora mais; um tem frete interessante, outro muda bastante quando entra no carrinho. Isso acontece porque a plataforma conecta vendedores variados, estoques diferentes e formas de envio que dependem da origem do produto e da estrutura logistica disponivel.',
+            'sections' => [
+                [
+                    'title' => 'Marketplace nao e uma loja unica',
+                    'body' => 'A Shopee funciona como marketplace. Isso significa que muitos vendedores anunciam dentro da mesma plataforma. Alguns produtos saem de vendedores nacionais, outros podem ter origem internacional, e isso muda prazo, rastreamento, custo de envio e experiencia de entrega. Por isso, comparar apenas o preço do produto pode enganar. O valor final e o prazo precisam entrar na conta.',
+                ],
+                [
+                    'title' => 'Frete faz parte do desconto real',
+                    'body' => 'Um cupom pode parecer bom, mas o frete pode reduzir o beneficio. Tambem pode acontecer o contrario: um produto um pouco mais caro, com frete melhor, sai mais vantajoso no total. O melhor jeito de avaliar e simular no carrinho. Coloque o produto, veja o frete, aplique o cupom e compare o total final com outras opcoes. Esse pequeno cuidado evita aquela sensacao de desconto bonito que some na etapa de pagamento.',
+                ],
+                [
+                    'title' => 'Prazo depende de origem, vendedor e rota',
+                    'body' => 'Produtos enviados de mais longe naturalmente podem demorar mais. Vendedores com estoque nacional tendem a entregar mais rapido, mas isso tambem depende da transportadora, do CEP e do periodo da compra. Em grandes datas promocionais, o volume de pedidos pode aumentar e afetar o prazo. Antes de fechar, confira a estimativa de entrega e veja se ela combina com sua necessidade. Presente de ultima hora, por exemplo, pede mais cuidado.',
+                ],
+                [
+                    'title' => 'Como comprar com mais tranquilidade',
+                    'body' => 'A compra fica melhor quando voce junta quatro pontos: loja bem avaliada, produto com comentarios reais, prazo aceitavel e cupom funcionando. Se um desses pontos falha, vale repensar. Para compras pequenas e sem urgencia, talvez um prazo maior seja aceitavel. Para item importante, pode valer pagar um pouco mais em uma opçao com entrega melhor. O Oferto ajuda na etapa do cupom, mas a decisao final precisa olhar o conjunto da compra.',
+                ],
+            ],
+            'coupon_box' => shopee_coupon_box(
+                'Antes de fechar o carrinho, veja cupons da Shopee',
+                'Copie um cupom ativo, abra a oferta e confirme o desconto junto com frete e prazo.'
+            ),
+            'tip' => 'Frete gratis, prazo curto e cupom nem sempre aparecem juntos. Compare o total antes de decidir.',
+        ],
         [
             'slug' => 'origem-do-yakisoba',
             'category' => 'Alimentação e Bebidas',

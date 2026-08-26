@@ -24,31 +24,36 @@ $shareSlug = $guide['slug'] ?? $slug;
 $shareUrl = $shareSlug ? 'https://cupons.oferto.digital/guia.php?tema=' . rawurlencode($shareSlug) : 'https://cupons.oferto.digital/guias';
 $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
 $whatsappShareUrl = 'https://wa.me/?text=' . rawurlencode($guide['title'] . ' - ' . $shareUrl);
-$guideCouponMatches = guide_coupon_matches($guide['coupon_box']['coupons'] ?? []);
+$guideCouponMatches = guide_coupon_matches(
+    $guide['coupon_box']['coupons'] ?? [],
+    $guide['coupon_box']['store'] ?? 'China in Box',
+    (int) ($guide['coupon_box']['limit'] ?? 4)
+);
 
-function guide_coupon_matches(array $couponRefs): array
+function guide_coupon_matches(array $couponRefs, string $storeName = 'China in Box', int $limit = 4): array
 {
     $matches = [];
-    if (!$couponRefs) {
-        return $matches;
-    }
-
     $wantedCodes = array_map(
         fn (array $coupon): string => normalize_search_text((string) ($coupon['code'] ?? '')),
         $couponRefs
     );
+    $wantedCodes = array_values(array_filter($wantedCodes));
+    $storeKey = normalize_search_text($storeName);
 
     foreach (active_coupons() as $coupon) {
-        if (normalize_search_text((string) ($coupon['store'] ?? '')) !== 'china in box') {
+        if (normalize_search_text((string) ($coupon['store'] ?? '')) !== $storeKey) {
             continue;
         }
 
         $code = normalize_search_text((string) ($coupon['code'] ?? ''));
-        if ($code === '' || !in_array($code, $wantedCodes, true)) {
+        if ($wantedCodes && ($code === '' || !in_array($code, $wantedCodes, true))) {
             continue;
         }
 
-        $matches[$code] = $coupon;
+        $matches[$code ?: (string) ($coupon['id'] ?? count($matches))] = $coupon;
+        if (!$wantedCodes && count($matches) >= $limit) {
+            break;
+        }
     }
 
     return $matches;
@@ -132,12 +137,26 @@ function guide_coupon_matches(array $couponRefs): array
               <h2><?= e($guide['coupon_box']['title'] ?? 'Cupons para testar') ?></h2>
               <p><?= e($guide['coupon_box']['body'] ?? '') ?></p>
               <div class="guide-coupon-list">
-                <?php foreach (($guide['coupon_box']['coupons'] ?? []) as $couponRef): ?>
-                  <?php $matchedCoupon = $guideCouponMatches[normalize_search_text((string) ($couponRef['code'] ?? ''))] ?? null; ?>
+                <?php $couponRefs = $guide['coupon_box']['coupons'] ?? []; ?>
+                <?php if (!$couponRefs): ?>
+                  <?php foreach ($guideCouponMatches as $matchedCoupon): ?>
+                    <?php $couponRefs[] = [
+                        'code' => (string) ($matchedCoupon['code'] ?? ''),
+                        'description' => (string) ($matchedCoupon['title'] ?? $matchedCoupon['description'] ?? 'Oferta ativa'),
+                    ]; ?>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+                <?php foreach ($couponRefs as $couponRef): ?>
+                  <?php
+                    $couponCodeKey = normalize_search_text((string) ($couponRef['code'] ?? ''));
+                    $matchedCoupon = $couponCodeKey !== '' ? ($guideCouponMatches[$couponCodeKey] ?? null) : null;
+                  ?>
                   <div class="guide-coupon-item">
                     <span><?= e($couponRef['description']) ?></span>
                     <div class="guide-coupon-actions">
-                      <button class="copy-button" type="button" data-code="<?= e($couponRef['code']) ?>">Copiar cupom</button>
+                      <?php if (!empty($couponRef['code'])): ?>
+                        <button class="copy-button" type="button" data-code="<?= e($couponRef['code']) ?>">Copiar cupom</button>
+                      <?php endif; ?>
                       <?php if ($matchedCoupon && coupon_shows_rescue_button($matchedCoupon)): ?>
                         <a class="use-button" href="<?= e(coupon_go_url($matchedCoupon, 'guide_cta')) ?>" target="_blank" rel="noopener">Resgatar oferta</a>
                       <?php endif; ?>

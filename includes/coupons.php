@@ -338,6 +338,10 @@ function coupon_destination_url(array $coupon): string
         return coupon_is_awin_tracking_url($tracking) ? $tracking : '';
     }
 
+    if ($partner === 'offer18') {
+        return coupon_is_offer18_tracking_url($tracking) ? $tracking : '';
+    }
+
     return $tracking !== '' ? $tracking : $target;
 }
 
@@ -359,7 +363,7 @@ function coupon_tracking_label(array $coupon): string
         return 'Sem botao externo';
     }
 
-    if (in_array($partner, ['lomadee', 'awin'], true)) {
+    if (in_array($partner, ['lomadee', 'awin', 'offer18'], true)) {
         return coupon_has_valid_destination($coupon) ? 'Tracking ok' : 'Sem tracking';
     }
 
@@ -453,6 +457,36 @@ function coupon_is_awin_tracking_url(string $url): bool
         || substr($host, -12) === '.awstrack.me'
         || $host === 'awin.com'
         || substr($host, -9) === '.awin.com';
+}
+
+function coupon_is_offer18_tracking_url(string $url): bool
+{
+    if (!is_remote_banner_url($url)) {
+        return false;
+    }
+
+    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+    $path = strtolower((string) parse_url($url, PHP_URL_PATH));
+    return strpos($host, 'offer18') !== false
+        || strpos($host, 'o18.link') !== false
+        || strpos($host, 'o18.click') !== false
+        || preg_match('/\/c\/?$/', $path)
+        || strpos($path, '/c') === 0;
+}
+
+function coupon_url_with_click_ref(string $url, string $clickRef, array $coupon): string
+{
+    $partner = strtolower(trim((string) ($coupon['partner_network'] ?? '')));
+    if ($url === '' || $clickRef === '' || $partner !== 'offer18') {
+        return $url;
+    }
+
+    $separator = strpos($url, '?') === false ? '?' : '&';
+    return $url . $separator . http_build_query([
+        'aff_sub1' => $clickRef,
+        'aff_sub2' => 'oferto',
+        'source' => 'cupons_oferto',
+    ]);
 }
 
 function coupon_has_code(array $coupon): bool

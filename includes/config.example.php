@@ -21,5 +21,8 @@ return [
             'access_token' => '',
             'publisher_id' => '',
         ],
+        'offer18' => [
+            'accounts' => [],
+        ],
     ],
 ];

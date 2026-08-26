@@ -19,7 +19,8 @@ if (!preg_match('/^https?:\/\//i', $url)) {
     exit('URL da oferta invalida.');
 }
 
-log_coupon_click($id, $event);
+$clickRef = log_coupon_click($id, $event);
+$url = coupon_url_with_click_ref($url, $clickRef, $coupon);
 
 header('Location: ' . $url, true, 302);
 exit;

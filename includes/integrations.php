@@ -405,6 +405,479 @@ function awin_default_excluded_terms(): string
     return 'adulto, erotico, erotica, sex shop, sexy, sensual, lingerie, cassino, bet, betting, apostas, vape, tabaco';
 }
 
+function offer18_accounts(): array
+{
+    $config = app_config();
+    $fromConfig = $config['integrations']['offer18']['accounts'] ?? [];
+    if (is_array($fromConfig) && $fromConfig) {
+        return array_values($fromConfig);
+    }
+
+    return integration_json_setting('offer18_accounts', []);
+}
+
+function save_offer18_account(array $account): void
+{
+    $accounts = offer18_accounts();
+    $account = [
+        'label' => trim((string) ($account['label'] ?? 'Offer18')),
+        'mid' => trim((string) ($account['mid'] ?? '')),
+        'api_key' => trim((string) ($account['api_key'] ?? '')),
+        'secret_key' => trim((string) ($account['secret_key'] ?? '')),
+        'affiliate_id' => trim((string) ($account['affiliate_id'] ?? '')),
+    ];
+    if ($account['mid'] === '' || $account['api_key'] === '' || $account['secret_key'] === '') {
+        throw new RuntimeException('Informe nome, MID, API key e secret key da conta Offer18.');
+    }
+
+    $key = offer18_account_key($account);
+    $updated = false;
+    foreach ($accounts as $index => $existing) {
+        if (offer18_account_key($existing) === $key) {
+            $accounts[$index] = $account;
+            $updated = true;
+            break;
+        }
+    }
+    if (!$updated) {
+        $accounts[] = $account;
+    }
+
+    save_integration_json_setting('offer18_accounts', $accounts);
+}
+
+function offer18_account_key(array $account): string
+{
+    return normalize_search_text((string) ($account['label'] ?? '')) . ':' . trim((string) ($account['mid'] ?? ''));
+}
+
+function offer18_account(int $index = 0): array
+{
+    $accounts = offer18_accounts();
+    return $accounts[$index] ?? [];
+}
+
+function offer18_mask(string $value): string
+{
+    $value = trim($value);
+    if ($value === '') {
+        return 'Nao configurado';
+    }
+
+    return substr($value, 0, 6) . str_repeat('*', 10) . substr($value, -4);
+}
+
+function offer18_status_options(): array
+{
+    return [
+        '1' => 'Aprovadas/ativas',
+        '2' => 'Pendentes',
+        '3' => 'Encerradas',
+    ];
+}
+
+function offer18_model_options(): array
+{
+    return [
+        '' => 'Todos',
+        'CPA' => 'CPA',
+        'CPL' => 'CPL',
+        'CPC' => 'CPC',
+        'CPS' => 'CPS',
+    ];
+}
+
+function offer18_default_excluded_terms(): string
+{
+    return awin_default_excluded_terms();
+}
+
+function offer18_normalize_filters(array $filters): array
+{
+    $status = (string) ($filters['status'] ?? '1');
+    $publishStatus = in_array($filters['publish_status'] ?? 'rascunho', ['ativo', 'rascunho'], true) ? $filters['publish_status'] : 'rascunho';
+
+    return [
+        'account_index' => max(0, (int) ($filters['account_index'] ?? 0)),
+        'page' => max(1, min(50, (int) ($filters['page'] ?? 1))),
+        'limit' => max(10, min(200, (int) ($filters['limit'] ?? 100))),
+        'status' => array_key_exists($status, offer18_status_options()) ? $status : '1',
+        'query' => trim((string) ($filters['query'] ?? '')),
+        'model_affiliate' => trim((string) ($filters['model_affiliate'] ?? '')),
+        'categories' => array_values(array_unique(array_filter(array_map(
+            fn ($category) => canonical_category((string) $category),
+            (array) ($filters['categories'] ?? [])
+        )))),
+        'excluded_terms' => array_values(array_filter(array_map('trim', explode(',', (string) ($filters['excluded_terms'] ?? offer18_default_excluded_terms()))))),
+        'publish_status' => $publishStatus,
+        'selected_external_ids' => array_values(array_filter(array_map('strval', (array) ($filters['selected_external_ids'] ?? [])))),
+    ];
+}
+
+function offer18_request(array $account, string $path, array $query = []): array
+{
+    if (empty($account['mid']) || empty($account['api_key']) || empty($account['secret_key'])) {
+        throw new RuntimeException('Configure uma conta Offer18 antes de buscar ofertas.');
+    }
+
+    $query = array_merge([
+        'mid' => $account['mid'],
+        'api-key' => $account['api_key'],
+        'secret-key' => $account['secret_key'],
+    ], $query);
+
+    $url = 'https://api.offer18.com' . $path . '?' . http_build_query($query);
+    if (!function_exists('curl_init')) {
+        throw new RuntimeException('A extensao cURL do PHP precisa estar ativa para usar a Offer18.');
+    }
+
+    $curl = curl_init($url);
+    curl_setopt_array($curl, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTPHEADER => ['Accept: application/json'],
+    ]);
+    $body = curl_exec($curl);
+    $error = curl_error($curl);
+    $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+    curl_close($curl);
+
+    if ($body === false || $error) {
+        throw new RuntimeException('Falha ao chamar a Offer18: ' . $error);
+    }
+
+    $decoded = json_decode((string) $body, true);
+    if (!is_array($decoded)) {
+        throw new RuntimeException('Resposta invalida da Offer18.');
+    }
+    if ($status < 200 || $status >= 300) {
+        $message = $decoded['message'] ?? $decoded['error'] ?? 'Erro HTTP ' . $status;
+        throw new RuntimeException('Offer18 recusou a chamada: ' . $message);
+    }
+
+    return $decoded;
+}
+
+function offer18_response_items(array $response): array
+{
+    foreach ([
+        ['data', 'offers'],
+        ['data', 'items'],
+        ['response', 'offers'],
+        ['result', 'offers'],
+    ] as $path) {
+        $value = $response;
+        foreach ($path as $part) {
+            if (!is_array($value) || !isset($value[$part])) {
+                $value = null;
+                break;
+            }
+            $value = $value[$part];
+        }
+        if (is_array($value)) {
+            return array_values($value);
+        }
+    }
+
+    foreach (['data', 'offers', 'response', 'result'] as $key) {
+        if (!empty($response[$key]) && is_array($response[$key])) {
+            return array_values($response[$key]);
+        }
+    }
+
+    return offer18_array_is_list($response) ? $response : [];
+}
+
+function offer18_array_is_list(array $value): bool
+{
+    if ($value === []) {
+        return true;
+    }
+
+    return array_keys($value) === range(0, count($value) - 1);
+}
+
+function offer18_offers(array $filters): array
+{
+    $filters = offer18_normalize_filters($filters);
+    $account = offer18_account($filters['account_index']);
+    $query = [
+        'status' => $filters['status'],
+        'limit' => $filters['limit'],
+        'page' => $filters['page'],
+    ];
+    if ($filters['query'] !== '') {
+        $query['offer_name'] = $filters['query'];
+    }
+    if ($filters['model_affiliate'] !== '') {
+        $query['model_affiliate'] = $filters['model_affiliate'];
+    }
+
+    return offer18_response_items(offer18_request($account, '/api/m/offers', $query));
+}
+
+function offer18_preview_offers(array $filters = []): array
+{
+    $filters = offer18_normalize_filters($filters);
+    $offers = offer18_offers($filters);
+    $items = [];
+
+    foreach ($offers as $offer) {
+        if (!is_array($offer) || !offer18_offer_passes_filters($offer, $filters)) {
+            continue;
+        }
+
+        $payload = offer18_offer_payload($offer, $filters['publish_status']);
+        if (!$payload) {
+            continue;
+        }
+
+        $items[] = [
+            'external_id' => $payload['external_id'],
+            'store' => $payload['store'],
+            'title' => $payload['title'],
+            'category' => $payload['category'],
+            'offer_type' => $payload['offer_type'],
+            'redemption_type' => $payload['redemption_type'],
+            'status' => $payload['status'],
+            'existing' => (bool) coupon_by_external_id($payload['external_id']),
+        ];
+    }
+
+    return ['filters' => $filters, 'items' => $items, 'total' => count($offers), 'matched' => count($items)];
+}
+
+function offer18_import_offers(array $filters = []): array
+{
+    $filters = offer18_normalize_filters($filters);
+    $selectedExternalIds = $filters['selected_external_ids'];
+    $offers = offer18_offers($filters);
+    $created = 0;
+    $updated = 0;
+    $skipped = 0;
+
+    foreach ($offers as $offer) {
+        if (!is_array($offer) || !offer18_offer_passes_filters($offer, $filters)) {
+            $skipped++;
+            continue;
+        }
+
+        $payload = offer18_offer_payload($offer, $filters['publish_status']);
+        if (!$payload || ($selectedExternalIds && !in_array($payload['external_id'], $selectedExternalIds, true))) {
+            $skipped++;
+            continue;
+        }
+
+        $existing = coupon_by_external_id($payload['external_id']);
+        save_coupon($payload, $existing ? (int) $existing['id'] : null);
+        monitor_integration_brand('Offer18', offer18_value($offer, ['advertiser_id', 'advertiser.id'], $payload['store']), $payload['store'], $payload['category']);
+        monitor_integration_offer('Offer18', $payload, offer18_offer_id($offer), offer18_value($offer, ['advertiser_id', 'advertiser.id'], ''));
+        $existing ? $updated++ : $created++;
+    }
+
+    create_system_log('offer18_import', 'Importacao Offer18', $created . ' criadas, ' . $updated . ' atualizadas e ' . $skipped . ' ignoradas.', 'Offer18');
+    return ['created' => $created, 'updated' => $updated, 'skipped' => $skipped, 'total' => count($offers)];
+}
+
+function sync_offer18_watchlist(): array
+{
+    $profile = integration_profile('offer18', []);
+    $filters = offer18_normalize_filters($profile);
+    $offers = offer18_offers($filters);
+    $seen = [];
+    $updated = 0;
+    $new = 0;
+
+    foreach ($offers as $offer) {
+        if (!is_array($offer) || !offer18_offer_passes_filters($offer, $filters)) {
+            continue;
+        }
+
+        $payload = offer18_offer_payload($offer, $filters['publish_status']);
+        if (!$payload) {
+            continue;
+        }
+
+        $seen[$payload['external_id']] = true;
+        $existing = coupon_by_external_id($payload['external_id']);
+        save_coupon($payload, $existing ? (int) $existing['id'] : null);
+        monitor_integration_offer('Offer18', $payload, offer18_offer_id($offer), offer18_value($offer, ['advertiser_id', 'advertiser.id'], ''));
+        $existing ? $updated++ : $new++;
+    }
+
+    $missing = 0;
+    foreach (monitored_integration_offers('Offer18') as $watch) {
+        if (!isset($seen[(string) $watch['external_id']])) {
+            mark_monitor_missing($watch);
+            $missing++;
+        } else {
+            mark_monitor_seen('Offer18', (string) $watch['external_id']);
+        }
+    }
+
+    return ['partner' => 'Offer18', 'read' => count($offers), 'updated' => $updated, 'new' => $new, 'missing' => $missing];
+}
+
+function offer18_offer_passes_filters(array $offer, array $filters): bool
+{
+    $haystack = strtolower(implode(' ', [
+        offer18_value($offer, ['offer_name', 'name', 'title']),
+        offer18_value($offer, ['advertiser.name', 'advertiser', 'advertiser_name']),
+        offer18_value($offer, ['category', 'offer_category']),
+        strip_tags(offer18_value($offer, ['description', 'offer_terms', 'terms'])),
+    ]));
+
+    if ($filters['query'] !== '' && !normalized_text_contains($haystack, $filters['query'])) {
+        return false;
+    }
+    foreach ($filters['excluded_terms'] as $term) {
+        if ($term !== '' && normalized_text_contains($haystack, $term)) {
+            return false;
+        }
+    }
+    if (awin_should_filter_categories($filters['categories'])) {
+        $category = offer18_offer_category($offer);
+        if (!in_array($category, $filters['categories'], true)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function offer18_offer_payload(array $offer, string $status = 'rascunho'): ?array
+{
+    $offerId = offer18_offer_id($offer);
+    $trackingUrl = offer18_tracking_url($offer);
+    if ($offerId === '' || !coupon_is_offer18_tracking_url($trackingUrl)) {
+        return null;
+    }
+
+    $title = offer18_value($offer, ['offer_name', 'name', 'title'], 'Oferta Offer18');
+    $store = offer18_value($offer, ['advertiser.name', 'advertiser_name', 'advertiser'], 'Offer18');
+    $code = offer18_value($offer, ['coupon_code', 'code', 'voucher_code', 'promo_code']);
+    $model = strtoupper(offer18_value($offer, ['model_affiliate', 'affiliate_model']));
+
+    return [
+        'category' => offer18_offer_category($offer),
+        'store' => $store,
+        'title' => $title,
+        'description' => offer18_description($offer, $store),
+        'code' => $code,
+        'target_url' => offer18_value($offer, ['preview_url', 'offer_url', 'fallback_url'], $trackingUrl),
+        'banner_url' => offer18_banner($offer),
+        'logo_url' => offer18_value($offer, ['logo', 'logo_url', 'advertiser.logo', 'advertiser.logoUrl']),
+        'starts_at' => lomadee_date(offer18_value($offer, ['start_datetime', 'start_date', 'created_at'])) ?: date('Y-m-d'),
+        'ends_at' => lomadee_date(offer18_value($offer, ['end_datetime', 'expiration_date', 'end_date'])) ?: date('Y-m-d', strtotime('+30 days')),
+        'status' => $status,
+        'featured' => 0,
+        'rules' => trim(strip_tags(offer18_value($offer, ['offer_terms', 'terms', 'kpi'], 'Confira as regras no site parceiro antes de finalizar.'))),
+        'redemption_type' => $code !== '' ? 'texto_redirect' : 'redirect',
+        'offer_type' => $code !== '' ? 'cupom' : ($model === 'CPL' ? 'cadastro' : 'oferta_direta'),
+        'cta_label' => $code !== '' ? 'Resgatar cupom' : ($model === 'CPL' ? 'Cadastre-se' : 'Resgatar oferta'),
+        'tracking_url' => $trackingUrl,
+        'partner_network' => 'Offer18',
+        'payout' => offer18_decimal_or_null(offer18_value($offer, ['price_affiliate', 'affiliate_price', 'payout'])),
+        'campaign_cap' => null,
+        'sponsored' => 0,
+        'priority' => 0,
+        'tags' => 'offer18,' . strtolower($model ?: 'offer'),
+        'requirements' => $code !== '' ? 'Copie o cupom e use no site parceiro' : 'Resgate no site parceiro',
+        'pixel_event' => 'offer18_' . preg_replace('/[^a-z0-9_]+/i', '_', $offerId),
+        'external_id' => 'offer18:' . $offerId,
+        'members_only' => 0,
+    ];
+}
+
+function offer18_offer_id(array $offer): string
+{
+    return offer18_value($offer, ['offer_id', 'id', 'oid']);
+}
+
+function offer18_tracking_url(array $offer): string
+{
+    foreach (['tracking_url', 'trackingUrl', 'click_url', 'clickUrl'] as $field) {
+        $value = offer18_value($offer, [$field]);
+        if (coupon_is_offer18_tracking_url($value)) {
+            return $value;
+        }
+    }
+
+    $affiliates = $offer['affiliates'] ?? [];
+    if (is_array($affiliates)) {
+        foreach ($affiliates as $affiliate) {
+            if (!is_array($affiliate)) {
+                continue;
+            }
+            $value = trim((string) ($affiliate['tracking_url'] ?? ''));
+            if (coupon_is_offer18_tracking_url($value)) {
+                return $value;
+            }
+        }
+    }
+
+    return '';
+}
+
+function offer18_banner(array $offer): string
+{
+    $creatives = $offer['creatives'] ?? [];
+    if (is_array($creatives)) {
+        foreach ($creatives as $creative) {
+            $url = is_array($creative) ? trim((string) ($creative['url'] ?? '')) : '';
+            if (coupon_is_image_url($url)) {
+                return $url;
+            }
+        }
+    }
+
+    return offer18_value($offer, ['thumbnail', 'image', 'logo'], 'assets/og-cupons.png') ?: 'assets/og-cupons.png';
+}
+
+function offer18_offer_category(array $offer): string
+{
+    return canonical_category(offer18_value($offer, ['category', 'offer_category']), implode(' ', [
+        offer18_value($offer, ['offer_name', 'name', 'title']),
+        offer18_value($offer, ['advertiser.name', 'advertiser_name', 'advertiser']),
+        strip_tags(offer18_value($offer, ['description', 'offer_terms', 'terms'])),
+    ]));
+}
+
+function offer18_description(array $offer, string $store): string
+{
+    $description = trim(strip_tags(offer18_value($offer, ['description', 'offer_description', 'offer_terms'])));
+    return $description !== '' ? $description : 'Oferta disponivel na ' . $store . ' por tempo limitado.';
+}
+
+function offer18_value(array $source, array $paths, string $default = ''): string
+{
+    foreach ($paths as $path) {
+        $value = $source;
+        foreach (explode('.', $path) as $part) {
+            if (!is_array($value) || !array_key_exists($part, $value)) {
+                $value = null;
+                break;
+            }
+            $value = $value[$part];
+        }
+        if (is_array($value)) {
+            $value = $value['name'] ?? $value['title'] ?? '';
+        }
+        $value = trim((string) $value);
+        if ($value !== '') {
+            return $value;
+        }
+    }
+
+    return $default;
+}
+
+function offer18_decimal_or_null(string $value): ?string
+{
+    $value = trim(str_replace(',', '.', $value));
+    return is_numeric($value) ? number_format((float) $value, 2, '.', '') : null;
+}
+
 function awin_normalize_filters(array $filters): array
 {
     $type = (string) ($filters['type'] ?? 'all');
@@ -1173,7 +1646,7 @@ function sync_awin_watchlist(): array
 function sync_all_integrations(): array
 {
     $results = [];
-    foreach (['Lomadee' => 'sync_lomadee_watchlist', 'Awin' => 'sync_awin_watchlist'] as $partner => $callback) {
+    foreach (['Lomadee' => 'sync_lomadee_watchlist', 'Awin' => 'sync_awin_watchlist', 'Offer18' => 'sync_offer18_watchlist'] as $partner => $callback) {
         try {
             $results[] = $callback();
         } catch (Throwable $exception) {

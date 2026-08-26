@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-function china_in_box_coupon_box(): array
+function china_in_box_coupon_box(string $title, string $body): array
 {
     return [
         'kicker' => 'Cupons China in Box',
-        'title' => 'Teste os cupons antes de fechar o pedido',
-        'body' => 'Confira as regras no site parceiro, veja se a sua regiao participa e aplique o cupom antes de pagar.',
+        'title' => $title,
+        'body' => $body,
         'coupons' => [
             [
                 'code' => 'CHINALOMADEE',
@@ -48,7 +48,10 @@ function all_guides(): array
                     'body' => 'Uma das partes mais interessantes do yakisoba e justamente sua capacidade de se adaptar. Existe yakisoba de carne, frango, camarao, misto, vegetariano e versoes mais brasileiras, com molho mais doce ou mais intenso. Esse tipo de prato mostra como a comida viaja: nasce de uma tradicao, passa por outro pais, muda de molho, muda de ingredientes e chega a novos publicos com uma cara propria. Para quem gosta de pedir comida chinesa em casa, o yakisoba tambem costuma ser uma boa escolha quando a ideia e economizar. Ele rende bem, combina com entradas como rolinho primavera e pode virar uma refeicao compartilhada. Antes de fechar o pedido, vale conferir se existe cupom ativo, pedido minimo, regra de uso e validade da promocao. Isso evita perder desconto por detalhe pequeno na hora de pagar.',
                 ],
             ],
-            'coupon_box' => china_in_box_coupon_box(),
+            'coupon_box' => china_in_box_coupon_box(
+                'Bateu vontade de comer yakisoba?',
+                'Antes de pedir, veja se um dos cupons ativos do China in Box deixa seu jantar mais barato.'
+            ),
             'tip' => 'Fontes consultadas: Receitas Nestle, Superinteressante e Discover Nikkei.',
         ],
         [
@@ -75,7 +78,10 @@ function all_guides(): array
                     'body' => 'No Brasil, o rolinho primavera virou uma entrada perfeita para delivery porque resolve varios desejos ao mesmo tempo. E crocante, vem em porcoes faceis de compartilhar, tem sabor conhecido e funciona bem antes do prato principal. Tambem e uma escolha interessante quando a pessoa quer montar um pedido mais completo sem gastar tanto: um prato principal para dividir, uma entrada e, se houver cupom, um desconto aplicado no fim. Na hora de pedir, vale olhar com carinho para os combos. Muitas vezes, o desconto fica mais vantajoso quando o pedido passa de um valor minimo. Se o cupom exige compras acima de R$60,00, por exemplo, adicionar uma entrada como rolinho primavera pode ajudar a bater o minimo e transformar uma compra comum em uma promocao melhor. E claro: isso so faz sentido se voce realmente for consumir. Economia boa nao e comprar mais por impulso; e pagar menos pelo que ja fazia sentido pedir.',
                 ],
             ],
-            'coupon_box' => china_in_box_coupon_box(),
+            'coupon_box' => china_in_box_coupon_box(
+                'Rolinho primavera combina com desconto',
+                'Se a ideia e completar o pedido com uma entrada crocante, aproveite para copiar o cupom e resgatar a oferta.'
+            ),
             'tip' => 'Fontes consultadas: China Today, Oxford Companion to Food e South China Morning Post.',
         ],
         [
@@ -102,7 +108,10 @@ function all_guides(): array
                     'body' => 'Aqui, a comida chinesa ganhou espaco principalmente pela praticidade, pelo delivery e por pratos que combinam bem com o paladar popular. Muita gente gosta porque e uma opcao diferente sem ser complicada. Tem molho, tem legumes, tem porcao generosa, tem entrada crocante e costuma funcionar bem para dividir. Isso ajuda a explicar por que marcas como China in Box conseguem conversar com quem quer variar o jantar sem gastar demais. Se voce esta pensando em pedir comida chinesa hoje, a dica e simples: escolha o prato, confira se sua regiao participa, veja se o pedido bate o minimo e teste o cupom antes de pagar. Assim, uma comida que viajou o mundo inteiro pode chegar na sua casa com um desconto melhor.',
                 ],
             ],
-            'coupon_box' => china_in_box_coupon_box(),
+            'coupon_box' => china_in_box_coupon_box(
+                'Hoje pode ser dia de comida chinesa',
+                'Escolha seu prato favorito, copie um cupom ativo e siga para o China in Box para resgatar a oferta.'
+            ),
             'tip' => 'Fontes consultadas: Xinhua, The World Economy/Wiley e Foodstar.',
         ],
         [

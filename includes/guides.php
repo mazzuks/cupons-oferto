@@ -63,7 +63,7 @@ function all_guides(): array
             'slug' => 'lojas-rede-produtos-de-higiene-com-desconto',
             'category' => 'Saúde e Beleza',
             'title' => 'Produtos de higiene com desconto: como economizar na Lojas REDE',
-            'summary' => 'Um guia simples para comprar itens recorrentes de higiene usando cupom sem exagerar no carrinho.',
+            'summary' => 'Uma leitura simples para comprar itens recorrentes de higiene usando cupom sem exagerar no carrinho.',
             'intro' => 'Sabonete, creme dental, escova, absorvente, desodorante e itens de cuidado diário entram na lista de compras o ano inteiro. Por isso, quando aparece cupom na Lojas REDE, a economia pode ser mais útil do que em uma compra feita só por vontade.',
             'sections' => [
                 ['title' => 'Monte uma lista de reposição', 'body' => 'A melhor forma de aproveitar desconto em higiene é saber o que falta. Faça uma lista curta com itens de uso frequente e priorize produtos que sua casa consome todo mês. Assim, o cupom reduz um gasto real.'],
@@ -117,7 +117,7 @@ function all_guides(): array
             'slug' => 'armario-de-cozinha-itatiaia-como-escolher',
             'category' => 'Casa e Utensílios',
             'title' => 'Armário de cozinha Itatiaia: como escolher sem errar na compra',
-            'summary' => 'Um guia rápido para comparar tamanho, acabamento, portas e espaço interno.',
+            'summary' => 'Uma explicação rápida para comparar tamanho, acabamento, portas e espaço interno.',
             'intro' => 'Armário de cozinha precisa ser bonito, mas também precisa funcionar no dia a dia. Antes de usar uma oferta da Itatiaia, vale pensar no que você guarda, no espaço disponível e na rotina da casa.',
             'sections' => [
                 ['title' => 'Pense no que vai dentro', 'body' => 'Panelas grandes, potes, pratos, copos e mantimentos ocupam espaços diferentes. Escolha o armário olhando para sua rotina, não apenas para a foto do produto.'],
@@ -500,7 +500,7 @@ function all_guides(): array
             'sections' => [
                 [
                     'title' => 'Um sucesso dificil de medir com uma lista unica',
-                    'body' => 'Antes de listar paises, vale fazer uma observacao importante: nao existe um ranking unico e perfeito de quem mais consome comida chinesa no mundo. O consumo pode ser medido por numero de restaurantes, tamanho da comunidade chinesa, pedidos em aplicativos, buscas na internet, faturamento ou presenca cultural. Cada metodo muda um pouco a lista. Ainda assim, alguns paises aparecem com frequencia quando o assunto e alcance global da comida chinesa fora da propria China. Como este guia olha fora do Japao, a lista considera mercados onde a culinaria chinesa tem presenca forte sem usar o Japao como exemplo principal.',
+                    'body' => 'Antes de listar paises, vale fazer uma observacao importante: nao existe um ranking unico e perfeito de quem mais consome comida chinesa no mundo. O consumo pode ser medido por numero de restaurantes, tamanho da comunidade chinesa, pedidos em aplicativos, buscas na internet, faturamento ou presenca cultural. Cada metodo muda um pouco a lista. Ainda assim, alguns paises aparecem com frequencia quando o assunto e alcance global da comida chinesa fora da propria China. Como este conteúdo olha fora do Japao, a lista considera mercados onde a culinaria chinesa tem presenca forte sem usar o Japao como exemplo principal.',
                 ],
                 [
                     'title' => 'Estados Unidos, Canada e Australia',
@@ -551,7 +551,7 @@ function all_guides(): array
             'slug' => 'gift-cards-quando-esperar-promocao',
             'category' => 'Games',
             'title' => 'Gift cards: quando vale esperar uma promoção',
-            'summary' => 'Um guia rápido para renovar assinatura, comprar créditos e evitar gasto por impulso.',
+            'summary' => 'Uma explicação rápida para renovar assinatura, comprar créditos e evitar gasto por impulso.',
             'intro' => 'Gift cards e créditos de jogos têm promoções recorrentes. Quando a compra não é urgente, esperar uma janela de desconto pode ajudar a renovar assinaturas, comprar moedas virtuais ou presentear pagando menos.',
             'sections' => [
                 ['title' => 'Compre antes do vencimento da assinatura', 'body' => 'Se a assinatura vence em breve, acompanhe cupons alguns dias antes. Assim você evita renovar no preço cheio por pressa.'],
@@ -583,31 +583,31 @@ function all_guides(): array
 function generated_brand_guides(): array
 {
     $brands = [
-        ['store' => 'BALAROTI', 'category' => 'Casa e Utensílios', 'item' => 'materiais para reforma'],
-        ['store' => 'Kidy Calçados', 'category' => 'Moda Infantil', 'item' => 'calçados infantis'],
-        ['store' => 'Iodice', 'category' => 'Moda Feminina', 'item' => 'moda feminina'],
-        ['store' => 'Cirurgica Sinete', 'category' => 'Saúde e Beleza', 'item' => 'produtos de saúde e cuidado'],
-        ['store' => 'Homedock', 'category' => 'Casa e Utensílios', 'item' => 'itens para casa'],
-        ['store' => 'Amakha Paris', 'category' => 'Saúde e Beleza', 'item' => 'beleza e perfumaria'],
-        ['store' => 'Lojão dos Esportes', 'category' => 'Esportes', 'item' => 'artigos esportivos'],
-        ['store' => 'FOM', 'category' => 'Casa e Utensílios', 'item' => 'conforto para casa e viagem'],
-        ['store' => 'Electrolux', 'category' => 'Casa e Utensílios', 'item' => 'eletrodomésticos'],
-        ['store' => 'Drogasmil', 'category' => 'Saúde e Beleza', 'item' => 'farmácia e cuidados pessoais'],
-        ['store' => 'Casa do Fitness', 'category' => 'Esportes', 'item' => 'equipamentos fitness'],
-        ['store' => 'BioVittare Farmácia de Manipulação', 'category' => 'Saúde e Beleza', 'item' => 'manipulados e bem-estar'],
-        ['store' => 'Drogaria Rosário', 'category' => 'Saúde e Beleza', 'item' => 'farmácia e higiene'],
-        ['store' => 'Maria Valentina', 'category' => 'Moda Feminina', 'item' => 'moda feminina'],
-        ['store' => 'Dona Coelha', 'category' => 'Kids', 'item' => 'produtos infantis'],
-        ['store' => 'Ferramentas Kennedy', 'category' => 'Casa e Utensílios', 'item' => 'ferramentas e reforma'],
-        ['store' => 'Desconto Aqui', 'category' => 'Compras', 'item' => 'ofertas variadas'],
-        ['store' => 'DeÔnibus', 'category' => 'Viagem e Transporte', 'item' => 'passagens de ônibus'],
-        ['store' => 'Coza', 'category' => 'Casa e Utensílios', 'item' => 'organização para casa'],
-        ['store' => 'Cicatrissim', 'category' => 'Saúde e Beleza', 'item' => 'cuidados com a pele'],
-        ['store' => 'Kappesberg', 'category' => 'Casa e Utensílios', 'item' => 'móveis para casa'],
-        ['store' => 'Casa das Alianças', 'category' => 'Joias e Acessórios', 'item' => 'alianças e joias'],
-        ['store' => 'Lauri Esporte', 'category' => 'Esportes', 'item' => 'produtos esportivos'],
-        ['store' => 'Livrarias Curitiba', 'category' => 'Educação e Cultura', 'item' => 'livros e papelaria'],
-        ['store' => 'Anhanguera Ferramentas', 'category' => 'Casa e Utensílios', 'item' => 'ferramentas'],
+        ['store' => 'BALAROTI', 'category' => 'Casa e Utensílios', 'item' => 'materiais para reforma', 'scene' => 'arrumar a casa, trocar acabamento ou resolver uma obra pequena', 'care' => 'medidas, voltagem, garantia, retirada e frete'],
+        ['store' => 'Kidy Calçados', 'category' => 'Moda Infantil', 'item' => 'calçados infantis', 'scene' => 'comprar tênis, sandália ou sapato para criança que cresce rápido', 'care' => 'numeração, conforto, solado, troca e rotina da criança'],
+        ['store' => 'Iodice', 'category' => 'Moda Feminina', 'item' => 'moda feminina', 'scene' => 'renovar peças de trabalho, passeio ou ocasiões especiais', 'care' => 'tecido, caimento, tabela de medidas e combinações com o armário'],
+        ['store' => 'Cirurgica Sinete', 'category' => 'Saúde e Beleza', 'item' => 'produtos de saúde e cuidado', 'scene' => 'comprar itens de cuidado, apoio e bem-estar para a rotina', 'care' => 'indicação correta, especificação, prazo e necessidade real'],
+        ['store' => 'Homedock', 'category' => 'Casa e Utensílios', 'item' => 'itens para casa', 'scene' => 'deixar um ambiente mais prático sem encher a casa de coisa inútil', 'care' => 'tamanho, material, uso no dia a dia e facilidade de limpar'],
+        ['store' => 'Amakha Paris', 'category' => 'Saúde e Beleza', 'item' => 'beleza e perfumaria', 'scene' => 'escolher fragrâncias, cuidados pessoais ou presentes de beleza', 'care' => 'perfil de uso, validade, sensibilidade e reputação da oferta'],
+        ['store' => 'Lojão dos Esportes', 'category' => 'Esportes', 'item' => 'artigos esportivos', 'scene' => 'voltar a treinar ou completar equipamento para uma modalidade', 'care' => 'tamanho, resistência, material, segurança e frequência de uso'],
+        ['store' => 'FOM', 'category' => 'Casa e Utensílios', 'item' => 'conforto para casa e viagem', 'scene' => 'melhorar descanso, trabalho ou viagem com acessórios confortáveis', 'care' => 'ergonomia, tecido, lavagem, tamanho e portabilidade'],
+        ['store' => 'Electrolux', 'category' => 'Casa e Utensílios', 'item' => 'eletrodomésticos', 'scene' => 'trocar um aparelho importante da casa ou comprar algo que economize tempo', 'care' => 'voltagem, consumo, assistência, dimensão e entrega'],
+        ['store' => 'Drogasmil', 'category' => 'Saúde e Beleza', 'item' => 'farmácia e cuidados pessoais', 'scene' => 'repor produtos de farmácia, higiene e autocuidado', 'care' => 'validade, quantidade, concentração, entrega e regra de medicamento'],
+        ['store' => 'Casa do Fitness', 'category' => 'Esportes', 'item' => 'equipamentos fitness', 'scene' => 'montar treino em casa sem gastar como academia profissional', 'care' => 'espaço disponível, carga, segurança, montagem e constância'],
+        ['store' => 'BioVittare Farmácia de Manipulação', 'category' => 'Saúde e Beleza', 'item' => 'manipulados e bem-estar', 'scene' => 'organizar uma compra de manipulados ou cuidados personalizados', 'care' => 'receita, fórmula, orientação profissional, prazo e conservação'],
+        ['store' => 'Drogaria Rosário', 'category' => 'Saúde e Beleza', 'item' => 'farmácia e higiene', 'scene' => 'comprar produtos de saúde, higiene e beleza de uso recorrente', 'care' => 'validade, embalagem, frete, retirada e comparação por unidade'],
+        ['store' => 'Maria Valentina', 'category' => 'Moda Feminina', 'item' => 'moda feminina', 'scene' => 'montar looks femininos para trabalho, eventos e dia a dia', 'care' => 'caimento, tecido, ocasião, troca e peças que combinam entre si'],
+        ['store' => 'Dona Coelha', 'category' => 'Kids', 'item' => 'produtos infantis', 'scene' => 'comprar presentes, itens de rotina ou produtos para criança', 'care' => 'idade indicada, segurança, material, troca e prazo de entrega'],
+        ['store' => 'Ferramentas Kennedy', 'category' => 'Casa e Utensílios', 'item' => 'ferramentas e reforma', 'scene' => 'comprar ferramenta para manutenção, obra ou uso profissional', 'care' => 'potência, compatibilidade, garantia, marca e frequência de uso'],
+        ['store' => 'Desconto Aqui', 'category' => 'Compras', 'item' => 'ofertas variadas', 'scene' => 'garimpar oportunidades sem uma loja única em mente', 'care' => 'origem da oferta, regra, preço final e confiabilidade'],
+        ['store' => 'DeÔnibus', 'category' => 'Viagem e Transporte', 'item' => 'passagens de ônibus', 'scene' => 'planejar uma viagem pagando menos na passagem', 'care' => 'horário, rodoviária, bagagem, cancelamento e assento'],
+        ['store' => 'Coza', 'category' => 'Casa e Utensílios', 'item' => 'organização para casa', 'scene' => 'organizar cozinha, banheiro, lavanderia ou escritório', 'care' => 'medidas, encaixe, material, cor e facilidade de limpar'],
+        ['store' => 'Cicatrissim', 'category' => 'Saúde e Beleza', 'item' => 'cuidados com a pele', 'scene' => 'comprar dermocosméticos e produtos de cuidado com a pele', 'care' => 'tipo de pele, composição, orientação, frequência e sensibilidade'],
+        ['store' => 'Kappesberg', 'category' => 'Casa e Utensílios', 'item' => 'móveis para casa', 'scene' => 'comprar móvel para quarto, cozinha, sala ou escritório', 'care' => 'medidas, montagem, entrega, material e espaço de circulação'],
+        ['store' => 'Casa das Alianças', 'category' => 'Joias e Acessórios', 'item' => 'alianças e joias', 'scene' => 'escolher aliança, presente ou acessório com significado', 'care' => 'medida, material, gravação, garantia e prazo para a data'],
+        ['store' => 'Lauri Esporte', 'category' => 'Esportes', 'item' => 'produtos esportivos', 'scene' => 'comprar roupa, acessório ou equipamento para treino', 'care' => 'tamanho, tecido, modalidade, durabilidade e troca'],
+        ['store' => 'Livrarias Curitiba', 'category' => 'Educação e Cultura', 'item' => 'livros e papelaria', 'scene' => 'comprar livros, materiais de estudo ou presentes criativos', 'care' => 'edição, autor, prazo, frete e lista de leitura'],
+        ['store' => 'Anhanguera Ferramentas', 'category' => 'Casa e Utensílios', 'item' => 'ferramentas', 'scene' => 'resolver reparos em casa ou equipar uma oficina pequena', 'care' => 'tipo de uso, potência, acessórios, segurança e garantia'],
     ];
 
     $guides = [];
@@ -615,18 +615,18 @@ function generated_brand_guides(): array
     foreach ($brands as $brand) {
         $guides[] = brand_generated_guide(
             $brand,
-            'como-aproveitar-ofertas',
-            $brand['store'] . ': como aproveitar ofertas de ' . $brand['item'] . ' sem comprar por impulso',
-            'Veja como comparar preço, regra, prazo e cupom antes de resgatar uma oferta da ' . $brand['store'] . '.',
-            'Comprar ' . $brand['item'] . ' com desconto fica melhor quando a decisão começa antes do botão de resgatar. A ' . $brand['store'] . ' pode aparecer com ofertas ativas no Oferto, mas o melhor resultado vem quando você entende o que precisa, compara o valor final e usa o cupom como parte da escolha, não como motivo único da compra.'
+            'por-que-vale-olhar',
+            $brand['store'] . ': por que vale olhar ofertas de ' . $brand['item'] . ' antes de comprar',
+            'Entenda quando uma promoção da ' . $brand['store'] . ' pode ajudar e o que observar antes de fechar.',
+            'Tem compra que parece pequena, mas pesa no fim do mês. Também tem compra grande que só fica tranquila quando a gente compara com calma. A ' . $brand['store'] . ' entra nessa conversa porque pode aparecer com oportunidades de ' . $brand['item'] . ', e esse tipo de oferta merece ser olhado com atenção, não com pressa.'
         );
 
         $guides[] = brand_generated_guide(
             $brand,
-            'o-que-conferir-antes-de-comprar',
-            $brand['store'] . ': o que conferir antes de usar cupom ou resgatar oferta',
-            'Um guia prático para usar ofertas da ' . $brand['store'] . ' com mais segurança no carrinho.',
-            'Antes de aproveitar uma promoção da ' . $brand['store'] . ', vale fazer uma checagem simples: produto certo, preço final claro, prazo viável e regra de uso entendida. Essa rotina evita frustração e ajuda o cupom a cumprir o papel principal, que é reduzir uma compra que já fazia sentido para você.'
+            'compra-melhor',
+            $brand['store'] . ': como montar uma compra melhor de ' . $brand['item'],
+            'Veja uma forma simples de escolher melhor, comparar o total e aproveitar cupons da ' . $brand['store'] . '.',
+            'Uma boa compra não começa no checkout. Ela começa quando você entende o que procura, separa o que é necessidade do que é impulso e só depois olha desconto. Em ofertas da ' . $brand['store'] . ', esse cuidado ajuda a transformar promoção em economia real.'
         );
     }
 
@@ -641,19 +641,19 @@ function brand_generated_guide(array $brand, string $angle, string $title, strin
         'title' => $title,
         'summary' => $summary,
         'intro' => $intro,
-        'sections' => guide_depth_sections($brand['store'], $brand['category'], $brand['item'], $title),
+        'sections' => brand_editorial_sections($brand, $angle),
         'coupon_box' => brand_coupon_box(
             $brand['store'],
             'Ofertas da ' . $brand['store'] . ' para conferir agora',
             'Veja cupons e promoções ativas da ' . $brand['store'] . ' e resgate pelo caminho certo.'
         ),
-        'tip' => 'Dica: sempre confira a regra no site parceiro antes de finalizar. Cupom bom é aquele que melhora o preço final de algo que você realmente queria comprar.',
+        'tip' => 'Dica: antes de finalizar, confira a regra no parceiro e veja se o desconto entrou no total. O melhor cupom é o que melhora uma compra que já fazia sentido.',
     ];
 }
 
 function guide_slug(string $value): string
 {
-    return trim((string) preg_replace('/[^a-z0-9]+/', '-', normalize_search_text($value)), '-') ?: 'guia';
+    return trim((string) preg_replace('/[^a-z0-9]+/', '-', normalize_search_text($value)), '-') ?: 'conteudo';
 }
 
 function ensure_guide_depth(array $guide): array
@@ -669,7 +669,7 @@ function ensure_guide_depth(array $guide): array
     while (guide_word_count($guide) < 600) {
         $guide['sections'] = array_merge(
             $guide['sections'] ?? [],
-            guide_depth_sections($store, $category, $item, $guide['title'] ?? 'Como economizar melhor')
+            article_depth_sections($store, $category, $item, $guide['title'] ?? 'Como economizar melhor', $guide['slug'] ?? '')
         );
     }
 
@@ -710,30 +710,119 @@ function guide_word_count(array $guide): int
     return count($matches[0]);
 }
 
-function guide_depth_sections(string $store, string $category, string $item, string $title): array
+function brand_editorial_sections(array $brand, string $angle): array
 {
+    if ($angle === 'compra-melhor') {
+        return [
+            [
+                'title' => 'Comece pela situação que você quer resolver',
+                'body' => 'O jeito mais simples de comprar melhor na ' . $brand['store'] . ' é começar pela situação real: ' . $brand['scene'] . '. Quando a busca parte de uma necessidade concreta, fica mais fácil separar oferta boa de distração. Em vez de abrir várias opções e colocar tudo no carrinho, pense no que precisa mudar na sua rotina depois da compra. O produto vai resolver um problema? Vai substituir algo que já acabou? Vai ser usado com frequência? Se a resposta for sim, o desconto trabalha a seu favor. Se a resposta for não, talvez seja só uma chamada bonita disputando sua atenção.',
+            ],
+            [
+                'title' => 'Monte o carrinho como se o cupom ainda não existisse',
+                'body' => 'Essa é uma regra boa para quase toda promoção: primeiro escolha o que você compraria mesmo sem desconto. Depois, teste o cupom. Isso evita aquela compra inflada, em que a pessoa tenta alcançar valor mínimo colocando itens desnecessários. Na prática, vale montar uma lista curta, comparar modelos e deixar no carrinho só o que tem uso claro. Quando o cupom entra no fim, ele reduz o custo de uma decisão que já estava madura. Esse processo parece menos emocionante que clicar rápido, mas costuma economizar mais dinheiro.',
+            ],
+            [
+                'title' => 'Olhe os detalhes que mudam a experiência',
+                'body' => 'Em ' . strtolower($brand['category']) . ', a diferença entre compra boa e compra frustrante quase sempre está nos detalhes. Antes de resgatar uma oferta da ' . $brand['store'] . ', confira ' . $brand['care'] . '. Esses pontos não aparecem com o mesmo destaque que o preço, mas podem mudar tudo. Um item barato com medida errada, prazo ruim ou regra confusa pode sair caro. Já uma oferta um pouco menor, mas com compra mais segura, troca simples e entrega viável, pode ser a melhor escolha.',
+            ],
+            [
+                'title' => 'Use comparação para não depender da promessa da promoção',
+                'body' => 'Toda loja quer mostrar a oferta do jeito mais atraente possível. O papel de quem compra é olhar além da chamada. Pesquise produtos parecidos, veja se o preço já esteve mais baixo, confira avaliações recentes e compare o valor final com frete ou retirada. Quando você faz isso, o cupom deixa de ser uma promessa solta e vira uma parte da conta. Se o total final realmente ficou bom, a promoção ganha força. Se o desconto só parece grande porque o preço base estava alto, melhor esperar outra oportunidade.',
+            ],
+            [
+                'title' => 'Transforme a promoção em hábito de economia',
+                'body' => 'A melhor parte de acompanhar cupons não é comprar mais; é comprar com mais consciência. Se a ' . $brand['store'] . ' aparece com frequência para você, vale observar quais tipos de oferta se repetem, quais produtos costumam compensar e em que momento o desconto fica mais interessante. Com o tempo, você passa a reconhecer o que é urgência real e o que é só pressão de vitrine. O Oferto ajuda nessa etapa reunindo ofertas ativas por marca, para que você veja o que está disponível sem sair abrindo páginas aleatórias.',
+            ],
+        ];
+    }
+
     return [
         [
-            'title' => 'Como saber se a oferta combina com você',
-            'body' => 'Antes de aproveitar uma oferta da ' . $store . ', pense no uso real do produto ou serviço. Parece simples, mas essa pergunta evita muita compra feita só pela pressa do desconto. Se o item resolve uma necessidade, repõe algo que acabou ou melhora uma rotina que você já tem, o cupom ganha força. Se ele cria uma vontade que nem existia, talvez seja melhor esperar. Essa diferença é importante para quem quer economizar de verdade, porque promoção boa não é a mais chamativa; é a que reduz o gasto de uma compra útil. Também vale comparar modelos parecidos, ler a descrição com calma e observar se a oferta tem limitação por região, categoria ou valor mínimo.',
+            'title' => 'Por que essa marca pode entrar no seu radar',
+            'body' => 'A ' . $brand['store'] . ' pode ser interessante para quem está pensando em ' . $brand['scene'] . '. O ponto não é comprar só porque apareceu uma oferta, e sim perceber quando a marca resolve uma necessidade que já estava no seu caminho. Muitas compras do dia a dia acabam sendo feitas com pressa, no primeiro resultado ou no primeiro anúncio. Quando você para alguns minutos para comparar, o cupom deixa de ser um detalhe e vira uma ferramenta para melhorar o preço final.',
         ],
         [
-            'title' => 'O que conferir antes de resgatar',
-            'body' => 'A etapa mais importante fica no carrinho ou na página do parceiro. Confira preço final, prazo, frete, disponibilidade, forma de pagamento e regra da promoção. Em muitas lojas, o desconto muda conforme categoria, valor mínimo ou produto participante. Por isso, não basta ver a chamada da oferta; é preciso testar o benefício no lugar certo. Quando houver código, copie e aplique antes de pagar. Quando a promoção for de resgate direto, siga pelo botão do Oferto para preservar o caminho de atribuição. Esse cuidado ajuda o site a medir o interesse real nas ofertas e também evita que você perca tempo com cupom que não se aplica ao que estava procurando.',
+            'title' => 'Oferta boa tem contexto',
+            'body' => 'Uma promoção de ' . $brand['item'] . ' não vale a mesma coisa para todo mundo. Para uma pessoa, pode ser compra urgente. Para outra, pode ser apenas vontade criada pela vitrine. Antes de resgatar qualquer oportunidade da ' . $brand['store'] . ', pense no contexto: você precisa disso agora, está repondo algo, está comprando para uma data específica ou só achou barato? Essa pergunta muda a qualidade da decisão. O desconto certo aparece quando necessidade, preço e momento combinam.',
         ],
         [
-            'title' => 'Como comparar com outras opções',
-            'body' => 'Mesmo quando a marca é conhecida, comparar continua valendo. Procure o mesmo tipo de produto em outras lojas, veja se existe variação de preço, analise avaliações recentes e observe se o desconto compensa possíveis custos extras. Em categorias como ' . $category . ', detalhes pequenos podem mudar bastante a experiência: tamanho, material, garantia, troca, prazo de entrega, suporte ou compatibilidade. O melhor preço não é sempre o menor número da vitrine; é o total que faz sentido depois de somar todos esses pontos. Se outra loja entrega mais rápido ou oferece condição melhor, talvez ela seja mais vantajosa mesmo com desconto menor.',
+            'title' => 'Detalhes pequenos evitam arrependimento',
+            'body' => 'O preço chama atenção, mas a compra é decidida nos detalhes. Em ofertas da ' . $brand['store'] . ', observe ' . $brand['care'] . '. Também vale ler a descrição inteira e conferir se existe regra por região, categoria, valor mínimo ou forma de pagamento. Esse cuidado é ainda mais importante quando o produto tem tamanho, especificação técnica, prazo apertado ou uso recorrente. Economizar não é apenas pagar menos; é pagar menos por algo que chega certo, funciona e será usado.',
         ],
         [
-            'title' => 'Quando vale esperar uma promoção melhor',
-            'body' => 'Nem toda oferta precisa ser usada na hora. Se a compra não é urgente, acompanhe por alguns dias, principalmente em datas de campanha, começo de mês, fim de semana ou períodos em que as lojas costumam renovar cupons. Essa espera curta pode mostrar se o preço sobe e desce com frequência ou se aquela condição é realmente boa. Para compras recorrentes, vale salvar a marca e voltar quando precisar repor. Para compras maiores, como itens de casa, moda, saúde, beleza, viagem ou serviços, esperar um pouco também ajuda a evitar arrependimento. O objetivo é transformar o cupom em ferramenta de decisão, não em pressão para fechar qualquer carrinho.',
+            'title' => 'Quando o cupom realmente melhora a compra',
+            'body' => 'Cupom bom não é necessariamente o maior desconto. Às vezes, uma porcentagem menor em um item certo vale mais que uma chamada enorme em uma compra cheia de restrições. O ideal é comparar o valor antes e depois, somar frete, observar prazo e confirmar se o benefício entrou no carrinho. Quando a oferta for de resgate direto, use o botão indicado para seguir pelo caminho correto. Assim você evita perder desconto e ainda ajuda a manter a curadoria de ofertas funcionando.',
         ],
         [
-            'title' => 'Como usar o Oferto nessa busca',
-            'body' => 'O Oferto organiza cupons, promoções e oportunidades por marca e categoria para que você encontre opções sem abrir várias abas. A ideia é simples: procurar a loja, ler a descrição, conferir a validade e escolher a forma de resgate. Em conteúdos como este, o bloco de ofertas da marca aparece junto do guia para aproximar a pesquisa da ação. Se você chegou buscando informação, pode entender melhor a compra; se chegou pronto para comprar, pode ir direto para a oferta. Nos dois casos, vale manter o mesmo cuidado: conferir a regra no parceiro, aplicar o cupom quando existir e fechar apenas quando o preço final fizer sentido.',
+            'title' => 'Como aproveitar sem virar compra por impulso',
+            'body' => 'Uma boa estratégia é salvar a oferta, respirar e voltar para ela depois de alguns minutos. Se a compra ainda fizer sentido, siga. Se a vontade passou, provavelmente era impulso. Isso vale para ' . $brand['item'] . ' e para qualquer outra categoria. O Oferto existe justamente para facilitar essa escolha: reunir cupons, promoções e oportunidades em um lugar mais organizado, com descrição, validade e botão de resgate. A decisão final continua sendo sua, mas com menos ruído e mais informação.',
         ],
     ];
+}
+
+function article_depth_sections(string $store, string $category, string $item, string $title, string $slug): array
+{
+    $variants = [
+        [
+            [
+                'title' => 'O que torna essa compra interessante',
+                'body' => 'Toda boa economia começa com uma pergunta simples: isso melhora alguma coisa na sua rotina ou só parece barato agora? Em ' . strtolower($category) . ', essa diferença é importante porque o desconto pode aparecer junto de muitas opções parecidas. O melhor caminho é olhar para o uso real, comparar o preço final e entender se o cupom combina com o que você estava procurando. Quando essas peças se encaixam, a promoção deixa de ser impulso e vira uma escolha mais inteligente.',
+            ],
+            [
+                'title' => 'Como olhar além da chamada de desconto',
+                'body' => 'A chamada de uma oferta costuma destacar o número mais bonito: porcentagem, frete, brinde ou validade curta. Só que a compra acontece no detalhe. Veja se existe valor mínimo, produto participante, região atendida, prazo de entrega e regra de pagamento. Se houver código, aplique antes de pagar. Se for resgate direto, siga pelo botão da oferta. Essa checagem evita frustração e ajuda você a saber se o desconto é real no seu carrinho.',
+            ],
+            [
+                'title' => 'Por que comparar ainda vale a pena',
+                'body' => 'Mesmo quando a marca parece ser a escolha óbvia, comparar ajuda. Veja produtos parecidos, leia avaliações recentes e confira se outra condição entrega mais valor. Às vezes, um preço um pouco maior com prazo melhor compensa. Em outros casos, esperar um cupom mais forte faz sentido. O segredo é não deixar que a urgência da promoção decida por você. Quem compara compra com mais calma e costuma errar menos.',
+            ],
+            [
+                'title' => 'O papel do Oferto nessa decisão',
+                'body' => 'O Oferto aproxima conteúdo e oferta para reduzir o tempo perdido em busca solta. Você entende melhor o tema, vê oportunidades relacionadas e segue para resgatar quando fizer sentido. Esse modelo é útil porque muita gente chega pela dúvida antes de chegar pela compra. Ao reunir informação, validade e chamada de ação, a página ajuda tanto quem está pesquisando quanto quem já está pronto para aproveitar o desconto.',
+            ],
+        ],
+        [
+            [
+                'title' => 'A compra começa antes do carrinho',
+                'body' => 'Comprar melhor não é apenas encontrar cupom. É entender o que você quer resolver, quanto pretende gastar e qual resultado espera depois da compra. Em ' . strtolower($category) . ', isso evita escolhas feitas no automático. Antes de clicar em resgatar, pense no produto, no uso, na frequência e no preço que faria sentido. Se a oferta aproxima você desse preço, ótimo. Se só empurra uma compra que não estava no plano, talvez seja melhor esperar.',
+            ],
+            [
+                'title' => 'Preço final é mais importante que desconto anunciado',
+                'body' => 'Um desconto bonito pode perder força quando entram frete, prazo, taxas ou regras escondidas. Por isso, sempre olhe o total no carrinho. O que importa é quanto você paga no fim, não apenas o destaque da vitrine. Quando possível, teste mais de uma combinação: produto único, kit, retirada, entrega e forma de pagamento. Essa pequena comparação costuma revelar se a promoção é realmente boa.',
+            ],
+            [
+                'title' => 'Use validade como alerta, não como pressão',
+                'body' => 'Oferta com prazo curto pode ser útil, mas também pode acelerar uma compra ruim. Validade serve para você saber até quando pode aproveitar, não para decidir sem pensar. Se o item é necessário, a urgência ajuda. Se não é, respire. Em compras maiores ou recorrentes, acompanhar a marca por alguns dias pode mostrar padrões de preço e campanhas que voltam com frequência.',
+            ],
+            [
+                'title' => 'Conteúdo também ajuda a economizar',
+                'body' => 'Muita gente procura cupom só no último minuto, mas ler sobre a categoria antes pode evitar gasto desnecessário. Um texto bem feito ajuda a escolher tamanho, modelo, ocasião, regra ou prioridade. Depois disso, o cupom entra como acabamento da decisão. É essa combinação que o Oferto quer construir: informação simples, ofertas organizadas e caminhos claros para aproveitar sem depender de sorte.',
+            ],
+        ],
+        [
+            [
+                'title' => 'Quando a oferta conversa com a vida real',
+                'body' => 'Uma promoção fica mais forte quando conversa com uma situação concreta: repor algo, presentear alguém, resolver um problema em casa, cuidar da saúde, estudar, viajar ou melhorar um hábito. Sem esse contexto, qualquer desconto parece tentador. Com contexto, você filtra melhor. Em ' . strtolower($category) . ', vale perguntar se o produto ou serviço será usado logo e se o valor final está dentro do que você pretendia pagar.',
+            ],
+            [
+                'title' => 'A regra precisa caber no seu pedido',
+                'body' => 'Muitos cupons têm condições. Pode haver valor mínimo, categoria específica, loja participante, limite de uso ou validade curta. Isso não é necessariamente ruim; só precisa estar claro. Antes de finalizar, confira se a regra cabe no seu pedido. Se você precisa mudar demais o carrinho para o desconto funcionar, talvez a oferta esteja mandando na compra mais do que deveria.',
+            ],
+            [
+                'title' => 'Promoção boa não precisa ser complicada',
+                'body' => 'Quanto mais simples for entender a vantagem, melhor para o usuário. A oferta ideal deixa claro o que está sendo vendido, qual é o benefício e como resgatar. Se a página do parceiro abrir com outra condição, volte e compare. Esse cuidado protege seu tempo e evita a sensação de ter sido levado por uma chamada que parecia melhor do que era.',
+            ],
+            [
+                'title' => 'Voltar depois também é estratégia',
+                'body' => 'Nem sempre o melhor clique é o clique imediato. Salvar uma marca, voltar quando precisar e acompanhar novas ofertas pode gerar economia maior no longo prazo. Isso vale principalmente para compras recorrentes ou categorias em que você ainda está pesquisando. O Oferto ajuda a manter essas oportunidades organizadas, para que você não dependa de lembrar onde viu cada cupom.',
+            ],
+        ],
+    ];
+
+    $index = abs((int) crc32($slug . $title)) % count($variants);
+
+    return $variants[$index];
 }
 
 function guide_by_slug(string $slug): ?array

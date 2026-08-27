@@ -11,7 +11,7 @@ if (!$guide) {
         'category' => 'Guia',
         'title' => 'Guia não encontrado',
         'summary' => 'O conteúdo solicitado não está disponível.',
-        'intro' => 'Volte para a página inicial e escolha um dos guias disponíveis.',
+        'intro' => 'Volte para a página inicial e escolha uma das dicas disponíveis.',
         'sections' => [],
         'tip' => '',
     ];
@@ -21,7 +21,7 @@ $relatedGuides = array_values(array_filter(all_guides(), fn ($item) => ($item['s
 $shareTitle = $guide['title'] . ' - Oferto Cupons';
 $shareDescription = $guide['summary'];
 $shareSlug = $guide['slug'] ?? $slug;
-$shareUrl = $shareSlug ? 'https://cupons.oferto.digital/guia.php?tema=' . rawurlencode($shareSlug) : 'https://cupons.oferto.digital/guias';
+$shareUrl = $shareSlug ? 'https://cupons.oferto.digital/guia.php?tema=' . rawurlencode($shareSlug) : 'https://cupons.oferto.digital/blog/';
 $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
 $whatsappShareUrl = 'https://wa.me/?text=' . rawurlencode($guide['title'] . ' - ' . $shareUrl);
 $guideCouponMatches = guide_coupon_matches(
@@ -104,7 +104,7 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
       <nav class="nav-links" aria-label="Navegação principal">
         <a href="index.php#categorias">Categorias</a>
         <a href="index.php#cupons">Cupons</a>
-        <a href="index.php#guias">Guias</a>
+        <a href="index.php#dicas">Dicas</a>
       </nav>
       <a class="header-cta" href="index.php#cupons">Ver cupons</a>
     </header>
@@ -175,7 +175,7 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
         <aside class="guide-sidebar">
           <section class="rail-block share-block">
             <p class="section-kicker">Compartilhar</p>
-            <h2>Envie este guia no WhatsApp</h2>
+            <h2>Envie esta dica no WhatsApp</h2>
             <p>Compartilhe o link com quem também quer economizar antes de finalizar a compra.</p>
             <a class="whatsapp-action" href="<?= e($whatsappShareUrl) ?>" target="_blank" rel="noopener">Compartilhar no WhatsApp</a>
           </section>
@@ -192,7 +192,7 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
           </section>
 
           <section class="rail-block">
-            <p class="section-kicker">Mais guias</p>
+            <p class="section-kicker">Mais dicas</p>
             <?php foreach (array_slice($relatedGuides, 0, 3) as $related): ?>
               <a href="guia.php?tema=<?= e($related['slug']) ?>"><?= e($related['title']) ?></a>
             <?php endforeach; ?>

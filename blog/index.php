@@ -6,7 +6,7 @@ $guides = all_guides();
 $categories = array_values(array_unique(array_map(fn ($guide) => $guide['category'] ?? 'Dicas', $guides)));
 sort($categories);
 $shareTitle = 'Blog Oferto Cupons - dicas para economizar';
-$shareDescription = 'Guias simples para usar cupons, encontrar promoções e comprar melhor.';
+$shareDescription = 'Conteúdos simples para usar cupons, encontrar promoções e comprar melhor.';
 $shareUrl = 'https://cupons.oferto.digital/blog/';
 $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
 

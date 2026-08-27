@@ -23,12 +23,17 @@ function china_in_box_coupon_box(string $title, string $body): array
 
 function shopee_coupon_box(string $title, string $body): array
 {
+    return brand_coupon_box('Shopee', $title, $body, 4);
+}
+
+function brand_coupon_box(string $store, string $title, string $body, int $limit = 3): array
+{
     return [
-        'store' => 'Shopee',
+        'store' => $store,
         'kicker' => '',
         'title' => $title,
         'body' => $body,
-        'limit' => 4,
+        'limit' => $limit,
         'coupons' => [],
     ];
 }
@@ -36,6 +41,276 @@ function shopee_coupon_box(string $title, string $body): array
 function all_guides(): array
 {
     return [
+        [
+            'slug' => 'lojas-rede-cosmeticos-que-valem-colocar-no-carrinho',
+            'category' => 'Saúde e Beleza',
+            'title' => 'Lojas REDE: cosméticos que valem colocar no carrinho quando aparece cupom',
+            'summary' => 'Veja como escolher maquiagem, cuidados com cabelo e itens de beleza sem comprar por impulso.',
+            'intro' => 'A Lojas REDE aparece bastante para quem procura beleza, perfumaria e cuidados pessoais com preço melhor. Como esse tipo de compra mistura desejo, reposição e novidade, o cupom ajuda muito quando entra no produto certo.',
+            'sections' => [
+                ['title' => 'Comece pelo que você realmente usa', 'body' => 'Antes de cair em uma promoção de cosméticos, olhe o que está acabando em casa: shampoo, condicionador, protetor, hidratante, desodorante, maquiagem básica ou produto de tratamento. Cupom bom é aquele que reduz o preço de algo que já fazia sentido comprar.'],
+                ['title' => 'Compare tamanho, kit e valor por unidade', 'body' => 'Em beleza, uma embalagem maior ou um kit pode parecer mais caro, mas sair melhor no valor final. Quando houver cupom, compare o preço por unidade e veja se o desconto entra no carrinho todo ou apenas em produtos selecionados.'],
+                ['title' => 'Cuidado com estoque parado', 'body' => 'Produto de beleza também vence, muda textura e pode não combinar com você. Se o desconto for bom, compre com critério. Vale mais garantir seus itens de rotina do que acumular produtos que talvez nunca saiam da gaveta.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Lojas REDE',
+                'Vai renovar seus itens de beleza?',
+                'Veja ofertas ativas da Lojas REDE, copie o cupom quando houver e resgate pelo caminho certo.'
+            ),
+            'tip' => 'Dica: antes de fechar, veja se o cupom vale para a marca desejada e confira prazo, frete e regra do carrinho.',
+        ],
+        [
+            'slug' => 'lojas-rede-produtos-de-higiene-com-desconto',
+            'category' => 'Saúde e Beleza',
+            'title' => 'Produtos de higiene com desconto: como economizar na Lojas REDE',
+            'summary' => 'Um guia simples para comprar itens recorrentes de higiene usando cupom sem exagerar no carrinho.',
+            'intro' => 'Sabonete, creme dental, escova, absorvente, desodorante e itens de cuidado diário entram na lista de compras o ano inteiro. Por isso, quando aparece cupom na Lojas REDE, a economia pode ser mais útil do que em uma compra feita só por vontade.',
+            'sections' => [
+                ['title' => 'Monte uma lista de reposição', 'body' => 'A melhor forma de aproveitar desconto em higiene é saber o que falta. Faça uma lista curta com itens de uso frequente e priorize produtos que sua casa consome todo mês. Assim, o cupom reduz um gasto real.'],
+                ['title' => 'Olhe combos com atenção', 'body' => 'Combos podem valer a pena, principalmente em itens recorrentes. Mas confira se a quantidade faz sentido e se o valor final com cupom ficou melhor que comprar separado.'],
+                ['title' => 'Use o desconto no carrinho certo', 'body' => 'Algumas ofertas exigem valor mínimo ou categorias específicas. Antes de concluir, aplique o cupom, veja se o desconto apareceu e só então finalize a compra.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Lojas REDE',
+                'Cupom da Lojas REDE para produtos do dia a dia',
+                'Confira as ofertas ativas e economize em higiene, beleza e perfumaria.'
+            ),
+            'tip' => 'Itens recorrentes são bons para cupom porque você compra de novo. Só cuide para não levar quantidade demais.',
+        ],
+        [
+            'slug' => 'lojas-rede-perfumaria-e-beleza-para-presentear',
+            'category' => 'Saúde e Beleza',
+            'title' => 'Perfumaria e beleza para presentear: como usar cupom na Lojas REDE',
+            'summary' => 'Veja ideias de presente em beleza e como conferir se a oferta realmente compensa.',
+            'intro' => 'Perfume, hidratante, kit de cabelo e maquiagem costumam funcionar bem como presente. Quando a Lojas REDE tem cupom ativo, dá para deixar a lembrança mais caprichada sem estourar o orçamento.',
+            'sections' => [
+                ['title' => 'Pense no perfil de quem vai receber', 'body' => 'Na dúvida, produtos de cuidado pessoal mais neutros costumam ser mais seguros que fragrâncias muito marcantes ou maquiagem de tom específico. Cupom ajuda, mas a escolha ainda precisa combinar com a pessoa.'],
+                ['title' => 'Kit pode ser melhor que produto solto', 'body' => 'Em datas comemorativas, kits de beleza podem ter apresentação melhor e preço interessante. Compare o valor do kit com os itens separados e veja se o cupom entra no total.'],
+                ['title' => 'Confira prazo de entrega', 'body' => 'Presente tem data. Antes de resgatar a oferta, olhe prazo, disponibilidade e região atendida. Um desconto ótimo perde força se chegar depois do aniversário ou da data especial.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Lojas REDE',
+                'Presentes de beleza com oferta ativa',
+                'Veja cupons e promoções da Lojas REDE antes de fechar o presente.'
+            ),
+            'tip' => 'Para presente, preço importa, mas prazo e troca também contam bastante.',
+        ],
+        [
+            'slug' => 'cozinha-planejada-itatiaia-com-cupom',
+            'category' => 'Casa e Utensílios',
+            'title' => 'Itatiaia: como planejar a compra de cozinha e móveis usando cupom',
+            'summary' => 'Veja o que observar antes de comprar armários, balcões e móveis para casa.',
+            'intro' => 'Comprar móveis para cozinha pede mais calma do que uma compra comum. Medida, cor, material, prazo e montagem importam muito. Se aparecer cupom da Itatiaia, ele pode ajudar, mas a escolha precisa começar pelo espaço da sua casa.',
+            'sections' => [
+                ['title' => 'Meça antes de olhar promoção', 'body' => 'Armário bonito não resolve se não couber. Tire medidas de parede, pia, tomadas e circulação. Depois disso, compare modelos e veja qual oferta faz sentido para o seu ambiente.'],
+                ['title' => 'Observe módulos e composição', 'body' => 'Muitas cozinhas são vendidas por módulos. Confira se a oferta inclui todos os itens que você espera, como aéreo, balcão, paneleiro ou nichos. O cupom deve entrar no conjunto certo.'],
+                ['title' => 'Frete e montagem mudam o valor final', 'body' => 'Móvel costuma ter frete mais sensível. Antes de decidir, simule entrega, prazo e necessidade de montagem. O desconto real é o preço final depois de tudo isso.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Itatiaia',
+                'Vai mexer na cozinha?',
+                'Confira ofertas da Itatiaia e veja se existe cupom ativo para melhorar o valor final.'
+            ),
+            'tip' => 'Para móveis, economizar bem é juntar preço, medida correta e entrega viável.',
+        ],
+        [
+            'slug' => 'armario-de-cozinha-itatiaia-como-escolher',
+            'category' => 'Casa e Utensílios',
+            'title' => 'Armário de cozinha Itatiaia: como escolher sem errar na compra',
+            'summary' => 'Um guia rápido para comparar tamanho, acabamento, portas e espaço interno.',
+            'intro' => 'Armário de cozinha precisa ser bonito, mas também precisa funcionar no dia a dia. Antes de usar uma oferta da Itatiaia, vale pensar no que você guarda, no espaço disponível e na rotina da casa.',
+            'sections' => [
+                ['title' => 'Pense no que vai dentro', 'body' => 'Panelas grandes, potes, pratos, copos e mantimentos ocupam espaços diferentes. Escolha o armário olhando para sua rotina, não apenas para a foto do produto.'],
+                ['title' => 'Confira acabamento e material', 'body' => 'Cozinha tem umidade, gordura e limpeza frequente. Veja informações de material, puxadores, dobradiças e recomendações de conservação antes de fechar a compra.'],
+                ['title' => 'Cupom entra depois da escolha certa', 'body' => 'Depois de confirmar modelo, medida e entrega, aplique o cupom. Se o desconto apareceu e o preço final ficou bom, aí sim a oferta ficou interessante.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Itatiaia',
+                'Veja ofertas da Itatiaia para cozinha',
+                'Use os cupons ativos para comparar melhor antes de comprar armários e móveis.'
+            ),
+            'tip' => 'Evite comprar móvel só pela pressa da promoção. Medida errada sai caro.',
+        ],
+        [
+            'slug' => 'moveis-para-casa-itatiaia-o-que-comparar',
+            'category' => 'Casa e Utensílios',
+            'title' => 'Móveis para casa: o que comparar antes de aproveitar cupom da Itatiaia',
+            'summary' => 'Entenda como olhar medidas, entrega e necessidade real antes de comprar.',
+            'intro' => 'Promoção de móvel chama atenção porque o valor costuma ser mais alto. Justamente por isso, um cupom da Itatiaia pode representar uma boa economia, desde que a compra esteja bem planejada.',
+            'sections' => [
+                ['title' => 'Compare com o ambiente real', 'body' => 'Veja altura, largura, profundidade e área de abertura das portas. Também confira se o móvel combina com o que já existe na casa.'],
+                ['title' => 'Veja avaliações e fotos de compradores', 'body' => 'Comentários ajudam a entender acabamento, cor real e dificuldade de montagem. Eles também mostram se o produto costuma chegar bem embalado.'],
+                ['title' => 'Calcule o total com entrega', 'body' => 'Em móveis, frete pode pesar. Teste o cupom no carrinho e compare o total com outras opções antes de finalizar.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Itatiaia',
+                'Ofertas da Itatiaia para mobiliar melhor',
+                'Confira cupons e oportunidades ativas antes de fechar sua compra.'
+            ),
+            'tip' => 'Compra grande merece carrinho revisado: medida, entrega, montagem e desconto.',
+        ],
+        [
+            'slug' => 'brinox-utensilios-de-cozinha-que-facilitam-a-rotina',
+            'category' => 'Casa e Utensílios',
+            'title' => 'Brinox: utensílios de cozinha que facilitam a rotina e podem sair com desconto',
+            'summary' => 'Veja como escolher panelas, formas, potes e acessórios usando ofertas da Brinox.',
+            'intro' => 'A Brinox aparece em compras de casa e cozinha porque reúne utensílios que ajudam no preparo, na organização e na mesa. Quando tem cupom ativo, é uma boa chance de trocar peças antigas ou completar a cozinha.',
+            'sections' => [
+                ['title' => 'Priorize o que você usa toda semana', 'body' => 'Panela boa, assadeira, escorredor, talheres e potes úteis aparecem na rotina. Antes de comprar itens diferentes, resolva primeiro o que melhora seu dia a dia de verdade.'],
+                ['title' => 'Material importa', 'body' => 'Inox, alumínio, antiaderente e plástico têm usos diferentes. Leia a descrição e veja cuidados de limpeza, compatibilidade com fogão e resistência ao calor.'],
+                ['title' => 'Cupom ajuda em kits', 'body' => 'Kits de cozinha podem valer a pena quando você precisa de várias peças. Aplique o cupom e compare o preço unitário para saber se a oferta ficou boa.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Brinox',
+                'Vai equipar a cozinha?',
+                'Veja ofertas da Brinox e teste os cupons ativos antes de comprar.'
+            ),
+            'tip' => 'Utensílio bom é aquele que sai do armário. Compre pensando na rotina, não só na vitrine.',
+        ],
+        [
+            'slug' => 'panelas-brinox-como-escolher',
+            'category' => 'Casa e Utensílios',
+            'title' => 'Panelas Brinox: como escolher melhor antes de usar cupom',
+            'summary' => 'Entenda tamanho, material e tipo de uso antes de aproveitar uma oferta.',
+            'intro' => 'Comprar panela parece simples, mas muda bastante conforme o tipo de preparo. Uma panela para arroz não resolve a mesma coisa que uma frigideira, uma caçarola ou uma panela de pressão.',
+            'sections' => [
+                ['title' => 'Olhe o tamanho da sua rotina', 'body' => 'Quem cozinha para uma pessoa precisa de medidas diferentes de uma família grande. Tamanho certo economiza gás, espaço e tempo na limpeza.'],
+                ['title' => 'Veja se o material combina com seu fogão', 'body' => 'Alguns produtos têm restrições de uso. Confira se funciona no seu fogão e se exige algum cuidado especial com antiaderente ou inox.'],
+                ['title' => 'Aproveite desconto sem duplicar peças', 'body' => 'Cupom é ótimo para trocar uma panela antiga ou completar um conjunto. Evite comprar uma peça quase igual à que você já tem só porque está em promoção.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Brinox',
+                'Ofertas Brinox para renovar panelas',
+                'Confira cupons ativos e veja se o desconto entra no item que você procura.'
+            ),
+            'tip' => 'Antes de comprar, pense em onde a panela será guardada. Espaço também faz parte da escolha.',
+        ],
+        [
+            'slug' => 'organizar-a-cozinha-com-produtos-brinox',
+            'category' => 'Casa e Utensílios',
+            'title' => 'Como organizar a cozinha com produtos Brinox sem gastar além da conta',
+            'summary' => 'Ideias simples para usar organizadores, potes e acessórios com mais inteligência.',
+            'intro' => 'Cozinha organizada economiza tempo. Você encontra o que precisa, evita comprar item repetido e usa melhor o espaço. A Brinox costuma ter produtos úteis para essa missão, principalmente quando aparecem ofertas.',
+            'sections' => [
+                ['title' => 'Comece por gavetas e bancada', 'body' => 'Gavetas bagunçadas e bancada cheia atrapalham a rotina. Organizadores, potes e suportes podem ajudar, mas só se resolverem um problema real do espaço.'],
+                ['title' => 'Padronizar pode economizar', 'body' => 'Potes do mesmo formato empilham melhor. Utensílios com função clara evitam acúmulo. Na hora do cupom, prefira itens que conversam entre si.'],
+                ['title' => 'Veja o custo do conjunto', 'body' => 'Às vezes, comprar duas ou três peças coordenadas sai melhor que comprar vários itens soltos depois. Teste o cupom no carrinho e compare o valor final.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Brinox',
+                'Produtos Brinox para deixar a cozinha mais prática',
+                'Veja ofertas ativas e use cupom quando estiver disponível.'
+            ),
+            'tip' => 'Organização boa deixa a cozinha mais fácil de usar, não apenas mais bonita na foto.',
+        ],
+        [
+            'slug' => 'hostinger-vale-a-pena-para-criar-site',
+            'category' => 'Serviços',
+            'title' => 'Hostinger vale a pena para criar um site? Veja quando usar cupom',
+            'summary' => 'Entenda hospedagem, domínio, e-mail e recursos básicos antes de contratar.',
+            'intro' => 'Quem quer colocar um site no ar costuma encontrar a Hostinger nas buscas por hospedagem. O cupom pode reduzir o preço inicial, mas a escolha precisa considerar o tipo de projeto que você quer publicar.',
+            'sections' => [
+                ['title' => 'Site simples pede estrutura simples', 'body' => 'Portfólio, página institucional, blog pequeno e landing page geralmente não precisam de uma estrutura complexa. O importante é ter estabilidade, painel fácil e suporte quando algo travar.'],
+                ['title' => 'Confira domínio, e-mail e renovação', 'body' => 'Antes de contratar, veja se o plano inclui domínio, e-mail, SSL e backup. Também olhe o valor de renovação, porque o primeiro ano pode ter desconto maior.'],
+                ['title' => 'Use o cupom pensando no total', 'body' => 'Aplique o cupom e compare o valor final do período contratado. Se o plano resolve seu projeto e a renovação cabe no bolso, a oferta faz mais sentido.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Hostinger',
+                'Vai criar um site?',
+                'Veja ofertas da Hostinger e resgate o desconto pelo link correto.'
+            ),
+            'tip' => 'Hospedagem barata só é boa se o projeto continuar funcionando bem depois da compra.',
+        ],
+        [
+            'slug' => 'como-escolher-hospedagem-na-hostinger',
+            'category' => 'Serviços',
+            'title' => 'Como escolher hospedagem na Hostinger sem pagar por recurso que não usa',
+            'summary' => 'Veja como comparar planos de hospedagem antes de resgatar uma promoção.',
+            'intro' => 'Hospedagem tem nomes parecidos e diferenças importantes. Antes de usar um cupom da Hostinger, vale entender se você precisa de algo básico, intermediário ou mais robusto.',
+            'sections' => [
+                ['title' => 'Defina o tamanho do projeto', 'body' => 'Um site de apresentação exige menos que uma loja virtual com muitos acessos. Quanto mais simples o projeto, maior a chance de um plano inicial atender bem.'],
+                ['title' => 'Pense em crescimento', 'body' => 'Se você pretende criar blog, páginas de SEO ou área de clientes, escolha um plano que não fique apertado rápido demais. Mas cuidado para não comprar estrutura exagerada logo no começo.'],
+                ['title' => 'Compare suporte e facilidade', 'body' => 'Painel, instalador, SSL e backup podem poupar tempo. Cupom reduz preço, mas a experiência no dia a dia também importa.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Hostinger',
+                'Ofertas da Hostinger para tirar o site do papel',
+                'Confira os cupons ativos e veja qual plano combina com seu projeto.'
+            ),
+            'tip' => 'O melhor plano é o que resolve hoje e permite crescer sem susto amanhã.',
+        ],
+        [
+            'slug' => 'dominio-email-e-site-com-hostinger',
+            'category' => 'Serviços',
+            'title' => 'Domínio, e-mail e site: como montar o básico com Hostinger e cupom',
+            'summary' => 'Um passo a passo leve para quem quer presença online sem complicação.',
+            'intro' => 'Para muita gente, colocar um negócio online começa por três coisas: domínio, e-mail profissional e um site que explique o que a empresa faz. A Hostinger costuma aparecer como opção para juntar essas peças em um só lugar.',
+            'sections' => [
+                ['title' => 'Domínio é o endereço da marca', 'body' => 'Escolha um domínio fácil de falar, escrever e lembrar. Evite nomes longos demais e confira se ele combina com a marca nas redes sociais.'],
+                ['title' => 'E-mail passa mais confiança', 'body' => 'Um e-mail com domínio próprio costuma parecer mais profissional que contas genéricas. Veja se o plano inclui caixas de e-mail ou se isso será contratado à parte.'],
+                ['title' => 'Site precisa ser claro', 'body' => 'Não precisa começar gigante. Uma página com serviços, contato, localização e prova de confiança já pode ajudar. Use o cupom para reduzir o custo inicial, sem perder de vista a renovação.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Hostinger',
+                'Comece seu site gastando menos',
+                'Veja ofertas ativas da Hostinger e resgate pelo tracking correto.'
+            ),
+            'tip' => 'Antes de pagar, anote custo inicial, renovação e o que está incluso no plano.',
+        ],
+        [
+            'slug' => 'malwee-roupas-basicas-com-cupom',
+            'category' => 'Moda',
+            'title' => 'Malwee: roupas básicas que combinam com cupom e compra inteligente',
+            'summary' => 'Veja como escolher camisetas, peças confortáveis e itens de uso recorrente.',
+            'intro' => 'A Malwee é uma marca conhecida por peças do dia a dia. Quando aparece cupom, pode ser um bom momento para renovar camisetas, roupas confortáveis e itens básicos que realmente entram na rotina.',
+            'sections' => [
+                ['title' => 'Básico bom repete muito', 'body' => 'Camiseta, blusa, moletom leve e peças confortáveis são boas candidatas a cupom porque você usa várias vezes. O desconto faz mais sentido quando a peça não fica parada no armário.'],
+                ['title' => 'Confira tecido e tamanho', 'body' => 'Antes de comprar online, veja composição, tabela de medidas e avaliações. Em roupa, preço bom não compensa se o tamanho não servir ou o tecido não agradar.'],
+                ['title' => 'Monte carrinho por necessidade', 'body' => 'Separe o que você precisa renovar e só depois aplique o cupom. Assim, a promoção ajuda a economizar, sem transformar a compra em impulso.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Malwee',
+                'Vai renovar peças básicas?',
+                'Confira ofertas da Malwee e veja se tem cupom ativo para o seu carrinho.'
+            ),
+            'tip' => 'Roupa básica boa é aquela que você usa sem pensar muito. Priorize conforto e combinação.',
+        ],
+        [
+            'slug' => 'moda-infantil-malwee-com-desconto',
+            'category' => 'Moda Infantil',
+            'title' => 'Moda infantil Malwee: como comprar com desconto sem errar no tamanho',
+            'summary' => 'Dicas para escolher roupas infantis olhando conforto, crescimento e uso real.',
+            'intro' => 'Roupa infantil entra na lista de compras com frequência porque criança cresce rápido, mancha roupa e muda de fase. Quando tem oferta da Malwee, vale aproveitar com atenção ao tamanho e ao uso.',
+            'sections' => [
+                ['title' => 'Compre pensando no conforto', 'body' => 'Tecido macio, modelagem fácil e roupa que permite brincar costumam valer mais que peça muito elaborada. Para criança, praticidade pesa bastante.'],
+                ['title' => 'Tamanho merece cuidado extra', 'body' => 'Confira tabela de medidas e, se estiver entre dois tamanhos, pense no tempo de uso. Comprar um pouco maior pode fazer sentido, mas exagerar pode deixar a peça parada.'],
+                ['title' => 'Cupom ajuda em reposição', 'body' => 'Camisetas, bermudas, calças e roupas para escola ou passeio são compras recorrentes. Use o cupom para reduzir esse gasto que volta várias vezes ao ano.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Malwee',
+                'Ofertas Malwee para moda infantil',
+                'Veja cupons ativos e resgate a promoção antes de fechar a compra.'
+            ),
+            'tip' => 'Em moda infantil, pense no uso real: escola, passeio, frio, calor e facilidade de lavar.',
+        ],
+        [
+            'slug' => 'malwee-como-montar-carrinho-melhor',
+            'category' => 'Moda',
+            'title' => 'Como montar um carrinho melhor na Malwee antes de aplicar cupom',
+            'summary' => 'Aprenda a combinar peças, evitar compras repetidas e testar o desconto no fim.',
+            'intro' => 'Comprar roupa online fica mais fácil quando o carrinho tem lógica. Em vez de escolher peças soltas só porque estão em promoção, monte combinações que você realmente vai usar.',
+            'sections' => [
+                ['title' => 'Escolha cores fáceis de combinar', 'body' => 'Peças neutras e cores que conversam com o que você já tem aumentam as chances de uso. O desconto fica melhor quando a roupa entra em vários looks.'],
+                ['title' => 'Evite repetir o mesmo papel', 'body' => 'Antes de comprar mais uma camiseta parecida, veja se falta uma calça, uma blusa de frio ou uma peça para trabalho e passeio. Cupom bom também ajuda a equilibrar o guarda-roupa.'],
+                ['title' => 'Teste o desconto antes de pagar', 'body' => 'Aplique o cupom, confira valor final, frete, prazo e política de troca. Se tudo encaixar, a compra fica mais tranquila.'],
+            ],
+            'coupon_box' => brand_coupon_box(
+                'Malwee',
+                'Cupons Malwee para comprar melhor',
+                'Veja ofertas ativas e confira o desconto antes de finalizar.'
+            ),
+            'tip' => 'Carrinho bom não é o maior. É aquele que resolve melhor o que você precisa vestir.',
+        ],
         [
             'slug' => 'origem-da-shopee',
             'category' => 'Shopee',

@@ -17,6 +17,7 @@ $featured = array_slice(array_values(array_filter($coupons, fn ($coupon) => (int
 $topCoupons = $featured ?: array_slice($coupons, 0, 6);
 $expiring = expiring_soon_coupons($coupons);
 $guides = all_guides();
+$homeGuides = array_slice($guides, 0, 8);
 $searchSuggestions = array_values(array_unique(array_filter(array_merge(
     $categories,
     array_column($coupons, 'store'),
@@ -278,10 +279,10 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <p class="section-kicker">Dicas de economia</p>
             <h2>Aprenda a economizar melhor antes de comprar</h2>
           </div>
-          <a class="primary-action v2-more-content" href="<?= $guides ? 'guia.php?tema=' . e($guides[0]['slug']) : '#dicas' ?>">Ver mais dicas</a>
+          <a class="primary-action v2-more-content" href="/blog/">Ver mais dicas</a>
         </div>
         <div class="guide-grid">
-          <?php foreach ($guides as $guide): ?>
+          <?php foreach ($homeGuides as $guide): ?>
             <a class="guide-card" href="guia.php?tema=<?= e($guide['slug']) ?>">
               <span><?= e($guide['category']) ?></span>
               <h3><?= e($guide['title']) ?></h3>

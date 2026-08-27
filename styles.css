@@ -14,6 +14,127 @@
   --shadow: 0 18px 45px rgba(22, 42, 78, 0.12);
 }
 
+.blog-hero {
+  padding: clamp(34px, 6vw, 72px) clamp(18px, 5vw, 72px) 28px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8fd 100%);
+  border-bottom: 1px solid var(--line);
+}
+
+.blog-hero h1 {
+  max-width: 920px;
+  margin-top: 10px;
+  font-size: clamp(42px, 7vw, 76px);
+  line-height: 0.98;
+}
+
+.blog-hero p:not(.eyebrow) {
+  max-width: 760px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.blog-index {
+  padding: 28px clamp(18px, 5vw, 72px) 42px;
+}
+
+.blog-filter-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.blog-filter-strip a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 16px;
+  color: var(--blue);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+.blog-filter-strip a:hover,
+.blog-filter-strip a:focus-visible {
+  color: #ffffff;
+  background: var(--blue);
+  outline: 0;
+}
+
+.blog-category {
+  margin-top: 34px;
+}
+
+.blog-category-title {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.blog-category-title h2 {
+  font-size: clamp(30px, 4vw, 46px);
+}
+
+.blog-category-title span {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.blog-guide-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 620px) {
+  .blog-hero {
+    padding: 26px 16px 22px;
+  }
+
+  .blog-hero h1 {
+    font-size: 38px;
+  }
+
+  .blog-hero p:not(.eyebrow) {
+    font-size: 16px;
+  }
+
+  .blog-index {
+    padding-inline: 16px;
+  }
+
+  .blog-filter-strip {
+    flex-wrap: nowrap;
+    margin-inline: -16px;
+    padding: 0 16px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .blog-filter-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .blog-filter-strip a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .blog-category-title {
+    align-items: start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .blog-guide-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

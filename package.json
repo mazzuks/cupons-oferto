@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "check": "npm run build && npm run php:lint",
+    "composer": "powershell -ExecutionPolicy Bypass -File scripts/composer.ps1",
+    "php:lint": "powershell -ExecutionPolicy Bypass -File scripts/php-lint.ps1",
+    "php:serve": "powershell -ExecutionPolicy Bypass -File scripts/php-serve.ps1"
   }
 }

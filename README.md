@@ -56,3 +56,14 @@ Tambem existe uma versao simples para cPanel/Turbocloud:
 - `includes/config.example.php`: modelo de configuracao do banco.
 
 Veja o passo a passo em `docs/cpanel.md`.
+
+## Ambiente local rapido
+
+O projeto tem atalhos para validar e testar sem depender do cPanel:
+
+- `npm run check`: roda build estatico e lint de todos os arquivos PHP.
+- `npm run php:lint`: valida sintaxe dos arquivos `.php`.
+- `npm run php:serve`: abre o site em `http://127.0.0.1:8080`.
+- `npm run composer -- --version`: usa o Composer local em `.tools/composer.phar`.
+
+O PHP local fica em `.tools/php/php.exe`, entao os comandos funcionam mesmo se o PHP global do Windows ainda nao estiver no PATH.

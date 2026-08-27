@@ -67,6 +67,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <meta name="twitter:title" content="<?= e($shareTitle) ?>" />
     <meta name="twitter:description" content="<?= e($shareDescription) ?>" />
     <meta name="twitter:image" content="<?= e($shareImage) ?>" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1725208559538025" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />

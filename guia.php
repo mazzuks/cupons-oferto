@@ -102,11 +102,11 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
         <span>Cupons</span>
       </a>
       <nav class="nav-links" aria-label="Navegação principal">
-        <a href="index.php#categorias">Categorias</a>
-        <a href="index.php#cupons">Cupons</a>
-        <a href="index.php#dicas">Dicas</a>
+        <a href="/#cupons">Cupons</a>
+        <a href="/sorteios/">Sorteios</a>
+        <a href="/#dicas">Dicas</a>
       </nav>
-      <a class="header-cta" href="index.php#cupons">Ver cupons</a>
+      <a class="header-cta" href="/#cupons">Ver cupons</a>
     </header>
 
     <main>

@@ -90,6 +90,77 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.sweepstakes-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 28px;
+  align-items: end;
+  padding: clamp(34px, 6vw, 72px) clamp(18px, 5vw, 72px) 28px;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(255, 203, 69, 0.24), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #f4f8fd 100%);
+  border-bottom: 1px solid var(--line);
+}
+
+.sweepstakes-hero h1 {
+  max-width: 900px;
+  margin-top: 10px;
+  font-size: clamp(42px, 7vw, 76px);
+  line-height: 0.98;
+}
+
+.sweepstakes-hero p:not(.eyebrow) {
+  max-width: 720px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.sweepstakes-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px clamp(18px, 5vw, 72px);
+  background: #ffffff;
+  border-bottom: 1px solid var(--line);
+}
+
+.sweepstakes-summary div {
+  display: grid;
+  gap: 2px;
+  padding: 16px;
+  background: #f4f8fd;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.sweepstakes-summary strong {
+  color: var(--navy);
+  font-family: Kanit, Inter, sans-serif;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.sweepstakes-summary span {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.sweepstakes-content {
+  padding: 30px clamp(18px, 5vw, 72px) 42px;
+}
+
+.sweepstakes-card .coupon-type {
+  color: var(--green);
+}
+
+.sweepstakes-empty {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
 @media (max-width: 620px) {
   .blog-hero {
     padding: 26px 16px 22px;
@@ -132,6 +203,29 @@
 
   .blog-guide-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sweepstakes-hero {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 26px 16px 22px;
+  }
+
+  .sweepstakes-hero h1 {
+    font-size: 38px;
+  }
+
+  .sweepstakes-hero p:not(.eyebrow) {
+    font-size: 16px;
+  }
+
+  .sweepstakes-summary {
+    grid-template-columns: 1fr;
+    padding-inline: 16px;
+  }
+
+  .sweepstakes-content {
+    padding-inline: 16px;
   }
 }
 

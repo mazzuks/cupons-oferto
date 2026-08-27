@@ -53,6 +53,7 @@ function blog_anchor(string $value): string
       </a>
       <nav class="nav-links" aria-label="Navegacao principal">
         <a href="/">Cupons</a>
+        <a href="/sorteios/">Sorteios</a>
         <a href="/#top-cupons">Destaques</a>
         <a href="/blog/">Dicas de economia</a>
       </nav>

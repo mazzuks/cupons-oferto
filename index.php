@@ -81,6 +81,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <nav class="nav-links" aria-label="Navegacao principal">
         <a href="#top-cupons">Destaques</a>
         <a href="#cupons">Todos</a>
+        <a href="/sorteios/">Sorteios</a>
         <a href="#dicas">Dicas de economia</a>
       </nav>
       <a class="header-cta" href="admin/">Admin</a>

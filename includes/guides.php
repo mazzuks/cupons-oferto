@@ -48,9 +48,12 @@ function all_guides(): array
             'summary' => 'Veja como escolher maquiagem, cuidados com cabelo e itens de beleza sem comprar por impulso.',
             'intro' => 'A Lojas REDE aparece bastante para quem procura beleza, perfumaria e cuidados pessoais com preço melhor. Como esse tipo de compra mistura desejo, reposição e novidade, o cupom ajuda muito quando entra no produto certo.',
             'sections' => [
-                ['title' => 'Comece pelo que você realmente usa', 'body' => 'Antes de cair em uma promoção de cosméticos, olhe o que está acabando em casa: shampoo, condicionador, protetor, hidratante, desodorante, maquiagem básica ou produto de tratamento. Cupom bom é aquele que reduz o preço de algo que já fazia sentido comprar.'],
-                ['title' => 'Compare tamanho, kit e valor por unidade', 'body' => 'Em beleza, uma embalagem maior ou um kit pode parecer mais caro, mas sair melhor no valor final. Quando houver cupom, compare o preço por unidade e veja se o desconto entra no carrinho todo ou apenas em produtos selecionados.'],
-                ['title' => 'Cuidado com estoque parado', 'body' => 'Produto de beleza também vence, muda textura e pode não combinar com você. Se o desconto for bom, compre com critério. Vale mais garantir seus itens de rotina do que acumular produtos que talvez nunca saiam da gaveta.'],
+                ['title' => 'Reponha primeiro os produtos de uso contínuo', 'body' => 'Shampoo, condicionador, protetor solar, hidratante, desodorante e itens básicos de banho são compras que voltam sempre. Quando aparece cupom da Lojas REDE, começar por essa lista deixa a economia mais concreta, porque o desconto entra em algo que você já compraria de qualquer forma. Antes de olhar novidades, veja o que está acabando em casa e monte um carrinho curto com produtos de rotina.'],
+                ['title' => 'Separe desejo de necessidade na maquiagem', 'body' => 'Maquiagem costuma ser a parte mais tentadora da compra. Uma base nova, uma paleta diferente ou um batom em promoção parecem ótimos no impulso, mas nem sempre entram no uso real. Para comprar melhor, pense nos tons que você já usa, na validade depois de aberto e na frequência de aplicação. O cupom é bem-vindo quando melhora o preço de um item certeiro, não quando cria uma coleção parada na gaveta.'],
+                ['title' => 'Em skincare, confira pele, composição e frequência', 'body' => 'Produtos de cuidado com a pele pedem um pouco mais de critério. Antes de colocar sérum, ácido, hidratante ou protetor no carrinho, confira indicação de uso, tipo de pele, composição e quantidade. Um desconto bom não compensa se o produto irritar, vencer antes do fim ou duplicar uma etapa que você já tem em casa. Para skincare, a melhor compra é a que você consegue usar com regularidade.'],
+                ['title' => 'Compare kit, embalagem grande e preço por unidade', 'body' => 'Em beleza, o menor preço da prateleira nem sempre é o melhor negócio. Um kit pode sair mais barato por unidade, uma embalagem maior pode durar mais e um combo pode valer a pena se todos os itens forem úteis. Antes de fechar, compare o total com e sem cupom e veja se o desconto vale para o carrinho inteiro ou só para produtos selecionados. Essa conta simples evita promoção bonita com economia pequena.'],
+                ['title' => 'Cuidado com validade e estoque parado', 'body' => 'Cosmético também vence, muda textura, oxida, perde cheiro ou simplesmente deixa de combinar com sua rotina. Por isso, comprar três ou quatro unidades só porque o desconto apareceu pode virar desperdício. Estoque faz sentido para itens que acabam rápido e têm validade confortável. Para produtos novos, vale testar uma unidade primeiro e só repetir quando você souber que realmente funciona.'],
+                ['title' => 'Frete, retirada e prazo mudam o desconto final', 'body' => 'Depois de aplicar o cupom, olhe o total da compra com entrega ou retirada. Às vezes o desconto melhora bastante o carrinho; em outras, o frete consome boa parte da vantagem. Também vale conferir prazo, disponibilidade da marca desejada e regra da oferta antes de pagar. O melhor cupom da Lojas REDE é aquele que fecha uma compra útil, chega dentro do prazo e reduz o valor final de verdade.'],
             ],
             'coupon_box' => brand_coupon_box(
                 'Lojas REDE',
@@ -665,15 +668,49 @@ function ensure_guide_depth(array $guide): array
     $store = $guide['coupon_box']['store'] ?? 'Oferto';
     $category = $guide['category'] ?? 'Compras';
     $item = strtolower($category);
+    $slug = $guide['slug'] ?? '';
+    $guide['sections'] = guide_unique_sections($guide['sections'] ?? []);
 
-    while (guide_word_count($guide) < 600) {
-        $guide['sections'] = array_merge(
-            $guide['sections'] ?? [],
-            article_depth_sections($store, $category, $item, $guide['title'] ?? 'Como economizar melhor', $guide['slug'] ?? '')
-        );
+    for ($attempt = 0; $attempt < 3 && guide_word_count($guide) < 600; $attempt++) {
+        $before = count($guide['sections']);
+        $guide['sections'] = guide_unique_sections(array_merge(
+            $guide['sections'],
+            article_depth_sections($store, $category, $item, $guide['title'] ?? 'Como economizar melhor', $slug . '-' . $attempt)
+        ));
+
+        if (count($guide['sections']) === $before) {
+            break;
+        }
     }
 
     return $guide;
+}
+
+function guide_unique_sections(array $sections): array
+{
+    $unique = [];
+    $seenTitles = [];
+    $seenBodies = [];
+
+    foreach ($sections as $section) {
+        $title = trim((string) ($section['title'] ?? ''));
+        $body = trim((string) ($section['body'] ?? ''));
+        if ($title === '' || $body === '') {
+            continue;
+        }
+
+        $titleKey = normalize_search_text($title);
+        $bodyKey = normalize_search_text(substr($body, 0, 220));
+        if (isset($seenTitles[$titleKey]) || isset($seenBodies[$bodyKey])) {
+            continue;
+        }
+
+        $seenTitles[$titleKey] = true;
+        $seenBodies[$bodyKey] = true;
+        $unique[] = $section;
+    }
+
+    return $unique;
 }
 
 function guide_is_excluded_from_depth(array $guide): bool

@@ -67,3 +67,33 @@ O projeto tem atalhos para validar e testar sem depender do cPanel:
 - `npm run composer -- --version`: usa o Composer local em `.tools/composer.phar`.
 
 O PHP local fica em `.tools/php/php.exe`, entao os comandos funcionam mesmo se o PHP global do Windows ainda nao estiver no PATH.
+
+## Deploy automatico no cPanel
+
+O workflow `.github/workflows/deploy-cpanel-ftp.yml` publica o site no cPanel sempre que houver push na branch `main`.
+
+Ele faz duas coisas antes de enviar os arquivos:
+
+- instala as dependencias do projeto;
+- roda `npm run check` para validar build e sintaxe dos arquivos PHP.
+
+Depois disso, o deploy acontece por FTPS usando secrets do GitHub. Cadastre estes secrets em `Settings > Secrets and variables > Actions`:
+
+- `CPANEL_FTP_SERVER`: host FTP/FTPS do cPanel.
+- `CPANEL_FTP_USERNAME`: usuario FTP.
+- `CPANEL_FTP_PASSWORD`: senha do usuario FTP.
+- `CPANEL_FTP_SERVER_DIR`: pasta remota do site, por exemplo `/cupons-oferto/` ou `/`.
+
+Enquanto esses secrets nao existirem, o workflow roda a validacao e pula a publicacao. Depois de cadastrar, o proximo push na `main` publica automaticamente.
+
+Arquivos sensiveis e dados de operacao nao sao enviados pelo workflow:
+
+- `includes/config.php`;
+- `uploads/cupons/`;
+- `.git`, `.github`, `.tools`, `dist`, zips e arquivos locais de estrategia.
+
+Assim o fluxo normal fica:
+
+1. fazer a alteracao local;
+2. commitar e dar push na `main`;
+3. o GitHub Actions valida e publica sozinho no cPanel.

@@ -40,6 +40,7 @@ function blog_anchor(string $value): string
     <meta name="twitter:title" content="<?= e($shareTitle) ?>" />
     <meta name="twitter:description" content="<?= e($shareDescription) ?>" />
     <meta name="twitter:image" content="<?= e($shareImage) ?>" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1725208559538025" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://picsum.photos" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

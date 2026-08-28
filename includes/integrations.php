@@ -955,7 +955,7 @@ function hasoffers_status_options(): array
 
 function hasoffers_default_excluded_terms(): string
 {
-    return awin_default_excluded_terms();
+    return '';
 }
 
 function hasoffers_normalize_filters(array $filters): array
@@ -1050,20 +1050,201 @@ function hasoffers_offers(array $filters): array
 {
     $filters = hasoffers_normalize_filters($filters);
     $account = hasoffers_account($filters['account_index']);
+    $query = hasoffers_base_offer_query($filters, $account);
+
+    foreach (hasoffers_offer_methods() as $attempt) {
+        try {
+            $attemptQuery = $query;
+            if (!empty($attempt['without_status'])) {
+                unset($attemptQuery['filters[status]']);
+            }
+
+            $response = hasoffers_request($account, $attempt['target'], $attempt['method'], $attemptQuery);
+            $items = hasoffers_response_items($response);
+            if ($items) {
+                if ($attempt['method'] !== 'findAll' || !empty($attempt['without_status'])) {
+                    create_system_log('hasoffers_fallback', 'HasOffers usou metodo alternativo', $attempt['target'] . '::' . $attempt['method'] . ' retornou ' . count($items) . ' campanhas.', 'HasOffers');
+                }
+
+                return !empty($attempt['without_status']) ? hasoffers_filter_active_rows($items, $filters['status']) : $items;
+            }
+        } catch (Throwable $exception) {
+            create_system_log('hasoffers_method_error', 'HasOffers tentativa falhou', $attempt['target'] . '::' . $attempt['method'] . ': ' . $exception->getMessage(), 'HasOffers');
+        }
+    }
+
+    return [];
+}
+
+function hasoffers_base_offer_query(array $filters, array $account): array
+{
     $query = [
         'limit' => $filters['limit'],
         'page' => $filters['page'],
         'filters[status]' => $filters['status'],
-        'contain[]' => ['Advertiser', 'OfferCategory', 'Thumbnail', 'TrackingLink'],
+        'contain[]' => ['Advertiser', 'OfferCategory', 'Thumbnail'],
         'fields[]' => ['id', 'name', 'description', 'preview_url', 'expiration_date', 'status', 'default_payout', 'percent_payout', 'payout_type', 'terms_and_conditions'],
     ];
+    if (!empty($account['affiliate_id'])) {
+        $query['contain[TrackingLink][affiliate_id]'] = $account['affiliate_id'];
+    } else {
+        $query['contain[]'][] = 'TrackingLink';
+    }
     if ($filters['query'] !== '') {
         $query['filters[name][LIKE]'] = '%' . $filters['query'] . '%';
     }
 
-    $response = hasoffers_request($account, 'Affiliate_Offer', 'findAll', $query);
+    return $query;
+}
+
+function hasoffers_offer_methods(): array
+{
+    return [
+        ['target' => 'Affiliate_Offer', 'method' => 'findAll', 'without_status' => false],
+        ['target' => 'Affiliate_Offer', 'method' => 'findAll', 'without_status' => true],
+        ['target' => 'Affiliate_Offer', 'method' => 'findMyApprovedOffers', 'without_status' => true],
+        ['target' => 'Affiliate_Offer', 'method' => 'findMyOffers', 'without_status' => true],
+    ];
+}
+
+function hasoffers_response_items(array $response): array
+{
     $data = $response['data'] ?? [];
-    return is_array($data) ? array_values($data) : [];
+    if (!is_array($data)) {
+        return [];
+    }
+
+    return hasoffers_extract_offer_rows($data);
+}
+
+function hasoffers_extract_offer_rows(array $value): array
+{
+    if (hasoffers_looks_like_offer_row($value)) {
+        return [$value];
+    }
+
+    if (array_key_exists('data', $value) && is_array($value['data'])) {
+        $nested = hasoffers_extract_offer_rows($value['data']);
+        if ($nested) {
+            return $nested;
+        }
+    }
+
+    $rows = [];
+    foreach ($value as $item) {
+        if (!is_array($item)) {
+            continue;
+        }
+
+        if (hasoffers_looks_like_offer_row($item)) {
+            $rows[] = $item;
+            continue;
+        }
+
+        foreach (hasoffers_extract_offer_rows($item) as $nestedRow) {
+            $rows[] = $nestedRow;
+        }
+    }
+
+    return $rows;
+}
+
+function hasoffers_looks_like_offer_row(array $value): bool
+{
+    return isset($value['Offer'])
+        || isset($value['id'])
+        || isset($value['offer_id'])
+        || isset($value['AffiliateOffer'])
+        || isset($value['Affiliate_Offer']);
+}
+
+function hasoffers_filter_active_rows(array $items, string $status): array
+{
+    if ($status === '') {
+        return $items;
+    }
+
+    return array_values(array_filter($items, function ($row) use ($status): bool {
+        if (!is_array($row)) {
+            return false;
+        }
+
+        $rowStatus = strtolower(hasoffers_value($row, ['Offer.status', 'status']));
+        return $rowStatus === '' || $rowStatus === strtolower($status);
+    }));
+}
+
+function hasoffers_debug_probe(array $filters = []): array
+{
+    $filters = hasoffers_normalize_filters($filters);
+    $account = hasoffers_account($filters['account_index']);
+    $baseQuery = hasoffers_base_offer_query($filters, $account);
+    unset($baseQuery['filters[status]']);
+
+    $results = [];
+    foreach (hasoffers_offer_methods() as $attempt) {
+        $attemptQuery = $baseQuery;
+        if (empty($attempt['without_status'])) {
+            $attemptQuery['filters[status]'] = $filters['status'];
+        }
+
+        try {
+            $response = hasoffers_request($account, $attempt['target'], $attempt['method'], $attemptQuery);
+            $items = hasoffers_response_items($response);
+            $results[] = [
+                'target' => $attempt['target'],
+                'method' => $attempt['method'],
+                'with_status_filter' => empty($attempt['without_status']),
+                'response_keys' => implode(', ', array_keys($response)),
+                'data_keys' => is_array($response['data'] ?? null) ? implode(', ', array_slice(array_keys($response['data']), 0, 8)) : '',
+                'items' => count($items),
+                'first_item' => hasoffers_debug_sanitize($items[0] ?? []),
+                'error' => '',
+            ];
+        } catch (Throwable $exception) {
+            $results[] = [
+                'target' => $attempt['target'],
+                'method' => $attempt['method'],
+                'with_status_filter' => empty($attempt['without_status']),
+                'response_keys' => '',
+                'data_keys' => '',
+                'items' => 0,
+                'first_item' => [],
+                'error' => $exception->getMessage(),
+            ];
+        }
+    }
+
+    return $results;
+}
+
+function hasoffers_debug_sanitize($value, int $depth = 0)
+{
+    if ($depth > 3) {
+        return '[truncated]';
+    }
+
+    if (!is_array($value)) {
+        $text = (string) $value;
+        if (preg_match('/api[_-]?key|token|password|secret/i', $text)) {
+            return '[redacted]';
+        }
+
+        return mb_strlen($text) > 180 ? mb_substr($text, 0, 180) . '...' : $text;
+    }
+
+    $safe = [];
+    foreach (array_slice($value, 0, 14, true) as $key => $item) {
+        $keyText = (string) $key;
+        if (preg_match('/api[_-]?key|token|password|secret/i', $keyText)) {
+            $safe[$keyText] = '[redacted]';
+            continue;
+        }
+
+        $safe[$keyText] = hasoffers_debug_sanitize($item, $depth + 1);
+    }
+
+    return $safe;
 }
 
 function hasoffers_preview_offers(array $filters = []): array
@@ -1071,27 +1252,20 @@ function hasoffers_preview_offers(array $filters = []): array
     $filters = hasoffers_normalize_filters($filters);
     $offers = hasoffers_offers($filters);
     $items = [];
+    $diagnostics = hasoffers_empty_diagnostics();
     foreach ($offers as $offer) {
-        if (!is_array($offer) || !hasoffers_offer_passes_filters($offer, $filters)) {
+        if (!is_array($offer)) {
+            $diagnostics['invalid_rows']++;
             continue;
         }
-        $payload = hasoffers_offer_payload($offer, $filters['publish_status'], $filters['account_index']);
-        if (!$payload) {
+        if (!hasoffers_offer_passes_filters($offer, $filters)) {
+            $diagnostics['filtered_out']++;
             continue;
         }
-        $items[] = [
-            'external_id' => $payload['external_id'],
-            'store' => $payload['store'],
-            'title' => $payload['title'],
-            'category' => $payload['category'],
-            'offer_type' => $payload['offer_type'],
-            'redemption_type' => $payload['redemption_type'],
-            'status' => $payload['status'],
-            'existing' => (bool) coupon_by_external_id($payload['external_id']),
-        ];
+        $items[] = hasoffers_preview_item($offer, $filters['account_index']);
     }
 
-    return ['filters' => $filters, 'items' => $items, 'total' => count($offers), 'matched' => count($items)];
+    return ['filters' => $filters, 'items' => $items, 'total' => count($offers), 'matched' => count($items), 'diagnostics' => $diagnostics];
 }
 
 function hasoffers_import_offers(array $filters = []): array
@@ -1102,13 +1276,23 @@ function hasoffers_import_offers(array $filters = []): array
     $created = 0;
     $updated = 0;
     $skipped = 0;
+    $diagnostics = hasoffers_empty_diagnostics();
     foreach ($offers as $offer) {
-        if (!is_array($offer) || !hasoffers_offer_passes_filters($offer, $filters)) {
+        if (!is_array($offer)) {
+            $diagnostics['invalid_rows']++;
             $skipped++;
             continue;
         }
-        $payload = hasoffers_offer_payload($offer, $filters['publish_status'], $filters['account_index']);
+        if (!hasoffers_offer_passes_filters($offer, $filters)) {
+            $diagnostics['filtered_out']++;
+            $skipped++;
+            continue;
+        }
+        $payload = hasoffers_offer_payload($offer, $filters['publish_status'], $filters['account_index'], $diagnostics);
         if (!$payload || ($selectedExternalIds && !in_array($payload['external_id'], $selectedExternalIds, true))) {
+            if ($payload && $selectedExternalIds && !in_array($payload['external_id'], $selectedExternalIds, true)) {
+                $diagnostics['not_selected']++;
+            }
             $skipped++;
             continue;
         }
@@ -1119,8 +1303,8 @@ function hasoffers_import_offers(array $filters = []): array
         $existing ? $updated++ : $created++;
     }
 
-    create_system_log('hasoffers_import', 'Importacao HasOffers', $created . ' criadas, ' . $updated . ' atualizadas e ' . $skipped . ' ignoradas.', 'HasOffers');
-    return ['created' => $created, 'updated' => $updated, 'skipped' => $skipped, 'total' => count($offers)];
+    create_system_log('hasoffers_import', 'Importacao HasOffers', $created . ' criadas, ' . $updated . ' atualizadas e ' . $skipped . ' ignoradas. ' . hasoffers_diagnostics_summary($diagnostics), 'HasOffers');
+    return ['created' => $created, 'updated' => $updated, 'skipped' => $skipped, 'total' => count($offers), 'diagnostics' => $diagnostics];
 }
 
 function sync_hasoffers_watchlist(): array
@@ -1131,11 +1315,17 @@ function sync_hasoffers_watchlist(): array
     $seen = [];
     $updated = 0;
     $new = 0;
+    $diagnostics = hasoffers_empty_diagnostics();
     foreach ($offers as $offer) {
-        if (!is_array($offer) || !hasoffers_offer_passes_filters($offer, $filters)) {
+        if (!is_array($offer)) {
+            $diagnostics['invalid_rows']++;
             continue;
         }
-        $payload = hasoffers_offer_payload($offer, $filters['publish_status'], $filters['account_index']);
+        if (!hasoffers_offer_passes_filters($offer, $filters)) {
+            $diagnostics['filtered_out']++;
+            continue;
+        }
+        $payload = hasoffers_offer_payload($offer, $filters['publish_status'], $filters['account_index'], $diagnostics);
         if (!$payload) {
             continue;
         }
@@ -1156,15 +1346,85 @@ function sync_hasoffers_watchlist(): array
         }
     }
 
-    return ['partner' => 'HasOffers', 'read' => count($offers), 'updated' => $updated, 'new' => $new, 'missing' => $missing];
+    create_system_log('hasoffers_sync', 'Sincronizacao HasOffers', count($offers) . ' lidas, ' . $updated . ' atualizadas, ' . $new . ' novas e ' . $missing . ' ausentes. ' . hasoffers_diagnostics_summary($diagnostics), 'HasOffers');
+
+    return ['partner' => 'HasOffers', 'read' => count($offers), 'updated' => $updated, 'new' => $new, 'missing' => $missing, 'diagnostics' => $diagnostics];
 }
 
-function hasoffers_offer_payload(array $row, string $status = 'rascunho', int $accountIndex = 0): ?array
+function hasoffers_empty_diagnostics(): array
+{
+    return [
+        'invalid_rows' => 0,
+        'filtered_out' => 0,
+        'missing_offer_id' => 0,
+        'missing_tracking' => 0,
+        'not_selected' => 0,
+    ];
+}
+
+function hasoffers_diagnostics_summary(array $diagnostics): string
+{
+    $parts = [];
+    if (!empty($diagnostics['filtered_out'])) {
+        $parts[] = $diagnostics['filtered_out'] . ' filtradas';
+    }
+    if (!empty($diagnostics['missing_offer_id'])) {
+        $parts[] = $diagnostics['missing_offer_id'] . ' sem ID';
+    }
+    if (!empty($diagnostics['missing_tracking'])) {
+        $parts[] = $diagnostics['missing_tracking'] . ' sem tracking link';
+    }
+    if (!empty($diagnostics['not_selected'])) {
+        $parts[] = $diagnostics['not_selected'] . ' nao selecionadas';
+    }
+    if (!empty($diagnostics['invalid_rows'])) {
+        $parts[] = $diagnostics['invalid_rows'] . ' linhas invalidas';
+    }
+
+    return $parts ? 'Diagnostico: ' . implode(', ', $parts) . '.' : 'Diagnostico: sem bloqueios.';
+}
+
+function hasoffers_preview_item(array $row, int $accountIndex = 0): array
+{
+    $offerId = hasoffers_offer_id($row);
+    $accountKey = hasoffers_account_key(hasoffers_account($accountIndex));
+    $externalId = $offerId !== '' ? 'hasoffers:' . $accountKey . ':' . $offerId : '';
+    $title = hasoffers_value($row, ['Offer.name', 'name'], 'Campanha HasOffers');
+    $store = hasoffers_value($row, ['Advertiser.company', 'Advertiser.name', 'advertiser_name'], 'HasOffers');
+    $category = hasoffers_offer_category($row);
+    $trackingUrl = $offerId !== '' ? hasoffers_tracking_url($row, $accountIndex) : '';
+    $code = hasoffers_value($row, ['Offer.coupon_code', 'coupon_code', 'code']);
+
+    return [
+        'external_id' => $externalId,
+        'offer_id' => $offerId,
+        'store' => $store,
+        'title' => $title,
+        'category' => $category,
+        'offer_type' => $code !== '' ? 'cupom' : 'campanha',
+        'redemption_type' => $code !== '' ? 'texto_redirect' : 'redirect',
+        'status' => hasoffers_value($row, ['Offer.status', 'status'], 'active'),
+        'tracking_ready' => coupon_is_hasoffers_tracking_url($trackingUrl),
+        'existing' => $externalId !== '' && (bool) coupon_by_external_id($externalId),
+    ];
+}
+
+function hasoffers_offer_payload(array $row, string $status = 'rascunho', int $accountIndex = 0, ?array &$diagnostics = null): ?array
 {
     $offer = hasoffers_offer_data($row);
     $offerId = hasoffers_offer_id($row);
+    if ($offerId === '') {
+        if (is_array($diagnostics)) {
+            $diagnostics['missing_offer_id']++;
+        }
+        return null;
+    }
+
     $trackingUrl = hasoffers_tracking_url($row, $accountIndex);
-    if ($offerId === '' || !coupon_is_hasoffers_tracking_url($trackingUrl)) {
+    if (!coupon_is_hasoffers_tracking_url($trackingUrl)) {
+        if (is_array($diagnostics)) {
+            $diagnostics['missing_tracking']++;
+        }
         return null;
     }
 
@@ -1220,7 +1480,7 @@ function hasoffers_offer_passes_filters(array $row, array $filters): bool
             return false;
         }
     }
-    if (awin_should_filter_categories($filters['categories'])) {
+    if ($filters['categories']) {
         $category = hasoffers_offer_category($row);
         if (!in_array($category, $filters['categories'], true)) {
             return false;
@@ -1243,12 +1503,18 @@ function hasoffers_tracking_url(array $row, int $accountIndex = 0): string
     }
 
     try {
-        $response = hasoffers_request(hasoffers_account($accountIndex), 'Affiliate_Offer', 'generateTrackingLink', [
+        $account = hasoffers_account($accountIndex);
+        $params = [
             'offer_id' => $offerId,
             'params[aff_sub2]' => 'oferto',
             'options[tiny_url]' => '0',
-        ]);
+        ];
+        if (!empty($account['affiliate_id'])) {
+            $params['affiliate_id'] = $account['affiliate_id'];
+        }
+        $response = hasoffers_request($account, 'Affiliate_Offer', 'generateTrackingLink', $params);
     } catch (Throwable $exception) {
+        create_system_log('hasoffers_tracking_error', 'HasOffers sem tracking link', 'Oferta ' . $offerId . ' nao gerou tracking: ' . $exception->getMessage(), 'HasOffers', $offerId);
         return '';
     }
 

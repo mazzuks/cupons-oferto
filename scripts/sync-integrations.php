@@ -25,5 +25,9 @@ foreach ($results as $result) {
         . ' novas=' . (int) ($result['new'] ?? 0)
         . ' sumiram=' . (int) $result['missing']
         . "\n";
+
+    if (!empty($result['diagnostics']) && function_exists('hasoffers_diagnostics_summary')) {
+        echo '  ' . hasoffers_diagnostics_summary($result['diagnostics']) . "\n";
+    }
 }
 echo "Fim em " . date('Y-m-d H:i:s') . "\n";

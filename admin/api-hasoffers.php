@@ -12,6 +12,7 @@ $error = '';
 $success = '';
 $previewResult = null;
 $importResult = null;
+$debugResult = null;
 
 function hasoffers_posted_array(string $key): array
 {
@@ -63,6 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $success = 'Previa do HasOffers carregada.';
         }
 
+        if ($action === 'debug_hasoffers') {
+            $debugResult = hasoffers_debug_probe($filters);
+            $success = 'Diagnostico bruto da HasOffers carregado.';
+        }
+
         if ($action === 'save_hasoffers_defaults') {
             save_integration_profile('hasoffers', $filters);
             $success = 'Padrao do HasOffers salvo para proximas buscas e cron.';
@@ -70,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'import_hasoffers') {
             if (!$filters['selected_external_ids']) {
-                throw new RuntimeException('Selecione pelo menos uma oferta para importar.');
+                throw new RuntimeException('Selecione pelo menos uma campanha para importar.');
             }
 
             $importResult = hasoffers_import_offers($filters);
@@ -90,7 +96,7 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
         <div>
           <p class="section-kicker">HasOffers / TUNE</p>
           <h1>Campanhas de redes HasOffers</h1>
-          <p>Cadastre qualquer Network ID, gere tracking link por oferta e importe campanhas aprovadas para o Oferto.</p>
+          <p>Cadastre qualquer Network ID, liste campanhas ativas da rede e importe o que fizer sentido publicar no Oferto.</p>
         </div>
         <div class="admin-hero-actions">
           <a class="admin-secondary-link" href="apis.php">Voltar para APIs</a>
@@ -137,7 +143,7 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
             <div>
               <p class="section-kicker">Marcas monitoradas</p>
               <h2><?= count($monitoredBrands) ?> marcas</h2>
-              <p>Ofertas importadas entram no monitoramento da cron e geram aviso se sumirem.</p>
+              <p>Campanhas importadas entram no monitoramento da cron e geram aviso se sumirem.</p>
             </div>
           </div>
           <div class="admin-api-roadmap">
@@ -154,8 +160,8 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
           <div class="admin-panel-title-row">
             <div>
               <p class="section-kicker">Busca</p>
-              <h2>Pesquisar ofertas</h2>
-              <p>O CRM lista ofertas via Affiliate_Offer::findAll e gera o link via generateTrackingLink antes de publicar.</p>
+              <h2>Pesquisar campanhas</h2>
+              <p>Para listar tudo que estiver ativo, deixe busca, segmentos e termos bloqueados em branco.</p>
             </div>
           </div>
 
@@ -170,13 +176,13 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
                   <?php endforeach; ?>
                 </select>
               </label>
-              <label>Buscar oferta
-                <input name="query" value="<?= e($filters['query']) ?>" placeholder="Ex: notebook, seguro, moda..." />
+              <label>Buscar campanha opcional
+                <input name="query" value="<?= e($filters['query']) ?>" placeholder="Deixe em branco para trazer todas as ativas" />
               </label>
             </div>
 
             <fieldset class="admin-choice-field">
-              <legend>Segmentos do Oferto</legend>
+              <legend>Segmentos opcionais</legend>
               <div class="admin-segmented admin-segmented-compact">
                 <?php foreach (category_options() as $category): ?>
                   <label>
@@ -208,17 +214,61 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
               </label>
             </div>
 
-            <label>Bloquear termos
-              <input name="excluded_terms" value="<?= e(implode(', ', $filters['excluded_terms'])) ?>" />
+            <label>Bloquear termos opcional
+              <input name="excluded_terms" value="<?= e(implode(', ', $filters['excluded_terms'])) ?>" placeholder="Deixe em branco para nao bloquear nenhuma campanha" />
             </label>
 
             <div class="admin-actions">
-              <button type="submit" name="action" value="preview_hasoffers" <?= !$accounts ? 'disabled' : '' ?>>Buscar ofertas</button>
+              <button type="submit" name="action" value="preview_hasoffers" <?= !$accounts ? 'disabled' : '' ?>>Buscar campanhas ativas</button>
+              <button type="submit" name="action" value="debug_hasoffers" <?= !$accounts ? 'disabled' : '' ?>>Diagnostico bruto</button>
               <button type="submit" name="action" value="save_hasoffers_defaults" <?= !$accounts ? 'disabled' : '' ?>>Salvar como padrao</button>
             </div>
           </form>
         </section>
       </div>
+
+      <?php if ($debugResult): ?>
+        <section class="admin-panel admin-api-preview">
+          <div class="admin-panel-title-row">
+            <div>
+              <p class="section-kicker">Diagnostico bruto</p>
+              <h2>Retorno direto da HasOffers</h2>
+              <p>Este bloco nao aplica importacao nem exige tracking. Ele serve para descobrir qual metodo da Ybox realmente retorna campanhas.</p>
+            </div>
+          </div>
+
+          <div class="admin-table-wrap">
+            <table class="admin-table admin-api-table">
+              <thead>
+                <tr>
+                  <th>Metodo</th>
+                  <th>Status filter</th>
+                  <th>Itens</th>
+                  <th>Chaves</th>
+                  <th>Erro ou amostra</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($debugResult as $probe): ?>
+                  <tr>
+                    <td><strong><?= e($probe['target']) ?>::<?= e($probe['method']) ?></strong></td>
+                    <td><?= $probe['with_status_filter'] ? 'sim' : 'nao' ?></td>
+                    <td><span class="status-pill <?= (int) $probe['items'] > 0 ? 'status-ativo' : 'status-pausado' ?>"><?= (int) $probe['items'] ?></span></td>
+                    <td><?= e($probe['response_keys']) ?><br /><span><?= e($probe['data_keys']) ?></span></td>
+                    <td>
+                      <?php if ($probe['error']): ?>
+                        <span><?= e($probe['error']) ?></span>
+                      <?php else: ?>
+                        <pre class="admin-debug-json"><?= e(json_encode($probe['first_item'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)) ?></pre>
+                      <?php endif; ?>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      <?php endif; ?>
 
       <?php if ($importResult): ?>
         <section class="admin-kpi-grid admin-api-result-grid">
@@ -227,6 +277,18 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
           <article class="admin-kpi-card"><span>Ignoradas</span><strong><?= (int) $importResult['skipped'] ?></strong></article>
           <article class="admin-kpi-card"><span>Lidas no feed</span><strong><?= (int) $importResult['total'] ?></strong></article>
         </section>
+        <?php if (!empty($importResult['diagnostics'])): ?>
+          <section class="admin-panel admin-api-card">
+            <p class="section-kicker">Diagnostico HasOffers</p>
+            <h2>Por que algumas campanhas nao entraram</h2>
+            <div class="admin-api-roadmap">
+              <span><?= (int) ($importResult['diagnostics']['filtered_out'] ?? 0) ?> filtradas por busca, segmento opcional ou termos bloqueados</span>
+              <span><?= (int) ($importResult['diagnostics']['missing_tracking'] ?? 0) ?> sem tracking link valido</span>
+              <span><?= (int) ($importResult['diagnostics']['missing_offer_id'] ?? 0) ?> sem ID de campanha</span>
+              <span><?= (int) ($importResult['diagnostics']['not_selected'] ?? 0) ?> nao selecionadas na importacao</span>
+            </div>
+          </section>
+        <?php endif; ?>
       <?php endif; ?>
 
       <?php if ($previewResult): ?>
@@ -234,10 +296,19 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
           <div class="admin-panel-title-row">
             <div>
               <p class="section-kicker">Previa</p>
-              <h2><?= (int) $previewResult['matched'] ?> ofertas selecionaveis</h2>
+              <h2><?= (int) $previewResult['matched'] ?> campanhas encontradas</h2>
               <p>Foram lidos <?= (int) $previewResult['total'] ?> itens no HasOffers.</p>
             </div>
           </div>
+
+          <?php if (!empty($previewResult['diagnostics'])): ?>
+            <div class="admin-api-roadmap">
+              <span><?= (int) ($previewResult['diagnostics']['filtered_out'] ?? 0) ?> filtradas por busca, segmento opcional ou termos bloqueados</span>
+              <span><?= (int) ($previewResult['diagnostics']['missing_tracking'] ?? 0) ?> sem tracking link valido</span>
+              <span><?= (int) ($previewResult['diagnostics']['missing_offer_id'] ?? 0) ?> sem ID de campanha</span>
+              <span><?= (int) ($previewResult['diagnostics']['invalid_rows'] ?? 0) ?> linhas invalidas no retorno</span>
+            </div>
+          <?php endif; ?>
 
           <form method="post" class="coupon-admin-form">
             <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
@@ -256,30 +327,34 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
                 <thead>
                   <tr>
                     <th>Importar</th>
-                    <th>Marca e campanha</th>
+                    <th>Anunciante e campanha</th>
                     <th>Tipo</th>
                     <th>Segmento</th>
                     <th>Resgate</th>
-                    <th>Status</th>
+                    <th>Tracking</th>
                   </tr>
                 </thead>
                 <tbody>
                   <?php if (!$previewResult['items']): ?>
-                    <tr><td colspan="6" class="admin-empty-cell">Nenhuma oferta passou pelos filtros ou veio sem tracking link HasOffers valido.</td></tr>
+                    <tr><td colspan="6" class="admin-empty-cell">Nenhuma campanha voltou da HasOffers para estes parametros. Deixe busca, segmentos e termos bloqueados em branco para testar todas as ativas.</td></tr>
                   <?php endif; ?>
                   <?php foreach ($previewResult['items'] as $item): ?>
                     <tr>
                       <td>
                         <label class="admin-mini-check">
-                          <input type="checkbox" name="selected_external_ids[]" value="<?= e($item['external_id']) ?>" checked />
-                          <span>Selecionar</span>
+                          <input type="checkbox" name="selected_external_ids[]" value="<?= e($item['external_id']) ?>" <?= $item['tracking_ready'] && $item['external_id'] !== '' ? 'checked' : 'disabled' ?> />
+                          <span><?= $item['tracking_ready'] ? 'Selecionar' : 'Sem link' ?></span>
                         </label>
                       </td>
                       <td><strong><?= e($item['store']) ?></strong><br /><span><?= e($item['title']) ?></span></td>
                       <td><span class="admin-pill admin-pill-type"><?= e(offer_type_label($item['offer_type'])) ?></span></td>
                       <td><?= e($item['category']) ?></td>
                       <td><?= e(redemption_type_label($item['redemption_type'])) ?></td>
-                      <td><span class="status-pill <?= $item['existing'] ? 'status-pausado' : 'status-rascunho' ?>"><?= $item['existing'] ? 'atualiza' : 'novo' ?></span></td>
+                      <td>
+                        <span class="status-pill <?= $item['tracking_ready'] ? 'status-ativo' : 'status-pausado' ?>">
+                          <?= $item['tracking_ready'] ? ($item['existing'] ? 'tracking ok / atualiza' : 'tracking ok / novo') : 'sem tracking' ?>
+                        </span>
+                      </td>
                     </tr>
                   <?php endforeach; ?>
                 </tbody>

@@ -486,8 +486,15 @@ function coupon_is_hasoffers_tracking_url(string $url): bool
 
     $host = strtolower((string) parse_url($url, PHP_URL_HOST));
     $query = strtolower((string) parse_url($url, PHP_URL_QUERY));
+    $path = strtolower((string) parse_url($url, PHP_URL_PATH));
+
     return strpos($host, 'hasoffers') !== false
         || strpos($host, 'tune') !== false
+        || strpos($host, 'go2cloud') !== false
+        || strpos($host, 'go2jump') !== false
+        || strpos($path, '/aff_c') !== false
+        || strpos($path, '/aff_r') !== false
+        || strpos($path, '/aff_l') !== false
         || strpos($query, 'offer_id=') !== false
         || strpos($query, 'aff_id=') !== false
         || strpos($query, 'affiliate_id=') !== false;

@@ -46,6 +46,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <meta name="twitter:description" content="<?= e($shareDescription) ?>" />
     <meta name="twitter:image" content="<?= e($shareImage) ?>" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1725208559538025" crossorigin="anonymous"></script>
+    <?php render_oferto_brand_schema($shareUrl, 'Oferto Sorteios'); ?>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -61,6 +62,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         <a href="/">Cupons</a>
         <a href="/sorteios/">Sorteios</a>
         <a href="/blog/">Dicas de economia</a>
+        <a href="/sobre-a-oferto-digital.php">Sobre</a>
       </nav>
       <a class="header-cta" href="/admin/">Admin</a>
     </header>

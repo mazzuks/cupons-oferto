@@ -92,6 +92,7 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
     <meta name="twitter:description" content="<?= e($shareDescription) ?>" />
     <meta name="twitter:image" content="<?= e($shareImage) ?>" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1725208559538025" crossorigin="anonymous"></script>
+    <?php render_oferto_brand_schema($shareUrl, $shareTitle); ?>
     <link rel="preconnect" href="https://picsum.photos" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -108,6 +109,7 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
         <a href="/#cupons">Cupons</a>
         <a href="/sorteios/">Sorteios</a>
         <a href="/#dicas">Dicas</a>
+        <a href="/sobre-a-oferto-digital.php">Sobre</a>
       </nav>
       <a class="header-cta" href="/#cupons">Ver cupons</a>
     </header>

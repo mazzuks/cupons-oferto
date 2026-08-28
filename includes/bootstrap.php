@@ -278,6 +278,66 @@ function e(?string $value): string
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
+function render_json_ld(array $data): void
+{
+    echo '<script type="application/ld+json">' . json_encode(
+        $data,
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+    ) . '</script>';
+}
+
+function render_oferto_brand_schema(string $pageUrl, string $pageName = 'Oferto Cupons'): void
+{
+    render_json_ld([
+        '@context' => 'https://schema.org',
+        '@graph' => [
+            [
+                '@type' => 'Organization',
+                '@id' => 'https://oferto.digital/#organization',
+                'name' => 'Oferto Digital',
+                'alternateName' => [
+                    'Oferto',
+                    'Oferto Cupons',
+                    'Cupons Oferto',
+                ],
+                'url' => 'https://oferto.digital/',
+                'logo' => 'https://oferto.digital/wp-content/uploads/2024/08/oferto.png',
+                'sameAs' => [
+                    'https://cupons.oferto.digital/',
+                ],
+            ],
+            [
+                '@type' => 'WebSite',
+                '@id' => 'https://cupons.oferto.digital/#website',
+                'name' => 'Oferto Cupons',
+                'alternateName' => [
+                    'Oferto Digital Cupons',
+                    'Oferto',
+                    'Cupons Oferto',
+                ],
+                'url' => 'https://cupons.oferto.digital/',
+                'publisher' => [
+                    '@id' => 'https://oferto.digital/#organization',
+                ],
+                'inLanguage' => 'pt-BR',
+            ],
+            [
+                '@type' => 'WebPage',
+                '@id' => $pageUrl . '#webpage',
+                'url' => $pageUrl,
+                'name' => $pageName,
+                'isPartOf' => [
+                    '@id' => 'https://cupons.oferto.digital/#website',
+                ],
+                'about' => [
+                    '@id' => 'https://oferto.digital/#organization',
+                ],
+                'inLanguage' => 'pt-BR',
+            ],
+        ],
+    ]);
+}
+
 function adsense_client_id(): string
 {
     return (string) (app_config()['adsense']['client_id'] ?? 'ca-pub-1725208559538025');

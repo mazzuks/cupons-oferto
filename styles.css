@@ -105,6 +105,87 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.brand-about-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 28px;
+  align-items: start;
+  padding: 34px clamp(18px, 5vw, 72px) 52px;
+  background: #ffffff;
+}
+
+.brand-about-article {
+  max-width: 900px;
+}
+
+.brand-about-article h2 {
+  margin-top: 34px;
+  color: var(--navy);
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.02;
+}
+
+.brand-about-article h2:first-of-type {
+  margin-top: 8px;
+}
+
+.brand-about-article p:not(.eyebrow) {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.brand-about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.brand-about-card {
+  position: sticky;
+  top: 98px;
+  display: grid;
+  gap: 12px;
+  padding: 22px;
+  background: #f6f9fd;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.brand-about-card img {
+  width: 140px;
+  height: auto;
+}
+
+.brand-about-card strong {
+  color: var(--navy);
+  font-family: Kanit, Inter, sans-serif;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.brand-about-card span {
+  color: var(--muted);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.brand-about-card a {
+  display: inline-flex;
+  width: max-content;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 16px;
+  color: #ffffff;
+  background: var(--blue);
+  border-radius: 999px;
+  font-weight: 900;
+}
+
 .sweepstakes-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
@@ -218,6 +299,19 @@
 
   .blog-guide-grid {
     grid-template-columns: 1fr;
+  }
+
+  .brand-about-content {
+    grid-template-columns: 1fr;
+    padding: 26px 16px 42px;
+  }
+
+  .brand-about-article p:not(.eyebrow) {
+    font-size: 16px;
+  }
+
+  .brand-about-card {
+    position: static;
   }
 
   .sweepstakes-hero {

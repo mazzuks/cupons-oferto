@@ -576,6 +576,108 @@ function all_guides(): array
             ],
             'tip' => 'Se estiver em dúvida, prefira cursos com prévia de aulas, garantia ou avaliações recentes.',
         ],
+        [
+            'slug' => 'o-que-e-a-oferto-digital',
+            'category' => 'Oferto Digital',
+            'title' => 'O que é a Oferto Digital?',
+            'summary' => 'Entenda a marca por trás do Oferto Cupons e veja como ela ajuda a encontrar ofertas, cupons e promoções com mais clareza.',
+            'intro' => 'A Oferto Digital é a marca por trás do Oferto Cupons, uma iniciativa criada para facilitar a vida de quem quer economizar antes de comprar online. Em vez de abrir vários sites, procurar códigos soltos e tentar adivinhar se uma oferta ainda funciona, a ideia é reunir oportunidades em um ambiente simples, com explicação clara e caminho direto para a loja parceira.',
+            'sections' => [
+                [
+                    'title' => 'Uma marca voltada para economia online',
+                    'body' => 'O nome Oferto Digital aparece ligado a projetos de descoberta de oportunidades na internet. No Oferto Cupons, isso se transforma em uma experiência prática: a pessoa encontra cupons, promoções, sorteios e campanhas por categoria, abre a oferta que chamou atenção, lê as condições principais e decide se vale seguir para o site parceiro. A proposta não é empurrar compra por impulso, mas ajudar o usuário a comparar antes de gastar.',
+                ],
+                [
+                    'title' => 'Qual é a diferença entre Oferto Digital e Oferto Cupons?',
+                    'body' => 'Oferto Digital é a marca maior. Oferto Cupons é uma frente dessa marca, focada em cupons, promoções e conteúdos de economia. Essa diferença ajuda o usuário a entender por que pode encontrar a marca Oferto Digital em mais de um contexto. Um projeto pode falar de cupons, outro pode falar de ofertas, outro pode organizar conteúdos por categoria. O ponto comum é o mesmo: facilitar decisões de compra online.',
+                ],
+                [
+                    'title' => 'O site não vende o produto diretamente',
+                    'body' => 'Quando alguém encontra uma oferta no Oferto Cupons, a compra não acontece dentro do Oferto. O usuário é direcionado para a loja parceira, onde confere preço final, estoque, frete, prazo e condições de pagamento. Isso é importante porque evita confusão: o Oferto ajuda na descoberta e na explicação da oferta, mas quem vende, entrega e atende o pedido é a loja onde a compra é concluída.',
+                ],
+                [
+                    'title' => 'Por que existe uma pré-página antes da loja?',
+                    'body' => 'A pré-página foi criada para melhorar a experiência. Em muitos sites de cupom, a pessoa clica em uma oferta e já cai direto na loja, sem conseguir copiar o código ou entender a regra. No Oferto, a página da oferta mostra descrição, validade, botão para copiar cupom quando houver e acesso ao site parceiro. Isso reduz atrito e ajuda o usuário a não perder a promoção no caminho.',
+                ],
+                [
+                    'title' => 'Como o Oferto Digital pode ganhar dinheiro?',
+                    'body' => 'Alguns links podem ser links de afiliado. Isso significa que o site pode receber uma comissão quando a pessoa compra depois de clicar, sem custo extra para o usuário. Também podem existir espaços de publicidade, como anúncios exibidos em páginas de conteúdo e oferta. Esse modelo permite manter a experiência gratuita para quem procura cupons e dicas de economia.',
+                ],
+                [
+                    'title' => 'Como usar o Oferto no dia a dia',
+                    'body' => 'O uso mais simples é pesquisar pela loja, produto ou categoria antes de comprar. Se existir cupom, copie o código e teste no carrinho da loja. Se for promoção sem código, entre pelo botão da oferta e confira se a condição aparece antes de pagar. Para compras maiores, vale comparar frete, prazo e regras. A melhor economia não é só achar desconto: é pagar menos por algo que já fazia sentido comprar.',
+                ],
+            ],
+            'tip' => 'Use o Oferto como etapa de conferência antes da compra: procure, leia a regra, copie o cupom quando existir e só finalize quando o desconto aparecer no carrinho.',
+        ],
+        [
+            'slug' => 'oferto-digital-e-confiavel',
+            'category' => 'Oferto Digital',
+            'title' => 'Oferto Digital é confiável? Como usar o Oferto Cupons com segurança',
+            'summary' => 'Veja o que observar antes de usar cupons, clicar em ofertas e seguir para lojas parceiras pelo Oferto.',
+            'intro' => 'Pesquisar se a Oferto Digital é confiável faz sentido, principalmente para quem viu um cupom pela primeira vez e quer entender para onde o clique leva. A resposta passa por uma distinção importante: o Oferto Cupons organiza oportunidades e direciona para lojas parceiras, mas a compra, o pagamento e a entrega acontecem fora do Oferto.',
+            'sections' => [
+                [
+                    'title' => 'Entenda o papel do Oferto',
+                    'body' => 'O Oferto atua como um guia de ofertas. Ele mostra cupons, promoções, sorteios e conteúdos que ajudam o usuário a decidir melhor. Ao clicar em uma oferta, a pessoa pode passar por uma página com informações do cupom e depois seguir para a loja parceira. Essa lógica é comum em sites de cupom e afiliados: o site ajuda na descoberta, mas a transação acontece no ambiente do anunciante.',
+                ],
+                [
+                    'title' => 'Confira sempre a loja onde a compra será feita',
+                    'body' => 'Antes de pagar, olhe o endereço do site parceiro, o preço final, o frete, o prazo de entrega e a política de troca. Mesmo quando a oferta foi encontrada pelo Oferto, a responsabilidade pela venda continua sendo da loja. Se a loja exigir cadastro, pagamento ou confirmação de dados, confira se você está no domínio correto e se a página usa conexão segura.',
+                ],
+                [
+                    'title' => 'Cupom confiável precisa aparecer no carrinho',
+                    'body' => 'Um cupom só deve ser considerado válido quando o desconto aparece no carrinho ou no checkout da loja. Se o código não funcionar, se a regra exigir valor mínimo ou se a promoção tiver acabado, não finalize a compra esperando desconto depois. O ideal é testar o cupom antes, ler as condições e comparar o total com outras opções.',
+                ],
+                [
+                    'title' => 'Cuidado com promoções boas demais',
+                    'body' => 'Mesmo em sites sérios, ofertas podem ter restrições. Desconto muito alto pode valer apenas para novos clientes, produtos selecionados, regiões específicas ou datas curtas. Também pode depender de estoque. Por isso, o melhor comportamento é simples: leia a regra, teste no carrinho e confirme tudo antes de pagar. Segurança em cupom vem mais da checagem do que da pressa.',
+                ],
+                [
+                    'title' => 'O Oferto não deve pedir pagamento pelo cupom',
+                    'body' => 'O usuário não precisa pagar ao Oferto para copiar um cupom ou abrir uma oferta. Se algum fluxo externo pedir pagamento, dados bancários ou informações sensíveis em nome do cupom, pare e confira o endereço. No modelo esperado, o Oferto apresenta a oportunidade e a loja parceira processa a compra no próprio site.',
+                ],
+                [
+                    'title' => 'Como aproveitar com tranquilidade',
+                    'body' => 'Use a página da oferta como checklist: veja a marca, entenda a descrição, copie o código quando existir e siga para o site parceiro. Depois, confirme se o desconto foi aplicado. Em compras de valor alto, compare com outras lojas e leia avaliações recentes. Assim, o cupom vira uma ferramenta de economia, não uma decisão automática.',
+                ],
+            ],
+            'tip' => 'Regra prática: encontrou a oferta no Oferto, mas só compre quando o site parceiro mostrar preço, frete, prazo e desconto final de forma clara.',
+        ],
+        [
+            'slug' => 'como-funciona-o-oferto-cupons',
+            'category' => 'Oferto Digital',
+            'title' => 'Como funciona o Oferto Cupons?',
+            'summary' => 'Veja como pesquisar ofertas, copiar cupons, compartilhar oportunidades e acessar lojas parceiras pelo Oferto.',
+            'intro' => 'O Oferto Cupons foi pensado para ser um caminho rápido entre a vontade de economizar e a compra mais bem avaliada. Em vez de mostrar apenas um botão que leva para fora do site, cada oferta pode ter uma pré-página com contexto, validade, descrição e instrução de uso. Isso ajuda quem quer copiar o cupom, compartilhar com alguém ou entender a regra antes de abrir a loja.',
+            'sections' => [
+                [
+                    'title' => 'A busca começa por loja, produto ou categoria',
+                    'body' => 'Na página inicial, o usuário pode procurar por uma loja, um produto ou uma categoria. Também pode navegar pelos destaques, pelas ofertas vencendo em breve, por sorteios e por dicas de economia. Essa organização evita que a pessoa dependa de um único banner ou de uma lista aleatória. Quanto mais específica for a busca, mais fácil fica encontrar uma oportunidade útil.',
+                ],
+                [
+                    'title' => 'Cada card leva para uma página da oferta',
+                    'body' => 'Quando o usuário clica em uma oferta, o objetivo é mostrar primeiro uma página intermediária. Essa página apresenta a marca, a descrição do benefício, a validade e o código do cupom quando houver. Ela também permite copiar o cupom antes de seguir para a loja parceira. Isso resolve um problema comum: clicar rápido demais e perder o código que precisava ser usado no checkout.',
+                ],
+                [
+                    'title' => 'Depois da pré-página, o usuário segue para a loja parceira',
+                    'body' => 'O botão principal da página da oferta leva ao site parceiro. É ali que o usuário confere estoque, preço final, frete e forma de pagamento. Em ofertas com código, o cupom precisa ser colado no campo indicado pela loja. Em ofertas sem código, o desconto pode depender do acesso pelo link ou de uma campanha ativa no próprio site parceiro.',
+                ],
+                [
+                    'title' => 'O WhatsApp ajuda a compartilhar a oferta certa',
+                    'body' => 'Compartilhar apenas a home obriga a outra pessoa a procurar tudo de novo. Por isso, a melhor experiência é enviar o link da própria pré-página da oferta. Assim, quem recebe já vê a descrição, o cupom, a validade e o botão correto para resgatar. Isso também aumenta a chance de a oferta ser usada do jeito certo.',
+                ],
+                [
+                    'title' => 'Os conteúdos ajudam antes da compra',
+                    'body' => 'Além dos cupons, o Oferto tem guias e artigos para explicar como economizar em categorias específicas. Um conteúdo pode falar sobre pizza com cupom, outro sobre cosméticos, ferramentas, móveis, cursos ou compras recorrentes. Esses textos ajudam o usuário a não olhar apenas a porcentagem do desconto, mas também prazo, regra, necessidade real e preço final.',
+                ],
+                [
+                    'title' => 'O que observar em toda oferta',
+                    'body' => 'Antes de finalizar qualquer compra, confira validade, região, valor mínimo, frete, categorias participantes e se o desconto apareceu no carrinho. Se a oferta envolver sorteio, leia o regulamento no site parceiro. Se envolver cupom, teste antes de pagar. O Oferto facilita o caminho, mas a decisão boa ainda depende de comparar com calma.',
+                ],
+            ],
+            'tip' => 'O caminho ideal é: encontrar a oferta, abrir a pré-página, copiar o cupom quando houver, acessar a loja parceira e conferir o desconto antes de finalizar.',
+        ],
     ];
 
     $guides = array_merge($guides, generated_brand_guides());

@@ -2143,31 +2143,34 @@ h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 7px;
   min-height: 46px;
-  padding: 0 18px;
+  min-width: 0;
+  padding: 0 12px;
   color: #ffffff;
-  background: linear-gradient(135deg, #25d366, #128c7e);
-  border: 1px solid rgba(37, 211, 102, 0.2);
+  background: #25d366;
+  border: 0;
   border-radius: 999px;
-  box-shadow: 0 14px 28px rgba(18, 140, 126, 0.22);
-  font-family: Kanit, Inter, sans-serif;
-  font-weight: 900;
+  box-shadow: 0 12px 24px rgba(37, 211, 102, 0.22);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.15;
   text-decoration: none;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+  text-align: center;
+  transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
 }
 
 .site-v2-compact .whatsapp-share-button:hover,
 .site-v2-compact .whatsapp-share-button:focus-visible {
-  filter: saturate(1.08);
+  background: #1fb95a;
   outline: 0;
-  box-shadow: 0 18px 34px rgba(18, 140, 126, 0.3);
+  box-shadow: 0 14px 28px rgba(37, 211, 102, 0.28);
   transform: translateY(-1px);
 }
 
 .site-v2-compact .whatsapp-share-button svg {
-  width: 21px;
-  height: 21px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
   flex: 0 0 auto;
 }

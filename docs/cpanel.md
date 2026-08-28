@@ -115,7 +115,11 @@ Essa cron:
 - avisa quando aparece campanha nova em marca monitorada;
 - marca campanhas que sumiram do feed;
 - cria notificacoes no CRM;
-- registra erros de API em `Notificacoes`.
+- registra erros de API em `Notificacoes`;
+- grava um resumo em `Admin > Logs` com o evento `Cron de integracoes executada`.
+
+Para confirmar se a cron rodou, abra `Admin > Logs` e procure o evento mais recente `integration_cron`.
+Ele mostra quantas ofertas cada parceiro leu, quantas foram atualizadas, quantas entraram como novas e quantas ficaram ausentes.
 
 ## Observacao sobre categorias
 

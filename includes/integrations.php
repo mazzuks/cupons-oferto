@@ -2353,7 +2353,41 @@ function sync_all_integrations(): array
         }
     }
 
+    create_system_log(
+        'integration_cron',
+        'Cron de integracoes executada',
+        sync_results_summary($results),
+        'Sistema'
+    );
+
     return $results;
+}
+
+function sync_results_summary(array $results): string
+{
+    $parts = [];
+    $errors = 0;
+
+    foreach ($results as $result) {
+        $partner = (string) ($result['partner'] ?? 'Integracao');
+        if (!empty($result['error'])) {
+            $errors++;
+            $parts[] = $partner . ': erro - ' . (string) $result['error'];
+            continue;
+        }
+
+        $parts[] = $partner
+            . ': lidas=' . (int) ($result['read'] ?? 0)
+            . ', atualizadas=' . (int) ($result['updated'] ?? 0)
+            . ', novas=' . (int) ($result['new'] ?? 0)
+            . ', ausentes=' . (int) ($result['missing'] ?? 0);
+    }
+
+    $prefix = $errors > 0
+        ? $errors . ' integracao(oes) com erro. '
+        : 'Todas as integracoes foram chamadas. ';
+
+    return $prefix . implode(' | ', $parts);
 }
 
 function lomadee_campaign_passes_filters(array $campaign, array $brand, array $filters): bool

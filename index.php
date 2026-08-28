@@ -226,8 +226,9 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <div class="v2-list" id="coupon-grid">
             <?php foreach ($coupons as $coupon): ?>
               <?php
+                $couponOfferUrl = 'https://cupons.oferto.digital/' . coupon_offer_url($coupon, 'whatsapp');
                 $couponShareText = rawurlencode(
-                    'Olha essa oferta da ' . $coupon['store'] . ': ' . $coupon['title'] . ' - https://cupons.oferto.digital/'
+                    'Olha essa oferta da ' . $coupon['store'] . ': ' . $coupon['title'] . '. Veja os detalhes e copie o cupom aqui: ' . $couponOfferUrl
                 );
               ?>
               <article class="coupon-card v2-list-card" <?= $defaultCategory !== 'Todos' && $coupon['category'] !== $defaultCategory ? 'hidden' : '' ?> data-category="<?= e($coupon['category']) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'cupom') ?>" data-search="<?= e(normalize_search_text($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'] . ' ' . ($coupon['tags'] ?? '') . ' ' . ($coupon['requirements'] ?? '') . ' ' . ($coupon['rules'] ?? '') . ' ' . ($coupon['partner_network'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'cupom') . ' ' . redemption_type_label($coupon['redemption_type'] ?? 'texto'))) ?>">

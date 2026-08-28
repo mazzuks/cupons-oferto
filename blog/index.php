@@ -40,12 +40,13 @@ function blog_anchor(string $value): string
     <meta name="twitter:title" content="<?= e($shareTitle) ?>" />
     <meta name="twitter:description" content="<?= e($shareDescription) ?>" />
     <meta name="twitter:image" content="<?= e($shareImage) ?>" />
+    <link rel="preconnect" href="https://picsum.photos" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20260827-blog" />
+    <link rel="stylesheet" href="/styles.css?v=20260828-picsum-seo" />
   </head>
-  <body class="site-v2 site-v2-compact">
+  <body class="site-v2 site-v2-compact" style="--seo-bg-image: url('https://picsum.photos/seed/oferto-dicas-economia/1600/900.webp');">
     <header class="site-header v2-compact-header">
       <a class="brand" href="/" aria-label="Oferto Cupons">
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />

@@ -15,14 +15,29 @@
 }
 
 .blog-hero {
+  position: relative;
+  overflow: hidden;
   padding: clamp(34px, 6vw, 72px) clamp(18px, 5vw, 72px) 28px;
-  background: linear-gradient(180deg, #ffffff 0%, #f4f8fd 100%);
+  color: #ffffff;
+  background:
+    linear-gradient(90deg, rgba(8, 27, 48, 0.92), rgba(8, 27, 48, 0.62)),
+    var(--seo-bg-image, url("https://picsum.photos/seed/oferto-dicas-economia/1600/900.webp"));
+  background-position: center;
+  background-size: cover;
   border-bottom: 1px solid var(--line);
+}
+
+.blog-hero .eyebrow,
+.blog-hero h1,
+.blog-hero p:not(.eyebrow) {
+  position: relative;
+  z-index: 1;
 }
 
 .blog-hero h1 {
   max-width: 920px;
   margin-top: 10px;
+  color: #ffffff;
   font-size: clamp(42px, 7vw, 76px);
   line-height: 0.98;
 }
@@ -30,7 +45,7 @@
 .blog-hero p:not(.eyebrow) {
   max-width: 760px;
   margin-top: 18px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.84);
   font-size: 20px;
   line-height: 1.45;
 }
@@ -982,9 +997,21 @@ h3 {
 }
 
 .guide-hero {
+  position: relative;
+  overflow: hidden;
   padding: clamp(42px, 7vw, 86px) clamp(18px, 5vw, 72px);
   background:
-    linear-gradient(110deg, #ffffff 0%, #ffffff 58%, rgba(235, 244, 255, 0.9) 58%, rgba(235, 244, 255, 0.9) 100%);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.82) 46%, rgba(235, 244, 255, 0.26)),
+    var(--seo-bg-image, url("https://picsum.photos/seed/oferto-guia-economia/1600/900.webp"));
+  background-position: center;
+  background-size: cover;
+}
+
+.guide-hero .eyebrow,
+.guide-hero h1,
+.guide-hero p {
+  position: relative;
+  z-index: 1;
 }
 
 .guide-hero h1 {
@@ -1671,7 +1698,11 @@ h3 {
   gap: 24px;
   align-items: end;
   padding: 34px clamp(18px, 5vw, 72px) 24px;
-  background: linear-gradient(180deg, #ffffff 0%, #f6fbff 100%);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86) 48%, rgba(235, 244, 255, 0.38)),
+    var(--seo-bg-image, url("https://picsum.photos/seed/oferto-cupons-economia/1600/900.webp"));
+  background-position: center;
+  background-size: cover;
 }
 
 .site-v2-compact .v2-compact-hero h1 {
@@ -2157,7 +2188,10 @@ h3 {
     gap: 18px;
     padding: 24px 16px 20px;
     background:
-      linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 255, 0.92)),
+      var(--seo-bg-image, url("https://picsum.photos/seed/oferto-cupons-economia/900/1100.webp"));
+    background-position: center;
+    background-size: cover;
   }
 
   .site-v2-compact .v2-compact-header {

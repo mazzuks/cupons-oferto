@@ -24,6 +24,8 @@ return [
             'guias_artigo_topo_responsivo' => '5834288282',
             'guias_lateral_300x250' => '9112072798',
             'sorteios_topo_responsivo' => '3358394686',
+            'oferta_topo_responsivo' => '3971426759',
+            'oferta_meio_responsivo' => '3971426759',
         ],
     ],
     'integrations' => [

@@ -86,7 +86,7 @@ document.addEventListener("click", (event) => {
 search?.addEventListener("input", applyFilters);
 applyFilters();
 
-grid?.addEventListener("click", async (event) => {
+document.addEventListener("click", async (event) => {
   const button = event.target.closest(".copy-button");
   if (!button || !button.dataset.code) return;
 

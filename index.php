@@ -143,7 +143,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           </div>
           <div class="v2-store-grid">
             <?php foreach ($topCoupons as $coupon): ?>
-              <a class="v2-store-card" href="<?= e(coupon_go_url($coupon, 'v2_featured')) ?>" target="_blank" rel="noopener">
+              <a class="v2-store-card" href="<?= e(coupon_offer_url($coupon, 'destaque')) ?>">
                 <div class="v2-card-media">
                   <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="" onerror="this.onerror=null;this.src='<?= e(coupon_fallback_banner_src($coupon)) ?>';" />
                   <span class="brand-mark">
@@ -177,7 +177,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <div class="v2-expiring-list">
               <?php if ($expiring): ?>
                 <?php foreach ($expiring as $coupon): ?>
-                  <a href="<?= e(coupon_go_url($coupon, 'v2_expiring')) ?>" target="_blank" rel="noopener">
+                  <a href="<?= e(coupon_offer_url($coupon, 'vencendo')) ?>">
                     <strong><?= e($coupon['store']) ?></strong>
                     <span><?= e(validity_label($coupon['ends_at'])) ?></span>
                   </a>

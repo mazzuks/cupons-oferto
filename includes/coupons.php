@@ -776,6 +776,11 @@ function coupon_go_url(array $coupon, string $eventType = 'cta'): string
     return 'go.php?id=' . (int) ($coupon['id'] ?? 0) . '&event=' . rawurlencode($eventType);
 }
 
+function coupon_offer_url(array $coupon, string $source = 'card'): string
+{
+    return 'oferta.php?id=' . (int) ($coupon['id'] ?? 0) . '&src=' . rawurlencode($source);
+}
+
 function click_report_summary(string $startDate, string $endDate): array
 {
     $pdo = db();

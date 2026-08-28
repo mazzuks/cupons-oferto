@@ -27,6 +27,8 @@ Os IDs abaixo foram criados no painel do AdSense e configurados como fallback no
 | `guias_artigo_topo_responsivo` | Oferto Guia Topo Responsivo | `5834288282` |
 | `guias_lateral_300x250` | Oferto Guia Lateral 300x250 | `9112072798` |
 | `sorteios_topo_responsivo` | Oferto Sorteios Topo Responsivo | `3358394686` |
+| `oferta_topo_responsivo` | Oferto Home Meio Responsivo | `3971426759` |
+| `oferta_meio_responsivo` | Oferto Home Meio Responsivo | `3971426759` |
 
 Se precisar sobrescrever algum ID no servidor, preencha `includes/config.php`:
 

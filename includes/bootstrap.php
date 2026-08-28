@@ -283,9 +283,28 @@ function adsense_client_id(): string
     return (string) (app_config()['adsense']['client_id'] ?? 'ca-pub-1725208559538025');
 }
 
+function adsense_default_slots(): array
+{
+    return [
+        'v2_topo_responsivo' => '5284508420',
+        'v2_entre_destaques_e_lista' => '3971426759',
+        'v2_lateral_300x250' => '9321167801',
+        'v2_antes_dicas' => '3971426759',
+        'blog_topo_responsivo' => '4796538786',
+        'guias_artigo_topo_responsivo' => '5834288282',
+        'guias_lateral_300x250' => '9112072798',
+        'sorteios_topo_responsivo' => '3358394686',
+    ];
+}
+
 function adsense_slot_id(string $slot): string
 {
-    return trim((string) (app_config()['adsense']['slots'][$slot] ?? ''));
+    $configured = trim((string) (app_config()['adsense']['slots'][$slot] ?? ''));
+    if ($configured !== '') {
+        return $configured;
+    }
+
+    return adsense_default_slots()[$slot] ?? '';
 }
 
 function render_ad_slot(string $slot, string $class = 'inventory-slot-wide'): void

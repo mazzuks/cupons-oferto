@@ -16,14 +16,14 @@ return [
     'adsense' => [
         'client_id' => 'ca-pub-1725208559538025',
         'slots' => [
-            'v2_topo_responsivo' => '',
-            'v2_entre_destaques_e_lista' => '',
-            'v2_lateral_300x250' => '',
-            'v2_antes_dicas' => '',
-            'blog_topo_responsivo' => '',
-            'guias_artigo_topo_responsivo' => '',
-            'guias_lateral_300x250' => '',
-            'sorteios_topo_responsivo' => '',
+            'v2_topo_responsivo' => '5284508420',
+            'v2_entre_destaques_e_lista' => '3971426759',
+            'v2_lateral_300x250' => '9321167801',
+            'v2_antes_dicas' => '3971426759',
+            'blog_topo_responsivo' => '4796538786',
+            'guias_artigo_topo_responsivo' => '5834288282',
+            'guias_lateral_300x250' => '9112072798',
+            'sorteios_topo_responsivo' => '3358394686',
         ],
     ],
     'integrations' => [

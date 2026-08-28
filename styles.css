@@ -627,6 +627,10 @@ h3 {
   border: 0;
 }
 
+.adsense-slot {
+  min-width: 250px;
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: minmax(260px, 330px) 1fr;

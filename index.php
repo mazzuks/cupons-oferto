@@ -128,9 +128,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       </section>
 
       <aside class="inventory-band v2-ad-band" aria-label="Publicidade">
-        <div class="inventory-slot inventory-slot-wide" data-inventory-slot="v2_topo_responsivo">
-          <span>Publicidade</span>
-        </div>
+        <?php render_ad_slot('v2_topo_responsivo'); ?>
       </aside>
 
       <?php if ($topCoupons): ?>
@@ -168,9 +166,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <?php endif; ?>
 
       <aside class="inventory-band v2-ad-band v2-ad-band-between" aria-label="Publicidade">
-        <div class="inventory-slot inventory-slot-wide" data-inventory-slot="v2_entre_destaques_e_lista">
-          <span>Publicidade</span>
-        </div>
+        <?php render_ad_slot('v2_entre_destaques_e_lista'); ?>
       </aside>
 
       <section class="v2-layout" id="cupons">
@@ -196,8 +192,8 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <h2>Confira a regra da oferta</h2>
             <p>Veja validade, categoria e forma de resgate antes de acessar o site parceiro. Assim fica mais facil escolher o cupom certo e evitar oferta vencida.</p>
           </section>
-          <aside class="inventory-slot inventory-slot-rectangle v2-side-ad" aria-label="Publicidade" data-inventory-slot="v2_lateral_300x250">
-            <span>Publicidade</span>
+          <aside aria-label="Publicidade">
+            <?php render_ad_slot('v2_lateral_300x250', 'inventory-slot-rectangle v2-side-ad'); ?>
           </aside>
         </aside>
 
@@ -281,9 +277,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       </section>
 
       <aside class="inventory-band v2-ad-band" aria-label="Publicidade">
-        <div class="inventory-slot inventory-slot-wide" data-inventory-slot="v2_antes_dicas">
-          <span>Publicidade</span>
-        </div>
+        <?php render_ad_slot('v2_antes_dicas'); ?>
       </aside>
 
       <section class="v2-section v2-guides-compact" id="dicas">

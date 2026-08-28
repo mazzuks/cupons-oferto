@@ -120,9 +120,7 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
       </section>
 
       <aside class="inventory-band guide-inventory" aria-label="Publicidade">
-        <div class="inventory-slot inventory-slot-wide" data-inventory-slot="guias_artigo_topo_responsivo">
-          <span>Publicidade</span>
-        </div>
+        <?php render_ad_slot('guias_artigo_topo_responsivo'); ?>
       </aside>
 
       <section class="guide-layout">
@@ -183,8 +181,8 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
             <a class="whatsapp-action" href="<?= e($whatsappShareUrl) ?>" target="_blank" rel="noopener">Compartilhar no WhatsApp</a>
           </section>
 
-          <aside class="inventory-slot inventory-slot-rectangle" aria-label="Publicidade" data-inventory-slot="guias_lateral_300x250">
-            <span>Publicidade</span>
+          <aside aria-label="Publicidade">
+            <?php render_ad_slot('guias_lateral_300x250', 'inventory-slot-rectangle'); ?>
           </aside>
 
           <section class="rail-block">

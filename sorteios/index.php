@@ -98,9 +98,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       </section>
 
       <aside class="inventory-band v2-ad-band" aria-label="Publicidade">
-        <div class="inventory-slot inventory-slot-wide" data-inventory-slot="sorteios_topo_responsivo">
-          <span>Publicidade</span>
-        </div>
+        <?php render_ad_slot('sorteios_topo_responsivo'); ?>
       </aside>
 
       <section class="sweepstakes-content" id="sorteios">

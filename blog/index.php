@@ -69,6 +69,10 @@ function blog_anchor(string $value): string
         <p>Conteúdos rápidos para comparar cupons, entender promoções, evitar compra por impulso e encontrar oportunidades por marca.</p>
       </section>
 
+      <aside class="inventory-band v2-ad-band" aria-label="Publicidade">
+        <?php render_ad_slot('blog_topo_responsivo'); ?>
+      </aside>
+
       <section class="blog-index">
         <div class="blog-filter-strip" aria-label="Categorias do blog">
           <a href="#todos">Todas</a>

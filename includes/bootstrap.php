@@ -278,6 +278,32 @@ function e(?string $value): string
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
+function adsense_client_id(): string
+{
+    return (string) (app_config()['adsense']['client_id'] ?? 'ca-pub-1725208559538025');
+}
+
+function adsense_slot_id(string $slot): string
+{
+    return trim((string) (app_config()['adsense']['slots'][$slot] ?? ''));
+}
+
+function render_ad_slot(string $slot, string $class = 'inventory-slot-wide'): void
+{
+    $slotId = adsense_slot_id($slot);
+    $classes = trim('inventory-slot ' . $class);
+
+    if ($slotId === '') {
+        echo '<div class="' . e($classes) . '" data-inventory-slot="' . e($slot) . '"><span>Publicidade</span></div>';
+        return;
+    }
+
+    echo '<div class="' . e($classes) . ' adsense-slot" data-filled="true" data-inventory-slot="' . e($slot) . '">';
+    echo '<ins class="adsbygoogle" style="display:block" data-ad-client="' . e(adsense_client_id()) . '" data-ad-slot="' . e($slotId) . '" data-ad-format="auto" data-full-width-responsive="true"></ins>';
+    echo '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>';
+    echo '</div>';
+}
+
 function csrf_token(): string
 {
     if (empty($_SESSION['csrf_token'])) {

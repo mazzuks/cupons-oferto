@@ -14,5 +14,20 @@ Este projeto ja tem espacos preparados para Google Ad Manager, Ad Exchange ou de
 
 ## Proxima etapa
 
-Quando a conta do Google Ad Manager estiver pronta, basta trocar os placeholders `.inventory-slot` pelas tags oficiais, mantendo os mesmos `data-inventory-slot`.
+Os placeholders `.inventory-slot` ja estao ligados ao helper `render_ad_slot()`.
+Para ativar blocos manuais do AdSense, crie os blocos no painel do AdSense e preencha os IDs em `includes/config.php`, dentro de `adsense.slots`.
+
+Exemplo:
+
+```php
+'adsense' => [
+    'client_id' => 'ca-pub-1725208559538025',
+    'slots' => [
+        'v2_topo_responsivo' => '1234567890',
+        'guias_artigo_topo_responsivo' => '2345678901',
+    ],
+],
+```
+
+Enquanto um slot estiver vazio, o site mostra apenas o placeholder visual de publicidade.
 

@@ -99,15 +99,16 @@ Quando uma oferta e importada por uma API, ela tambem entra na lista de campanha
 - marcas que queremos garimpar sempre;
 - campanhas ja publicadas ou importadas.
 
-## 7. Cron diaria
+## 7. Cron de sincronizacao
 
-No cPanel, abra **Cron Jobs** e crie uma tarefa diaria a meia-noite:
+No cPanel, abra **Cron Jobs** e mantenha uma tarefa para atualizar as ofertas periodicamente.
+No servidor atual, ela esta configurada para rodar a cada 2 horas, sempre no minuto 17:
 
 ```bash
-0 0 * * * /usr/local/bin/php /home/USUARIO/cupons-oferto/scripts/sync-integrations.php
+17 */2 * * * cd /home/oferto/cupons-oferto && /usr/local/bin/php scripts/sync-integrations.php >> /home/oferto/cron-sync-integrations.log 2>&1
 ```
 
-Troque `/home/USUARIO/cupons-oferto` pela pasta real do clone no servidor.
+Se mudar de servidor, troque `/home/oferto/cupons-oferto` pela pasta real do clone e ajuste o caminho do arquivo de log.
 
 Essa cron:
 
@@ -120,6 +121,7 @@ Essa cron:
 
 Para confirmar se a cron rodou, abra `Admin > Logs` e procure o evento mais recente `integration_cron`.
 Ele mostra quantas ofertas cada parceiro leu, quantas foram atualizadas, quantas entraram como novas e quantas ficaram ausentes.
+Tambem da para conferir a saida tecnica em `/home/oferto/cron-sync-integrations.log`.
 
 ## Observacao sobre categorias
 

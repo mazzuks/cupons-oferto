@@ -495,7 +495,8 @@ function offer18_default_excluded_terms(): string
 function offer18_normalize_filters(array $filters): array
 {
     $status = (string) ($filters['status'] ?? '1');
-    $publishStatus = in_array($filters['publish_status'] ?? 'rascunho', ['ativo', 'rascunho'], true) ? $filters['publish_status'] : 'rascunho';
+    $publishStatus = (string) ($filters['publish_status'] ?? 'rascunho');
+    $publishStatus = in_array($publishStatus, ['ativo', 'rascunho'], true) ? $publishStatus : 'rascunho';
 
     return [
         'account_index' => max(0, (int) ($filters['account_index'] ?? 0)),
@@ -961,7 +962,8 @@ function hasoffers_default_excluded_terms(): string
 function hasoffers_normalize_filters(array $filters): array
 {
     $status = (string) ($filters['status'] ?? 'active');
-    $publishStatus = in_array($filters['publish_status'] ?? 'rascunho', ['ativo', 'rascunho'], true) ? $filters['publish_status'] : 'rascunho';
+    $publishStatus = (string) ($filters['publish_status'] ?? 'rascunho');
+    $publishStatus = in_array($publishStatus, ['ativo', 'rascunho'], true) ? $publishStatus : 'rascunho';
 
     return [
         'account_index' => max(0, (int) ($filters['account_index'] ?? 0)),
@@ -1580,7 +1582,8 @@ function awin_normalize_filters(array $filters): array
     $type = (string) ($filters['type'] ?? 'all');
     $membership = (string) ($filters['membership'] ?? 'all');
     $status = (string) ($filters['status'] ?? 'active');
-    $publishStatus = in_array($filters['publish_status'] ?? 'rascunho', ['ativo', 'rascunho'], true) ? $filters['publish_status'] : 'rascunho';
+    $publishStatus = (string) ($filters['publish_status'] ?? 'rascunho');
+    $publishStatus = in_array($publishStatus, ['ativo', 'rascunho'], true) ? $publishStatus : 'rascunho';
 
     if (!array_key_exists($type, awin_offer_type_options())) {
         $type = 'all';
@@ -2035,7 +2038,8 @@ function lomadee_normalize_filters(array $filters): array
     ))));
     $brandIds = array_values(array_filter(array_map('strval', (array) ($filters['brand_ids'] ?? []))));
     $excludedTerms = array_values(array_filter(array_map('trim', explode(',', (string) ($filters['excluded_terms'] ?? 'BANNERS:')))));
-    $status = in_array($filters['publish_status'] ?? 'rascunho', ['ativo', 'rascunho'], true) ? $filters['publish_status'] : 'rascunho';
+    $status = (string) ($filters['publish_status'] ?? 'rascunho');
+    $status = in_array($status, ['ativo', 'rascunho'], true) ? $status : 'rascunho';
 
     return [
         'max_pages' => max(1, min(50, (int) ($filters['max_pages'] ?? 20))),

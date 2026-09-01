@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<?php admin_layout_start('Classificacao de ofertas - Oferto Cupons', 'classificacao', 'Classificacao'); ?>
+<?php admin_layout_start('Classificacao de ofertas - Oferto Cupons', 'afiliacao', 'Classificacao'); ?>
       <section class="admin-hero admin-api-hero">
         <div>
           <p class="section-kicker">Nichos e tags</p>
@@ -61,6 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <a class="admin-secondary-link" href="apis.php">Voltar para APIs</a>
         </div>
       </section>
+
+      <?php admin_affiliation_subnav('classificacao'); ?>
 
       <?php if ($error): ?><p class="admin-alert"><?= e($error) ?></p><?php endif; ?>
       <?php if ($success): ?><p class="admin-success"><?= e($success) ?></p><?php endif; ?>

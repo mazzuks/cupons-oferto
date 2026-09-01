@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $accounts = offer18_accounts();
 $monitoredBrands = monitored_integration_brands('Offer18');
 ?>
-<?php admin_layout_start('Offer18 - Oferto Cupons', 'apis', 'Offer18'); ?>
+<?php admin_layout_start('Offer18 - Oferto Cupons', 'afiliacao', 'Offer18'); ?>
       <section class="admin-hero admin-api-hero">
         <div>
           <p class="section-kicker">Offer18</p>
@@ -98,6 +98,8 @@ $monitoredBrands = monitored_integration_brands('Offer18');
           <a class="admin-secondary-link" href="apis.php">Voltar para APIs</a>
         </div>
       </section>
+
+      <?php admin_affiliation_subnav('redes'); ?>
 
       <?php if ($error): ?><p class="admin-alert"><?= e($error) ?></p><?php endif; ?>
       <?php if ($success): ?><p class="admin-success"><?= e($success) ?></p><?php endif; ?>

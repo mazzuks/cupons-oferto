@@ -96,7 +96,7 @@ $savedKey = lomadee_api_key();
 $maskedKey = $savedKey === '' ? 'Nao configurada' : substr($savedKey, 0, 14) . str_repeat('*', 12) . substr($savedKey, -6);
 $monitoredBrands = monitored_integration_brands('Lomadee');
 ?>
-<?php admin_layout_start('Lomadee - Oferto Cupons', 'apis', 'Lomadee'); ?>
+<?php admin_layout_start('Lomadee - Oferto Cupons', 'afiliacao', 'Lomadee'); ?>
       <section class="admin-hero admin-api-hero">
         <div>
           <p class="section-kicker">Lomadee</p>
@@ -107,6 +107,8 @@ $monitoredBrands = monitored_integration_brands('Lomadee');
           <a class="admin-secondary-link" href="apis.php">Voltar para APIs</a>
         </div>
       </section>
+
+      <?php admin_affiliation_subnav('redes'); ?>
 
       <?php if ($error): ?><p class="admin-alert"><?= e($error) ?></p><?php endif; ?>
       <?php if ($success): ?><p class="admin-success"><?= e($success) ?></p><?php endif; ?>

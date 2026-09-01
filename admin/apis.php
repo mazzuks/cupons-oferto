@@ -76,7 +76,7 @@ $partners = [
     ],
 ];
 ?>
-<?php admin_layout_start('APIs - Oferto Cupons', 'apis', 'Integracoes'); ?>
+<?php admin_layout_start('Redes de afiliacao - Oferto Cupons', 'afiliacao', 'Afiliacao'); ?>
       <section class="admin-hero admin-api-hero">
         <div>
           <p class="section-kicker">Central de parceiros</p>
@@ -88,6 +88,8 @@ $partners = [
           <span><strong>1</strong> curadoria ativa</span>
         </div>
       </section>
+
+      <?php admin_affiliation_subnav('redes'); ?>
 
       <section class="admin-api-hub-grid">
         <?php foreach ($partners as $partner): ?>

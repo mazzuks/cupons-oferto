@@ -127,7 +127,7 @@ $awinPublisherId = awin_publisher_id();
 $awinPublisherName = awin_publisher_name();
 $monitoredBrands = monitored_integration_brands('Awin');
 ?>
-<?php admin_layout_start('Awin - Oferto Cupons', 'apis', 'Awin'); ?>
+<?php admin_layout_start('Awin - Oferto Cupons', 'afiliacao', 'Awin'); ?>
       <section class="admin-hero admin-api-hero">
         <div>
           <p class="section-kicker">Awin</p>
@@ -138,6 +138,8 @@ $monitoredBrands = monitored_integration_brands('Awin');
           <a class="admin-secondary-link" href="apis.php">Voltar para APIs</a>
         </div>
       </section>
+
+      <?php admin_affiliation_subnav('redes'); ?>
 
       <?php if ($error): ?><p class="admin-alert"><?= e($error) ?></p><?php endif; ?>
       <?php if ($success): ?><p class="admin-success"><?= e($success) ?></p><?php endif; ?>

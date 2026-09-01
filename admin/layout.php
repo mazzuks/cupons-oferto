@@ -7,8 +7,7 @@ function admin_nav_items(): array
     return [
         ['key' => 'dashboard', 'label' => 'Dashboard', 'hint' => 'Visao geral', 'href' => 'dashboard.php'],
         ['key' => 'ofertas', 'label' => 'Ofertas', 'hint' => 'Cupons e campanhas', 'href' => 'index.php'],
-        ['key' => 'apis', 'label' => 'APIs', 'hint' => 'Parceiros e feeds', 'href' => 'apis.php'],
-        ['key' => 'classificacao', 'label' => 'Classificacao', 'hint' => 'Nichos e tags', 'href' => 'import-classifications.php'],
+        ['key' => 'afiliacao', 'label' => 'Afiliacao', 'hint' => 'Redes e campanhas', 'href' => 'afiliacao.php'],
         ['key' => 'notificacoes', 'label' => 'Notificacoes', 'hint' => 'Alertas do sistema', 'href' => 'notificacoes.php'],
         ['key' => 'logs', 'label' => 'Logs', 'hint' => 'Alteracoes e eventos', 'href' => 'logs.php'],
         ['key' => 'relatorios', 'label' => 'Relatorios', 'hint' => 'Cliques e CSV', 'href' => 'relatorios.php'],
@@ -69,5 +68,24 @@ function admin_layout_end(): void
     </div>
   </body>
 </html>
+<?php
+}
+
+function admin_affiliation_subnav(string $activeKey): void
+{
+    $items = [
+        ['key' => 'overview', 'label' => 'Visao geral', 'href' => 'afiliacao.php'],
+        ['key' => 'campanhas', 'label' => 'Campanhas', 'href' => 'afiliacao-campanhas.php'],
+        ['key' => 'redes', 'label' => 'Redes', 'href' => 'apis.php'],
+        ['key' => 'monitoramento', 'label' => 'Monitoramento', 'href' => 'afiliacao-monitoramento.php'],
+        ['key' => 'conversoes', 'label' => 'Conversoes', 'href' => 'afiliacao-conversoes.php'],
+        ['key' => 'classificacao', 'label' => 'Classificacao', 'href' => 'import-classifications.php'],
+    ];
+    ?>
+      <nav class="admin-subnav" aria-label="Subguias de afiliacao">
+        <?php foreach ($items as $item): ?>
+          <a class="<?= $activeKey === $item['key'] ? 'is-active' : '' ?>" href="<?= e($item['href']) ?>"><?= e($item['label']) ?></a>
+        <?php endforeach; ?>
+      </nav>
 <?php
 }

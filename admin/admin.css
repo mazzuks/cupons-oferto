@@ -161,6 +161,36 @@ body {
   padding: 34px clamp(18px, 5vw, 72px);
 }
 
+.admin-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(2, 6, 23, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+}
+
+.admin-subnav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 900;
+  border: 1px solid transparent;
+  border-radius: 999px;
+}
+
+.admin-subnav a:hover,
+.admin-subnav a.is-active {
+  color: #07111f;
+  background: var(--cyan);
+  border-color: rgba(125, 211, 252, 0.5);
+}
+
 .admin-hero {
   display: flex;
   align-items: flex-end;

@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $accounts = hasoffers_accounts();
 $monitoredBrands = monitored_integration_brands('HasOffers');
 ?>
-<?php admin_layout_start('HasOffers - Oferto Cupons', 'apis', 'HasOffers'); ?>
+<?php admin_layout_start('HasOffers - Oferto Cupons', 'afiliacao', 'HasOffers'); ?>
       <section class="admin-hero admin-api-hero">
         <div>
           <p class="section-kicker">HasOffers / TUNE</p>
@@ -102,6 +102,8 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
           <a class="admin-secondary-link" href="apis.php">Voltar para APIs</a>
         </div>
       </section>
+
+      <?php admin_affiliation_subnav('redes'); ?>
 
       <?php if ($error): ?><p class="admin-alert"><?= e($error) ?></p><?php endif; ?>
       <?php if ($success): ?><p class="admin-success"><?= e($success) ?></p><?php endif; ?>

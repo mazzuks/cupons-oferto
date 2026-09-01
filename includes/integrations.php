@@ -1580,7 +1580,7 @@ function hasoffers_value(array $source, array $paths, string $default = ''): str
 function awin_normalize_filters(array $filters): array
 {
     $type = (string) ($filters['type'] ?? 'all');
-    $membership = (string) ($filters['membership'] ?? 'all');
+    $membership = (string) ($filters['membership'] ?? 'joined');
     $status = (string) ($filters['status'] ?? 'active');
     $publishStatus = (string) ($filters['publish_status'] ?? 'rascunho');
     $publishStatus = in_array($publishStatus, ['ativo', 'rascunho'], true) ? $publishStatus : 'rascunho';
@@ -1593,7 +1593,7 @@ function awin_normalize_filters(array $filters): array
         $type = 'all';
     }
     if (!array_key_exists($membership, awin_membership_options())) {
-        $membership = 'all';
+        $membership = 'joined';
     }
     if (!array_key_exists($status, awin_status_options())) {
         $status = 'active';
@@ -1712,6 +1712,9 @@ function save_awin_monitored_brands_from_selection(array $selectedExternalIds, a
         }
 
         $advertiser = is_array($offer['advertiser'] ?? null) ? $offer['advertiser'] : [];
+        if (!awin_advertiser_is_joined($advertiser)) {
+            continue;
+        }
         if (empty($advertiser['id']) || empty($advertiser['name'])) {
             continue;
         }
@@ -1726,6 +1729,7 @@ function save_awin_monitored_brands_from_selection(array $selectedExternalIds, a
 function awin_import_offers(array $filters = []): array
 {
     $filters = awin_normalize_filters($filters);
+    $filters['membership'] = 'joined';
     $selectedExternalIds = $filters['selected_external_ids'];
     $offers = awin_promotions($filters);
     $created = 0;
@@ -1777,6 +1781,10 @@ function awin_offer_passes_filters(array $offer, array $filters): bool
     }
 
     $advertiser = is_array($offer['advertiser'] ?? null) ? $offer['advertiser'] : [];
+    if (($filters['membership'] ?? 'joined') === 'joined' && !awin_advertiser_is_joined($advertiser)) {
+        return false;
+    }
+
     $haystack = strtolower(implode(' ', [
         (string) ($advertiser['name'] ?? ''),
         (string) ($offer['title'] ?? ''),
@@ -1797,6 +1805,25 @@ function awin_offer_passes_filters(array $offer, array $filters): bool
     if (awin_should_filter_categories($filters['categories'])) {
         $category = awin_offer_category($offer);
         if (!in_array($category, $filters['categories'], true)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function awin_advertiser_is_joined(array $advertiser): bool
+{
+    if (array_key_exists('joined', $advertiser)) {
+        return filter_var($advertiser['joined'], FILTER_VALIDATE_BOOLEAN);
+    }
+
+    foreach (['membership', 'relationship', 'status'] as $field) {
+        $value = normalize_search_text((string) ($advertiser[$field] ?? ''));
+        if (in_array($value, ['joined', 'active', 'approved', 'aprovado', 'ativo'], true)) {
+            return true;
+        }
+        if (in_array($value, ['notjoined', 'not joined', 'pending', 'suspended', 'rejected'], true)) {
             return false;
         }
     }
@@ -2365,6 +2392,7 @@ function sync_awin_watchlist(): array
 {
     $profile = integration_profile('awin', []);
     $filters = awin_normalize_filters($profile);
+    $filters['membership'] = 'joined';
     $monitoredBrandIds = monitored_integration_brand_ids('Awin');
     if ($monitoredBrandIds) {
         $filters['advertiser_ids'] = array_map('intval', $monitoredBrandIds);
@@ -2410,6 +2438,10 @@ function sync_awin_watchlist(): array
 
     foreach (monitored_integration_offers('Awin') as $watch) {
         if (empty($seen[(string) $watch['external_id']])) {
+            if (!coupon_by_external_id((string) $watch['external_id'])) {
+                continue;
+            }
+
             mark_monitor_missing($watch);
             create_system_log('awin_campaign_missing', 'Oferta sumiu da Awin', ($watch['store'] ?? 'Awin') . ' - ' . ($watch['title'] ?? 'oferta') . ' nao apareceu na sincronizacao.', 'Awin', (string) $watch['external_id']);
             $missing++;

@@ -127,6 +127,23 @@ Fluxo pratico:
 4. Se encontrar, copia o nicho e as tags para a linha da oferta em `coupons`.
 5. Se nao encontrar, a oferta continua salva normalmente, so com esses campos vazios.
 
+## Como atualizar nichos e tags por CSV
+
+Quando o time receber um CSV classificado, entre no CRM em `admin/import-classifications.php` e envie o arquivo. O formato minimo esperado e:
+
+```csv
+id,loja,categoria_atual,nicho_principal,titulo
+251,BioVittare Farmacia de Manipulacao,Saude e Beleza,saude_farmacia,8% OFF para montar seu pedido
+```
+
+A coluna `tags_produto` e opcional. Quando ela nao vem na planilha, o CRM gera tags automaticamente usando loja, categoria, nicho e palavras uteis do titulo. Isso resolve o caso em que o JSON ainda aparece com `nicho_principal` e `tags_produto` vazios: primeiro o CSV atualiza o MySQL, depois `/api/offers.php` passa a devolver os campos preenchidos.
+
+Tambem existe um script para rodar direto no servidor:
+
+```bash
+php scripts/import-offer-classifications.php /caminho/para/ofertas_classificadas.csv
+```
+
 ## Fluxo recomendado no WhatsApp
 
 1. Usuario pede algo amplo: "quero economizar no mercado" ou "tem cupom de pizza?"

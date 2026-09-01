@@ -269,6 +269,158 @@ function ensure_integration_tables(PDO $pdo): void
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 
+function import_offer_classifications(PDO $pdo, string $path): array
+{
+    $handle = fopen($path, 'rb');
+    if (!$handle) {
+        return ['updated' => 0, 'mapped_stores' => 0, 'skipped' => 0];
+    }
+
+    $delimiter = classification_csv_delimiter($path);
+    $headers = fgetcsv($handle, 0, $delimiter);
+    if (!is_array($headers)) {
+        fclose($handle);
+        return ['updated' => 0, 'mapped_stores' => 0, 'skipped' => 0];
+    }
+
+    $headers = array_map('classification_header_key', $headers);
+    $rows = [];
+    $storeMap = [];
+
+    while (($values = fgetcsv($handle, 0, $delimiter)) !== false) {
+        if (!is_array($values)) {
+            continue;
+        }
+
+        $row = [];
+        foreach ($headers as $index => $header) {
+            $row[$header] = trim((string) ($values[$index] ?? ''));
+        }
+
+        $id = (int) ($row['id'] ?? 0);
+        $store = $row['loja'] ?? $row['store'] ?? $row['nome_loja'] ?? '';
+        $niche = $row['nicho_principal'] ?? '';
+        $title = $row['titulo'] ?? $row['title'] ?? '';
+
+        if ($id <= 0 || $store === '' || $niche === '') {
+            continue;
+        }
+
+        $row['tags_produto'] = trim((string) ($row['tags_produto'] ?? $row['tags'] ?? ''));
+        if ($row['tags_produto'] === '') {
+            $row['tags_produto'] = classification_tags_from_row($store, $niche, $title, $row['categoria_atual'] ?? '');
+        }
+
+        $rows[] = [
+            'id' => $id,
+            'store' => $store,
+            'niche' => $niche,
+            'tags' => $row['tags_produto'],
+        ];
+
+        $storeKey = classification_store_key($store);
+        if (!isset($storeMap[$storeKey])) {
+            $storeMap[$storeKey] = [
+                'store' => $store,
+                'niches' => [],
+                'tags' => [],
+            ];
+        }
+
+        $storeMap[$storeKey]['niches'][$niche] = ($storeMap[$storeKey]['niches'][$niche] ?? 0) + 1;
+        foreach (array_filter(array_map('trim', explode(',', $row['tags_produto']))) as $tag) {
+            $storeMap[$storeKey]['tags'][$tag] = true;
+        }
+    }
+
+    fclose($handle);
+
+    $update = $pdo->prepare("UPDATE coupons
+        SET nicho_principal = ?, tags_produto = ?, updated_at = NOW()
+        WHERE id = ?");
+    $updated = 0;
+    foreach ($rows as $row) {
+        $update->execute([$row['niche'], $row['tags'], $row['id']]);
+        $updated += $update->rowCount();
+    }
+
+    $upsert = $pdo->prepare("INSERT INTO mapa_loja_nicho (nome_loja, nicho_principal, tags_produto, status)
+        VALUES (?, ?, ?, 'ativo')
+        ON DUPLICATE KEY UPDATE
+          nicho_principal = VALUES(nicho_principal),
+          tags_produto = VALUES(tags_produto),
+          status = 'ativo'");
+    $mappedStores = 0;
+    foreach ($storeMap as $store) {
+        arsort($store['niches']);
+        $niche = (string) array_key_first($store['niches']);
+        $tags = implode(', ', array_slice(array_keys($store['tags']), 0, 18));
+        $upsert->execute([$store['store'], $niche, $tags]);
+        $mappedStores++;
+    }
+
+    return [
+        'updated' => $updated,
+        'mapped_stores' => $mappedStores,
+        'rows' => count($rows),
+    ];
+}
+
+function classification_header_key(string $header): string
+{
+    $header = strtolower(trim($header));
+    $header = strtr($header, [
+        'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a',
+        'é' => 'e', 'ê' => 'e',
+        'í' => 'i',
+        'ó' => 'o', 'ô' => 'o', 'õ' => 'o',
+        'ú' => 'u',
+        'ç' => 'c',
+    ]);
+
+    return preg_replace('/[^a-z0-9]+/', '_', $header) ?: '';
+}
+
+function classification_csv_delimiter(string $path): string
+{
+    $handle = fopen($path, 'rb');
+    if (!$handle) {
+        return ',';
+    }
+
+    $line = (string) fgets($handle);
+    fclose($handle);
+
+    $delimiters = [',' => substr_count($line, ','), ';' => substr_count($line, ';'), "\t" => substr_count($line, "\t")];
+    arsort($delimiters);
+
+    return (string) array_key_first($delimiters);
+}
+
+function classification_store_key(string $store): string
+{
+    return classification_header_key($store);
+}
+
+function classification_tags_from_row(string $store, string $niche, string $title, string $category): string
+{
+    $tags = array_filter([$store, str_replace('_', ' ', $niche), $category]);
+    $text = classification_header_key($title);
+    $stopwords = [
+        'acima', 'apenas', 'compras', 'cupom', 'desconto', 'frete', 'off', 'para', 'produtos',
+        'todo', 'todos', 'valido', 'validos', 'site', 'com', 'nas', 'nos', 'seu', 'sua',
+    ];
+
+    foreach (explode('_', $text) as $word) {
+        if (strlen($word) < 4 || in_array($word, $stopwords, true)) {
+            continue;
+        }
+        $tags[] = $word;
+    }
+
+    return implode(', ', array_slice(array_values(array_unique($tags)), 0, 12));
+}
+
 function coupon_column_exists(PDO $pdo, string $column): bool
 {
     $statement = $pdo->prepare("SHOW COLUMNS FROM coupons LIKE ?");

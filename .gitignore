@@ -5,3 +5,4 @@ includes/config.php
 uploads/cupons/*
 !uploads/cupons/.gitkeep
 !uploads/cupons/.htaccess
+data/*classificadas*.csv

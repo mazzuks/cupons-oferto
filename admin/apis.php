@@ -47,6 +47,13 @@ $partners = [
         'action' => 'Abrir HasOffers',
     ],
     [
+        'name' => 'Classificacao',
+        'status' => 'Upload CSV',
+        'text' => 'Atualize nicho principal e tags de produto das ofertas para alimentar a API do bot e a curadoria do site.',
+        'href' => 'import-classifications.php',
+        'action' => 'Importar CSV',
+    ],
+    [
         'name' => 'Amazon',
         'status' => 'Em breve',
         'text' => 'Associados, produtos e ofertas selecionadas para uma curadoria futura.',

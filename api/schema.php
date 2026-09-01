@@ -8,7 +8,7 @@ api_json_response([
     'ok' => true,
     'generated_at' => api_now(),
     'purpose' => 'Esquema para integrar o bot Shopper do Oferto no WhatsApp usando dados vivos do MySQL.',
-    'important_note' => 'O bot deve consumir os endpoints publicos. Campos internos de afiliacao, tracking bruto e comissao nao devem ser exibidos ao usuario final.',
+    'important_note' => 'O bot deve consumir os endpoints públicos. Campos internos de afiliação, tracking bruto e comissão não devem ser exibidos ao usuário final.',
     'endpoints' => [
         [
             'method' => 'GET',
@@ -20,6 +20,8 @@ api_json_response([
             'url' => OFERTO_API_BASE_URL . 'api/offers.php',
             'query_params' => [
                 'category' => 'Slug ou nome da categoria. Exemplo: alimentacao-e-bebidas.',
+                'niche' => 'Nicho principal da oferta. Também aceita o alias nicho. Exemplo: saude_farmacia.',
+                'tag' => 'Busca em tags de produto e tags públicas. Exemplo: pizza.',
                 'store' => 'Busca parcial pelo nome da loja.',
                 'q' => 'Busca textual em loja, titulo, descricao, regras e tags.',
                 'featured' => 'Use 1 para listar apenas destaques.',

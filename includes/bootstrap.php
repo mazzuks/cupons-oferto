@@ -412,7 +412,7 @@ function import_offer_classifications(PDO $pdo, string $path): array
 
         $row = [];
         foreach ($headers as $index => $header) {
-            $row[$header] = trim((string) ($values[$index] ?? ''));
+            $row[$header] = classification_clean_csv_value((string) ($values[$index] ?? ''));
         }
 
         $id = (int) ($row['id'] ?? 0);
@@ -486,6 +486,7 @@ function import_offer_classifications(PDO $pdo, string $path): array
 
 function classification_header_key(string $header): string
 {
+    $header = classification_clean_csv_value($header);
     $header = strtolower(trim($header));
     $header = strtr($header, [
         'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a',
@@ -497,6 +498,25 @@ function classification_header_key(string $header): string
     ]);
 
     return preg_replace('/[^a-z0-9]+/', '_', $header) ?: '';
+}
+
+function classification_clean_csv_value(string $value): string
+{
+    $value = preg_replace('/^\xEF\xBB\xBF/', '', $value) ?? $value;
+    $value = trim($value);
+
+    if ($value === '') {
+        return '';
+    }
+
+    if (function_exists('mb_check_encoding') && !mb_check_encoding($value, 'UTF-8')) {
+        $converted = @mb_convert_encoding($value, 'UTF-8', 'Windows-1252, ISO-8859-1');
+        if (is_string($converted) && $converted !== '') {
+            return trim($converted);
+        }
+    }
+
+    return $value;
 }
 
 function classification_csv_delimiter(string $path): string

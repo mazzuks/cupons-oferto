@@ -175,15 +175,19 @@ function api_share_text(array $coupon, string $offerUrl): string
 function api_filter_coupons(array $coupons): array
 {
     $category = trim((string) ($_GET['category'] ?? ''));
+    $niche = trim((string) ($_GET['niche'] ?? $_GET['nicho'] ?? ''));
+    $tag = trim((string) ($_GET['tag'] ?? ''));
     $store = trim((string) ($_GET['store'] ?? ''));
     $query = trim((string) ($_GET['q'] ?? ''));
     $featured = api_bool_param('featured');
 
     $categorySlug = api_slug($category);
+    $nicheText = function_exists('normalize_search_text') ? normalize_search_text($niche) : strtolower($niche);
+    $tagText = function_exists('normalize_search_text') ? normalize_search_text($tag) : strtolower($tag);
     $queryText = function_exists('normalize_search_text') ? normalize_search_text($query) : strtolower($query);
     $storeText = function_exists('normalize_search_text') ? normalize_search_text($store) : strtolower($store);
 
-    return array_values(array_filter($coupons, function (array $coupon) use ($category, $categorySlug, $storeText, $queryText, $featured): bool {
+    return array_values(array_filter($coupons, function (array $coupon) use ($category, $categorySlug, $nicheText, $tagText, $storeText, $queryText, $featured): bool {
         if ($featured !== null && (bool) ($coupon['featured'] ?? false) !== $featured) {
             return false;
         }
@@ -200,6 +204,24 @@ function api_filter_coupons(array $coupons): array
                 ? normalize_search_text((string) ($coupon['store'] ?? ''))
                 : strtolower((string) ($coupon['store'] ?? ''));
             if (strpos($couponStore, $storeText) === false) {
+                return false;
+            }
+        }
+
+        if ($nicheText !== '') {
+            $couponNiche = function_exists('normalize_search_text')
+                ? normalize_search_text((string) ($coupon['nicho_principal'] ?? ''))
+                : strtolower((string) ($coupon['nicho_principal'] ?? ''));
+            if ($couponNiche !== $nicheText && strpos($couponNiche, $nicheText) === false) {
+                return false;
+            }
+        }
+
+        if ($tagText !== '') {
+            $couponTags = function_exists('normalize_search_text')
+                ? normalize_search_text((string) ($coupon['tags_produto'] ?? '') . ' ' . (string) ($coupon['tags'] ?? ''))
+                : strtolower((string) ($coupon['tags_produto'] ?? '') . ' ' . (string) ($coupon['tags'] ?? ''));
+            if (strpos($couponTags, $tagText) === false) {
                 return false;
             }
         }

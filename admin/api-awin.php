@@ -32,6 +32,7 @@ function awin_posted_filters(): array
         'region' => (string) ($_POST['region'] ?? 'BR'),
         'query' => trim((string) ($_POST['query'] ?? '')),
         'categories' => awin_posted_array('categories'),
+        'advertiser_ids' => awin_posted_array('advertiser_ids'),
         'excluded_terms' => trim((string) ($_POST['excluded_terms'] ?? awin_default_excluded_terms())),
         'publish_status' => (string) ($_POST['publish_status'] ?? 'rascunho'),
         'selected_external_ids' => awin_posted_array('selected_external_ids'),
@@ -78,6 +79,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'preview_awin_programmes') {
             $programmesResult = awin_preview_programmes($filters);
             $success = 'Anunciantes aprovados da Awin carregados.';
+        }
+
+        if ($action === 'preview_awin_programme_offers') {
+            $selectedBrandIds = array_values(array_filter(array_map('intval', awin_posted_array('selected_brand_ids'))));
+            if (!$selectedBrandIds) {
+                throw new RuntimeException('Selecione pelo menos um anunciante aprovado para buscar ofertas.');
+            }
+
+            $filters['advertiser_ids'] = $selectedBrandIds;
+            $filters['query'] = '';
+            $previewResult = awin_preview_offers($filters);
+            $programmesResult = awin_preview_programmes($filters);
+            $success = 'Busca de ofertas dos anunciantes selecionados concluida.';
         }
 
         if ($action === 'save_awin_defaults') {
@@ -296,7 +310,6 @@ $monitoredBrands = monitored_integration_brands('Awin');
 
           <form method="post" class="coupon-admin-form">
             <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
-            <input type="hidden" name="action" value="monitor_awin_programmes" />
             <input type="hidden" name="query" value="<?= e($filters['query']) ?>" />
             <input type="hidden" name="page_size" value="<?= (int) $filters['page_size'] ?>" />
             <input type="hidden" name="type" value="<?= e($filters['type']) ?>" />
@@ -350,7 +363,8 @@ $monitoredBrands = monitored_integration_brands('Awin');
             </div>
 
             <div class="admin-actions">
-              <button type="submit" <?= !$programmesResult['items'] ? 'disabled' : '' ?>>Monitorar anunciantes selecionados</button>
+              <button type="submit" name="action" value="preview_awin_programme_offers" <?= !$programmesResult['items'] ? 'disabled' : '' ?>>Buscar ofertas dos selecionados</button>
+              <button type="submit" name="action" value="monitor_awin_programmes" <?= !$programmesResult['items'] ? 'disabled' : '' ?>>Monitorar anunciantes selecionados</button>
             </div>
           </form>
         </section>

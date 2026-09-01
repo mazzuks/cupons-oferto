@@ -59,6 +59,7 @@ Campos seguros para o bot:
 - `store`
 - `category`
 - `category_slug`
+- `nicho_principal`
 - `title`
 - `description`
 - `rules`
@@ -81,6 +82,7 @@ Campos seguros para o bot:
 - `sponsored`
 - `members_only`
 - `tags`
+- `tags_produto`
 - `offer_url`
 - `rescue_url`
 - `share_text`
@@ -99,9 +101,10 @@ Uso: mostra para o time tecnico quais endpoints existem, quais campos saem na AP
 
 ## Tabelas do MySQL
 
-O banco tem 8 tabelas principais:
+O banco tem 9 tabelas principais:
 
 - `coupons`: tabela central de ofertas, cupons, campanhas e sorteios.
+- `mapa_loja_nicho`: dicionario auxiliar que liga nome da loja a nicho e tags de produto.
 - `coupon_clicks`: cliques e eventos de saida.
 - `affiliate_conversions`: conversoes recebidas das redes de afiliados.
 - `integration_settings`: configuracoes das integracoes.
@@ -111,6 +114,18 @@ O banco tem 8 tabelas principais:
 - `admins`: usuarios administrativos.
 
 Para o bot, a tabela principal e `coupons`, mas o consumo deve acontecer via `/api/offers.php`, porque essa rota ja limpa os campos internos.
+
+## Relacao entre `coupons` e `mapa_loja_nicho`
+
+`mapa_loja_nicho` nao substitui `coupons`; ela funciona como uma tabela auxiliar de consulta.
+
+Fluxo pratico:
+
+1. `coupons` tem duas colunas finais: `nicho_principal` e `tags_produto`.
+2. `mapa_loja_nicho` guarda um dicionario por loja: `nome_loja`, `nicho_principal` e `tags_produto`.
+3. Quando uma oferta e salva ou atualizada, o sistema procura o `store` da oferta em `mapa_loja_nicho`.
+4. Se encontrar, copia o nicho e as tags para a linha da oferta em `coupons`.
+5. Se nao encontrar, a oferta continua salva normalmente, so com esses campos vazios.
 
 ## Fluxo recomendado no WhatsApp
 

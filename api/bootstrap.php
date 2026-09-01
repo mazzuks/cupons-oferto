@@ -125,6 +125,7 @@ function api_public_coupon(array $coupon): array
         'store' => (string) ($coupon['store'] ?? ''),
         'category' => (string) ($coupon['category'] ?? 'Outros'),
         'category_slug' => api_slug((string) ($coupon['category'] ?? 'Outros')),
+        'nicho_principal' => (string) ($coupon['nicho_principal'] ?? ''),
         'title' => (string) ($coupon['title'] ?? ''),
         'description' => (string) ($coupon['description'] ?? ''),
         'rules' => (string) ($coupon['rules'] ?? ''),
@@ -147,6 +148,7 @@ function api_public_coupon(array $coupon): array
         'sponsored' => (bool) ($coupon['sponsored'] ?? false),
         'members_only' => (bool) ($coupon['members_only'] ?? false),
         'tags' => api_split_tags((string) ($coupon['tags'] ?? '')),
+        'tags_produto' => api_split_tags((string) ($coupon['tags_produto'] ?? '')),
         'offer_url' => $offerUrl,
         'rescue_url' => $rescueUrl,
         'share_text' => api_share_text($coupon, $offerUrl),
@@ -210,6 +212,8 @@ function api_filter_coupons(array $coupons): array
                 (string) ($coupon['description'] ?? ''),
                 (string) ($coupon['rules'] ?? ''),
                 (string) ($coupon['tags'] ?? ''),
+                (string) ($coupon['nicho_principal'] ?? ''),
+                (string) ($coupon['tags_produto'] ?? ''),
                 (string) ($coupon['requirements'] ?? ''),
             ]);
             $haystack = function_exists('normalize_search_text') ? normalize_search_text($haystack) : strtolower($haystack);

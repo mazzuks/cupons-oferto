@@ -633,10 +633,52 @@ function normalize_coupon_record(array $coupon): array
         (string) ($coupon['title'] ?? ''),
         (string) ($coupon['description'] ?? ''),
         (string) ($coupon['tags'] ?? ''),
+        (string) ($coupon['nicho_principal'] ?? ''),
+        (string) ($coupon['tags_produto'] ?? ''),
         (string) ($coupon['requirements'] ?? ''),
     ]));
 
     return $coupon;
+}
+
+function loja_nicho_map_by_store(string $store): ?array
+{
+    $pdo = db();
+    $store = trim($store);
+
+    if (!$pdo || $store === '') {
+        return null;
+    }
+
+    $statement = $pdo->prepare("SELECT nome_loja, nicho_principal, tags_produto
+        FROM mapa_loja_nicho
+        WHERE status = 'ativo' AND LOWER(nome_loja) = LOWER(?)
+        LIMIT 1");
+    $statement->execute([$store]);
+    $mapping = $statement->fetch();
+
+    return $mapping ?: null;
+}
+
+function apply_loja_nicho_map(array $data): array
+{
+    $mapping = loja_nicho_map_by_store((string) ($data['store'] ?? ''));
+
+    if (!$mapping) {
+        $data['nicho_principal'] = trim((string) ($data['nicho_principal'] ?? ''));
+        $data['tags_produto'] = trim((string) ($data['tags_produto'] ?? ''));
+        return $data;
+    }
+
+    if (trim((string) ($data['nicho_principal'] ?? '')) === '') {
+        $data['nicho_principal'] = trim((string) ($mapping['nicho_principal'] ?? ''));
+    }
+
+    if (trim((string) ($data['tags_produto'] ?? '')) === '') {
+        $data['tags_produto'] = trim((string) ($mapping['tags_produto'] ?? ''));
+    }
+
+    return $data;
 }
 
 function save_coupon(array $data, ?int $id = null): void
@@ -646,11 +688,15 @@ function save_coupon(array $data, ?int $id = null): void
         throw new RuntimeException('Banco de dados indisponivel.');
     }
 
+    $data = apply_loja_nicho_map($data);
+
     $data['category'] = canonical_category((string) ($data['category'] ?? ''), implode(' ', [
         (string) ($data['store'] ?? ''),
         (string) ($data['title'] ?? ''),
         (string) ($data['description'] ?? ''),
         (string) ($data['tags'] ?? ''),
+        (string) ($data['nicho_principal'] ?? ''),
+        (string) ($data['tags_produto'] ?? ''),
         (string) ($data['requirements'] ?? ''),
     ]));
     $data['banner_url'] = banner_url_or_fallback((string) ($data['banner_url'] ?? ''), (string) $data['category']);
@@ -680,6 +726,8 @@ function save_coupon(array $data, ?int $id = null): void
         'sponsored',
         'priority',
         'tags',
+        'nicho_principal',
+        'tags_produto',
         'requirements',
         'pixel_event',
         'external_id',

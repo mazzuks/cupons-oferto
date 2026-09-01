@@ -33,6 +33,8 @@ CREATE TABLE IF NOT EXISTS coupons (
   sponsored TINYINT(1) NOT NULL DEFAULT 0,
   priority INT NOT NULL DEFAULT 0,
   tags VARCHAR(500) DEFAULT NULL,
+  nicho_principal VARCHAR(160) DEFAULT NULL,
+  tags_produto VARCHAR(500) DEFAULT NULL,
   requirements VARCHAR(220) DEFAULT NULL,
   pixel_event VARCHAR(120) DEFAULT NULL,
   external_id VARCHAR(190) DEFAULT NULL,
@@ -42,6 +44,20 @@ CREATE TABLE IF NOT EXISTS coupons (
   PRIMARY KEY (id),
   KEY coupons_public_idx (status, starts_at, ends_at, featured),
   KEY coupons_category_idx (category)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS mapa_loja_nicho (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  nome_loja VARCHAR(160) NOT NULL,
+  nicho_principal VARCHAR(160) NOT NULL,
+  tags_produto VARCHAR(500) DEFAULT NULL,
+  status ENUM('ativo', 'pausado') NOT NULL DEFAULT 'ativo',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY mapa_loja_nicho_nome_unique (nome_loja),
+  KEY mapa_loja_nicho_status_idx (status),
+  KEY mapa_loja_nicho_nicho_idx (nicho_principal)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS coupon_clicks (

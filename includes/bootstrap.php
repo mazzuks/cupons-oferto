@@ -87,6 +87,8 @@ function ensure_database(PDO $pdo): void
         sponsored TINYINT(1) NOT NULL DEFAULT 0,
         priority INT NOT NULL DEFAULT 0,
         tags VARCHAR(500) DEFAULT NULL,
+        nicho_principal VARCHAR(160) DEFAULT NULL,
+        tags_produto VARCHAR(500) DEFAULT NULL,
         requirements VARCHAR(220) DEFAULT NULL,
         pixel_event VARCHAR(120) DEFAULT NULL,
         external_id VARCHAR(190) DEFAULT NULL,
@@ -151,6 +153,8 @@ function ensure_coupon_columns(PDO $pdo): void
         'sponsored' => "ALTER TABLE coupons ADD sponsored TINYINT(1) NOT NULL DEFAULT 0 AFTER campaign_cap",
         'priority' => "ALTER TABLE coupons ADD priority INT NOT NULL DEFAULT 0 AFTER sponsored",
         'tags' => "ALTER TABLE coupons ADD tags VARCHAR(500) DEFAULT NULL AFTER priority",
+        'nicho_principal' => "ALTER TABLE coupons ADD nicho_principal VARCHAR(160) DEFAULT NULL AFTER tags",
+        'tags_produto' => "ALTER TABLE coupons ADD tags_produto VARCHAR(500) DEFAULT NULL AFTER nicho_principal",
         'requirements' => "ALTER TABLE coupons ADD requirements VARCHAR(220) DEFAULT NULL AFTER tags",
         'pixel_event' => "ALTER TABLE coupons ADD pixel_event VARCHAR(120) DEFAULT NULL AFTER requirements",
         'external_id' => "ALTER TABLE coupons ADD external_id VARCHAR(190) DEFAULT NULL AFTER pixel_event",
@@ -181,6 +185,20 @@ function ensure_click_columns(PDO $pdo): void
 
 function ensure_integration_tables(PDO $pdo): void
 {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS mapa_loja_nicho (
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        nome_loja VARCHAR(160) NOT NULL,
+        nicho_principal VARCHAR(160) NOT NULL,
+        tags_produto VARCHAR(500) DEFAULT NULL,
+        status ENUM('ativo', 'pausado') NOT NULL DEFAULT 'ativo',
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY mapa_loja_nicho_nome_unique (nome_loja),
+        KEY mapa_loja_nicho_status_idx (status),
+        KEY mapa_loja_nicho_nicho_idx (nicho_principal)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
     $pdo->exec("CREATE TABLE IF NOT EXISTS integration_watchlist (
         id INT UNSIGNED NOT NULL AUTO_INCREMENT,
         partner VARCHAR(60) NOT NULL,

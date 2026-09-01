@@ -86,6 +86,34 @@ body {
   color: #bae6fd;
 }
 
+.status-disponivel,
+.status-selecionada,
+.status-publicada,
+.status-encerrada {
+  color: #dbeafe;
+  background: rgba(37, 99, 235, 0.24);
+}
+
+.status-publicada {
+  color: #bbf7d0;
+  background: rgba(22, 163, 74, 0.24);
+}
+
+.status-selecionada {
+  color: #fde68a;
+  background: rgba(217, 119, 6, 0.22);
+}
+
+.status-encerrada {
+  color: #e2e8f0;
+  background: rgba(100, 116, 139, 0.28);
+}
+
+.status-pausada {
+  color: #fecaca;
+  background: rgba(220, 38, 38, 0.2);
+}
+
 .admin-sidebar-user {
   display: grid;
   gap: 4px;

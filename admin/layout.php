@@ -5,15 +5,15 @@ declare(strict_types=1);
 function admin_nav_items(): array
 {
     return [
-        ['key' => 'dashboard', 'label' => 'Dashboard', 'hint' => 'Visao geral', 'href' => 'dashboard.php'],
+        ['key' => 'dashboard', 'label' => 'Dashboard', 'hint' => 'Visão geral', 'href' => 'dashboard.php'],
         ['key' => 'ofertas', 'label' => 'Ofertas', 'hint' => 'Cupons e campanhas', 'href' => 'index.php'],
-        ['key' => 'afiliacao', 'label' => 'Afiliacao', 'hint' => 'Redes e campanhas', 'href' => 'afiliacao.php'],
-        ['key' => 'notificacoes', 'label' => 'Notificacoes', 'hint' => 'Alertas do sistema', 'href' => 'notificacoes.php'],
-        ['key' => 'logs', 'label' => 'Logs', 'hint' => 'Alteracoes e eventos', 'href' => 'logs.php'],
-        ['key' => 'relatorios', 'label' => 'Relatorios', 'hint' => 'Cliques e CSV', 'href' => 'relatorios.php'],
-        ['key' => 'usuarios', 'label' => 'Usuarios', 'hint' => 'Acessos do CRM', 'href' => 'usuarios.php'],
-        ['key' => 'site', 'label' => 'Ver site', 'hint' => 'Vitrine publica', 'href' => '../index.php'],
-        ['key' => 'logout', 'label' => 'Sair', 'hint' => 'Encerrar sessao', 'href' => 'logout.php'],
+        ['key' => 'afiliacao', 'label' => 'Afiliação', 'hint' => 'Redes e campanhas', 'href' => 'afiliacao.php'],
+        ['key' => 'notificacoes', 'label' => 'Notificações', 'hint' => 'Alertas do sistema', 'href' => 'notificacoes.php'],
+        ['key' => 'logs', 'label' => 'Logs', 'hint' => 'Alterações e eventos', 'href' => 'logs.php'],
+        ['key' => 'relatorios', 'label' => 'Relatórios', 'hint' => 'Cliques e CSV', 'href' => 'relatorios.php'],
+        ['key' => 'usuarios', 'label' => 'Usuários', 'hint' => 'Acessos do CRM', 'href' => 'usuarios.php'],
+        ['key' => 'site', 'label' => 'Ver site', 'hint' => 'Vitrine pública', 'href' => '../index.php'],
+        ['key' => 'logout', 'label' => 'Sair', 'hint' => 'Encerrar sessão', 'href' => 'logout.php'],
     ];
 }
 
@@ -34,7 +34,7 @@ function admin_layout_start(string $title, string $activeKey, string $eyebrow = 
   </head>
   <body>
     <div class="admin-app">
-      <aside class="admin-sidebar" aria-label="Navegacao do CRM">
+      <aside class="admin-sidebar" aria-label="Navegação do CRM">
         <a class="admin-sidebar-brand" href="dashboard.php">
           <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
           <span><?= e($eyebrow) ?></span>
@@ -74,15 +74,19 @@ function admin_layout_end(): void
 function admin_affiliation_subnav(string $activeKey): void
 {
     $items = [
-        ['key' => 'overview', 'label' => 'Visao geral', 'href' => 'afiliacao.php'],
+        ['key' => 'overview', 'label' => 'Visão geral', 'href' => 'afiliacao.php'],
         ['key' => 'campanhas', 'label' => 'Campanhas', 'href' => 'afiliacao-campanhas.php'],
+        ['key' => 'parceiros', 'label' => 'Parceiros', 'href' => 'afiliacao-parceiros.php'],
+        ['key' => 'tracking', 'label' => 'Tracking', 'href' => 'afiliacao-tracking.php'],
+        ['key' => 'carteira', 'label' => 'Carteira', 'href' => 'afiliacao-carteira.php'],
+        ['key' => 'selecionar', 'label' => 'Selecionar cupons', 'href' => 'afiliacao-selecionar.php'],
         ['key' => 'redes', 'label' => 'Redes', 'href' => 'apis.php'],
         ['key' => 'monitoramento', 'label' => 'Monitoramento', 'href' => 'afiliacao-monitoramento.php'],
-        ['key' => 'conversoes', 'label' => 'Conversoes', 'href' => 'afiliacao-conversoes.php'],
-        ['key' => 'classificacao', 'label' => 'Classificacao', 'href' => 'import-classifications.php'],
+        ['key' => 'conversoes', 'label' => 'Conversões', 'href' => 'afiliacao-conversoes.php'],
+        ['key' => 'classificacao', 'label' => 'Classificação', 'href' => 'import-classifications.php'],
     ];
     ?>
-      <nav class="admin-subnav" aria-label="Subguias de afiliacao">
+      <nav class="admin-subnav" aria-label="Subguias de afiliação">
         <?php foreach ($items as $item): ?>
           <a class="<?= $activeKey === $item['key'] ? 'is-active' : '' ?>" href="<?= e($item['href']) ?>"><?= e($item['label']) ?></a>
         <?php endforeach; ?>

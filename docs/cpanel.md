@@ -83,21 +83,39 @@ O painel permite:
 
 Somente cupons `ativo`, com `inicio <= hoje` e `fim >= hoje`, aparecem no site.
 
-## 6. Integracoes de afiliados
+## 6. Afiliação e integrações
 
-No CRM, acesse `APIs`. Cada parceiro tem sua propria tela:
+No CRM, acesse `Afiliação`. A vitrine pública de cupons continua na tabela `coupons`; o módulo de afiliação usa tabelas próprias:
 
-- `Lomadee`: chave, busca de marcas, filtros, selecao de campanhas e importacao.
-- `Awin`: token, publisher, filtros, busca de ofertas e sincronizacao.
+- `affiliate_campaigns`: campanhas afiliadas selecionadas, publicadas ou pausadas.
+- `affiliate_partners`: parceiros/afiliados que podem receber smartlinks no futuro.
+- `affiliate_clicks`: cliques de tracking do módulo afiliado.
+- `affiliate_campaign_conversions`: conversões atribuídas a campanhas afiliadas.
+- `affiliate_transactions`: carteira e movimentações dos parceiros.
 
-As chaves nao devem ser salvas no GitHub. Elas ficam no banco do servidor ou, se preferir, no `includes/config.php` fora do repositorio.
+Quando um cupom/desconto da vitrine fizer sentido para afiliação, use `Afiliação > Selecionar cupons`. Isso copia o item para `affiliate_campaigns`, sem misturar a tabela pública de cupons com a tabela operacional de afiliação.
 
-Quando uma marca e salva na tela do parceiro, ela entra na lista de monitoramento. A sincronizacao diaria confere tudo que aparece daquela marca no feed do parceiro.
+As subguias de afiliação ficam separadas por função:
 
-Quando uma oferta e importada por uma API, ela tambem entra na lista de campanhas monitoradas. Assim o CRM acompanha duas coisas:
+- `Campanhas`: campanhas afiliadas importadas, selecionadas, publicadas ou pausadas.
+- `Parceiros`: cadastro e desempenho dos afiliados/parceiros.
+- `Tracking`: smartlinks, modo de redirect, cookie TTL e postback secret.
+- `Carteira`: ganhos, aprovações, pendências e saques.
+- `Selecionar cupons`: ponte manual entre vitrine pública e módulo afiliado.
+
+Em `Afiliação > Redes`, cada parceiro tem sua própria tela:
+
+- `Lomadee`: chave, busca de marcas, filtros, seleção de campanhas e importação.
+- `Awin`: token, publisher, filtros, busca de ofertas e sincronização.
+
+As chaves não devem ser salvas no GitHub. Elas ficam no banco do servidor ou, se preferir, no `includes/config.php` fora do repositório.
+
+Quando uma marca é salva na tela do parceiro, ela entra na lista de monitoramento. A sincronização diária confere tudo que aparece daquela marca no feed do parceiro.
+
+Quando uma oferta é importada por uma API, ela também entra na lista de campanhas monitoradas. Assim o CRM acompanha duas coisas:
 
 - marcas que queremos garimpar sempre;
-- campanhas ja publicadas ou importadas.
+- campanhas já publicadas ou importadas.
 
 ## 7. Cron de sincronizacao
 

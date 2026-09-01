@@ -591,13 +591,22 @@ function active_coupons(): array
         return array_map('normalize_coupon_record', fallback_coupons());
     }
 
-    $sql = "SELECT * FROM coupons
-            WHERE status = 'ativo'
-              AND starts_at <= CURDATE()
-              AND ends_at >= CURDATE()
-              AND title NOT LIKE 'BANNERS:%'
-              AND title NOT LIKE 'BANNER:%'
-            ORDER BY featured DESC, priority DESC, ends_at ASC, store ASC";
+    $sql = "SELECT c.* FROM coupons c
+            LEFT JOIN integration_watchlist iw
+              ON iw.partner = 'Awin'
+             AND iw.external_id = c.external_id
+            WHERE c.status = 'ativo'
+              AND c.starts_at <= CURDATE()
+              AND c.ends_at >= CURDATE()
+              AND c.title NOT LIKE 'BANNERS:%'
+              AND c.title NOT LIKE 'BANNER:%'
+              AND (
+                  c.partner_network <> 'Awin'
+                  OR c.partner_network IS NULL
+                  OR iw.status IS NULL
+                  OR iw.status <> 'sumiu'
+              )
+            ORDER BY c.featured DESC, c.priority DESC, c.ends_at ASC, c.store ASC";
 
     return array_values(array_filter(array_map('normalize_coupon_record', $pdo->query($sql)->fetchAll()), 'coupon_is_ready_for_public_site'));
 }

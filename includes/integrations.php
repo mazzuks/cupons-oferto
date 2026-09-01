@@ -1657,6 +1657,118 @@ function awin_promotions(array $filters): array
     return is_array($offers) ? array_values($offers) : [];
 }
 
+function awin_programmes(array $filters = []): array
+{
+    $publisherId = awin_publisher_id();
+    if ($publisherId === '') {
+        awin_connect_first_publisher();
+        $publisherId = awin_publisher_id();
+    }
+    if ($publisherId === '') {
+        throw new RuntimeException('Conecte a Awin antes de buscar anunciantes.');
+    }
+
+    $filters = awin_normalize_filters($filters);
+    $response = awin_request('/publishers/' . rawurlencode($publisherId) . '/programmes', [
+        'accessToken' => awin_access_token(),
+        'relationship' => 'joined',
+        'countryCode' => $filters['region'],
+    ]);
+
+    $programmes = $response['data'] ?? $response['programmes'] ?? $response;
+    return is_array($programmes) ? array_values($programmes) : [];
+}
+
+function awin_preview_programmes(array $filters = []): array
+{
+    $filters = awin_normalize_filters($filters);
+    $programmes = awin_programmes($filters);
+    $items = [];
+
+    foreach ($programmes as $programme) {
+        if (!is_array($programme) || empty($programme['id']) || empty($programme['name'])) {
+            continue;
+        }
+
+        if (!awin_programme_matches_filters($programme, $filters)) {
+            continue;
+        }
+
+        $items[] = [
+            'brand_id' => (string) $programme['id'],
+            'name' => (string) $programme['name'],
+            'description' => trim(strip_tags((string) ($programme['description'] ?? ''))),
+            'display_url' => (string) ($programme['displayUrl'] ?? ''),
+            'click_url' => (string) ($programme['clickThroughUrl'] ?? ''),
+            'logo_url' => (string) ($programme['logoUrl'] ?? ''),
+            'region' => (string) ($programme['primaryRegion']['countryCode'] ?? $filters['region']),
+            'status' => (string) ($programme['status'] ?? ''),
+            'link_status' => (string) ($programme['linkStatus'] ?? ''),
+            'monitored' => in_array((string) $programme['id'], monitored_integration_brand_ids('Awin'), true),
+        ];
+    }
+
+    return [
+        'filters' => $filters,
+        'items' => $items,
+        'total' => count($programmes),
+        'matched' => count($items),
+    ];
+}
+
+function awin_programme_matches_filters(array $programme, array $filters): bool
+{
+    $region = strtoupper(trim((string) ($filters['region'] ?? 'BR')));
+    $programmeRegion = strtoupper(trim((string) ($programme['primaryRegion']['countryCode'] ?? '')));
+
+    if ($programmeRegion !== '' && $programmeRegion !== $region) {
+        return false;
+    }
+
+    $haystack = implode(' ', [
+        (string) ($programme['name'] ?? ''),
+        strip_tags((string) ($programme['description'] ?? '')),
+        (string) ($programme['displayUrl'] ?? ''),
+        (string) ($programme['primarySector'] ?? ''),
+    ]);
+
+    if ($filters['query'] !== '' && !normalized_text_contains($haystack, $filters['query'])) {
+        return false;
+    }
+
+    return true;
+}
+
+function save_awin_monitored_programmes(array $brandIds, array $programmes): int
+{
+    $saved = 0;
+    foreach ($programmes as $programme) {
+        if (!is_array($programme)) {
+            continue;
+        }
+
+        $brandId = (string) ($programme['brand_id'] ?? $programme['id'] ?? '');
+        $brandName = (string) ($programme['name'] ?? '');
+        if ($brandId === '' || $brandName === '') {
+            continue;
+        }
+
+        if (!in_array($brandId, $brandIds, true)) {
+            continue;
+        }
+
+        monitor_integration_brand(
+            'Awin',
+            $brandId,
+            $brandName,
+            (string) ($programme['primarySector'] ?? '')
+        );
+        $saved++;
+    }
+
+    return $saved;
+}
+
 function awin_preview_offers(array $filters = []): array
 {
     $filters = awin_normalize_filters($filters);

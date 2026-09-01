@@ -12,7 +12,9 @@ $error = '';
 $success = '';
 $awinResult = null;
 $previewResult = null;
+$programmesResult = null;
 $importResult = null;
+$monitoredProgrammes = null;
 
 function awin_posted_array(string $key): array
 {
@@ -69,12 +71,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'preview_awin') {
             $previewResult = awin_preview_offers($filters);
+            $programmesResult = awin_preview_programmes($filters);
             $success = 'Previa da Awin carregada.';
+        }
+
+        if ($action === 'preview_awin_programmes') {
+            $programmesResult = awin_preview_programmes($filters);
+            $success = 'Anunciantes aprovados da Awin carregados.';
         }
 
         if ($action === 'save_awin_defaults') {
             save_integration_profile('awin', $filters);
             $success = 'Padrao da Awin salvo para proximas buscas e sincronizacoes.';
+        }
+
+        if ($action === 'monitor_awin_programmes') {
+            $programmesResult = awin_preview_programmes($filters);
+            $monitoredProgrammes = save_awin_monitored_programmes(awin_posted_array('selected_brand_ids'), $programmesResult['items']);
+            $monitoredBrands = monitored_integration_brands('Awin');
+            $success = $monitoredProgrammes . ' anunciante(s) aprovado(s) entraram no monitoramento da Awin.';
         }
 
         if ($action === 'import_awin') {
@@ -253,6 +268,7 @@ $monitoredBrands = monitored_integration_brands('Awin');
 
             <div class="admin-actions">
               <button type="submit" name="action" value="preview_awin">Buscar ofertas da Awin</button>
+              <button type="submit" name="action" value="preview_awin_programmes">Buscar anunciantes aprovados</button>
               <button type="submit" name="action" value="save_awin_defaults">Salvar como padrao</button>
             </div>
           </form>
@@ -265,6 +281,78 @@ $monitoredBrands = monitored_integration_brands('Awin');
           <article class="admin-kpi-card"><span>Atualizadas</span><strong><?= (int) $importResult['updated'] ?></strong></article>
           <article class="admin-kpi-card"><span>Ignoradas</span><strong><?= (int) $importResult['skipped'] ?></strong></article>
           <article class="admin-kpi-card"><span>Lidas no feed</span><strong><?= (int) $importResult['total'] ?></strong></article>
+        </section>
+      <?php endif; ?>
+
+      <?php if ($programmesResult): ?>
+        <section class="admin-panel admin-api-preview">
+          <div class="admin-panel-title-row">
+            <div>
+              <p class="section-kicker">Anunciantes aprovados</p>
+              <h2><?= (int) $programmesResult['matched'] ?> programas encontrados</h2>
+              <p>Foram lidos <?= (int) $programmesResult['total'] ?> programas aprovados na Awin. Eles podem ser monitorados mesmo quando ainda nao existe cupom ativo.</p>
+            </div>
+          </div>
+
+          <form method="post" class="coupon-admin-form">
+            <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
+            <input type="hidden" name="action" value="monitor_awin_programmes" />
+            <input type="hidden" name="query" value="<?= e($filters['query']) ?>" />
+            <input type="hidden" name="page_size" value="<?= (int) $filters['page_size'] ?>" />
+            <input type="hidden" name="type" value="<?= e($filters['type']) ?>" />
+            <input type="hidden" name="membership" value="<?= e($filters['membership']) ?>" />
+            <input type="hidden" name="status" value="<?= e($filters['status']) ?>" />
+            <input type="hidden" name="region" value="<?= e($filters['region']) ?>" />
+            <input type="hidden" name="excluded_terms" value="<?= e(implode(', ', $filters['excluded_terms'])) ?>" />
+            <input type="hidden" name="publish_status" value="<?= e($filters['publish_status']) ?>" />
+            <?php foreach ($filters['categories'] as $category): ?><input type="hidden" name="categories[]" value="<?= e($category) ?>" /><?php endforeach; ?>
+
+            <div class="admin-table-wrap">
+              <table class="admin-table admin-api-table">
+                <thead>
+                  <tr>
+                    <th>Monitorar</th>
+                    <th>Anunciante</th>
+                    <th>Regiao</th>
+                    <th>Status</th>
+                    <th>Site</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php if (!$programmesResult['items']): ?>
+                    <tr><td colspan="5" class="admin-empty-cell">Nenhum anunciante aprovado passou por estes filtros. Tente buscar por outro nome ou deixe a busca em branco.</td></tr>
+                  <?php endif; ?>
+
+                  <?php foreach ($programmesResult['items'] as $item): ?>
+                    <tr>
+                      <td>
+                        <label class="admin-mini-check">
+                          <input type="checkbox" name="selected_brand_ids[]" value="<?= e($item['brand_id']) ?>" <?= $item['monitored'] ? '' : 'checked' ?> />
+                          <span><?= $item['monitored'] ? 'Monitorado' : 'Selecionar' ?></span>
+                        </label>
+                      </td>
+                      <td>
+                        <strong><?= e($item['name']) ?></strong><br />
+                        <?php $programmeDescription = $item['description'] !== '' ? (strlen($item['description']) > 140 ? substr($item['description'], 0, 137) . '...' : $item['description']) : 'Programa aprovado na Awin.'; ?>
+                        <span><?= e($programmeDescription) ?></span>
+                      </td>
+                      <td><?= e($item['region']) ?></td>
+                      <td>
+                        <span class="status-pill <?= $item['monitored'] ? 'status-ativo' : 'status-rascunho' ?>">
+                          <?= $item['monitored'] ? 'monitorado' : e($item['status'] ?: 'aprovado') ?>
+                        </span>
+                      </td>
+                      <td><?= e($item['display_url'] ?: '-') ?></td>
+                    </tr>
+                  <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="admin-actions">
+              <button type="submit" <?= !$programmesResult['items'] ? 'disabled' : '' ?>>Monitorar anunciantes selecionados</button>
+            </div>
+          </form>
         </section>
       <?php endif; ?>
 

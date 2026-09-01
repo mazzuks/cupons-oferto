@@ -1584,6 +1584,10 @@ function awin_normalize_filters(array $filters): array
     $status = (string) ($filters['status'] ?? 'active');
     $publishStatus = (string) ($filters['publish_status'] ?? 'rascunho');
     $publishStatus = in_array($publishStatus, ['ativo', 'rascunho'], true) ? $publishStatus : 'rascunho';
+    $region = strtoupper(trim((string) ($filters['region'] ?? 'BR')));
+    if (!preg_match('/^[A-Z]{2}$/', $region)) {
+        $region = 'BR';
+    }
 
     if (!array_key_exists($type, awin_offer_type_options())) {
         $type = 'all';
@@ -1601,7 +1605,7 @@ function awin_normalize_filters(array $filters): array
         'type' => $type,
         'membership' => $membership,
         'status' => $status,
-        'region' => strtoupper(trim((string) ($filters['region'] ?? 'BR'))),
+        'region' => $region,
         'query' => trim((string) ($filters['query'] ?? '')),
         'categories' => array_values(array_unique(array_filter(array_map(
             fn ($category) => canonical_category((string) $category),
@@ -1768,6 +1772,10 @@ function awin_import_offers(array $filters = []): array
 
 function awin_offer_passes_filters(array $offer, array $filters): bool
 {
+    if (!awin_offer_matches_region($offer, (string) ($filters['region'] ?? 'BR'))) {
+        return false;
+    }
+
     $advertiser = is_array($offer['advertiser'] ?? null) ? $offer['advertiser'] : [];
     $haystack = strtolower(implode(' ', [
         (string) ($advertiser['name'] ?? ''),
@@ -1794,6 +1802,72 @@ function awin_offer_passes_filters(array $offer, array $filters): bool
     }
 
     return true;
+}
+
+function awin_offer_matches_region(array $offer, string $region): bool
+{
+    $region = strtoupper(trim($region));
+    if (!preg_match('/^[A-Z]{2}$/', $region)) {
+        $region = 'BR';
+    }
+
+    $regions = is_array($offer['regions'] ?? null) ? $offer['regions'] : [];
+    if (!$regions) {
+        return true;
+    }
+
+    if (!empty($regions['all'])) {
+        return true;
+    }
+
+    $codes = awin_offer_region_codes($regions);
+    if (!$codes) {
+        return true;
+    }
+
+    return in_array($region, $codes, true);
+}
+
+function awin_offer_region_codes(array $regions): array
+{
+    $codes = [];
+    $list = is_array($regions['list'] ?? null) ? $regions['list'] : [];
+
+    foreach ($list as $region) {
+        if (!is_array($region)) {
+            continue;
+        }
+
+        foreach (['countryCode', 'country_code', 'code'] as $field) {
+            $code = strtoupper(trim((string) ($region[$field] ?? '')));
+            if (preg_match('/^[A-Z]{2}$/', $code)) {
+                $codes[] = $code;
+                break;
+            }
+        }
+    }
+
+    foreach (['countryCode', 'country_code', 'regionCode', 'region_code'] as $field) {
+        $code = strtoupper(trim((string) ($regions[$field] ?? '')));
+        if (preg_match('/^[A-Z]{2}$/', $code)) {
+            $codes[] = $code;
+        }
+    }
+
+    foreach (['countryCodes', 'country_codes', 'regionCodes', 'region_codes'] as $field) {
+        if (!is_array($regions[$field] ?? null)) {
+            continue;
+        }
+
+        foreach ($regions[$field] as $code) {
+            $code = strtoupper(trim((string) $code));
+            if (preg_match('/^[A-Z]{2}$/', $code)) {
+                $codes[] = $code;
+            }
+        }
+    }
+
+    return array_values(array_unique($codes));
 }
 
 function awin_should_filter_categories(array $categories): bool
@@ -2306,11 +2380,12 @@ function sync_awin_watchlist(): array
             continue;
         }
         $externalId = 'awin:' . (string) $offer['promotionId'];
-        $seen[$externalId] = true;
 
         if (!awin_offer_passes_filters($offer, $filters)) {
             continue;
         }
+
+        $seen[$externalId] = true;
 
         $payload = awin_offer_payload($offer, $filters['publish_status']);
         $existing = coupon_by_external_id($externalId);

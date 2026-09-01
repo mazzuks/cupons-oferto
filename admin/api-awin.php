@@ -234,7 +234,7 @@ $monitoredBrands = monitored_integration_brands('Awin');
               </label>
               <label>Regiao
                 <input name="region" value="<?= e($filters['region']) ?>" maxlength="2" />
-                <small>Use BR para evitar campanhas de fora.</small>
+                <small>BR fica travado por padrao. A importacao tambem valida a regiao retornada pela Awin.</small>
               </label>
             </div>
 

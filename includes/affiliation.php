@@ -291,6 +291,105 @@ function affiliation_partner_rows(): array
         LIMIT 250")->fetchAll();
 }
 
+function affiliation_partner_by_id(int $id): ?array
+{
+    $pdo = db();
+    if (!$pdo || $id <= 0) {
+        return null;
+    }
+
+    $statement = $pdo->prepare("SELECT * FROM affiliate_partners WHERE id = ? LIMIT 1");
+    $statement->execute([$id]);
+    $row = $statement->fetch();
+
+    return $row ?: null;
+}
+
+function affiliation_partner_options(): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return [];
+    }
+
+    return $pdo->query("SELECT id, name, email, status
+        FROM affiliate_partners
+        ORDER BY status ASC, name ASC")->fetchAll();
+}
+
+function affiliation_save_partner(array $data): int
+{
+    $pdo = db();
+    if (!$pdo) {
+        throw new RuntimeException('Banco de dados indisponível.');
+    }
+
+    $id = (int) ($data['id'] ?? 0);
+    $name = trim((string) ($data['name'] ?? ''));
+    $email = trim((string) ($data['email'] ?? ''));
+    $companyName = trim((string) ($data['company_name'] ?? ''));
+    $phone = trim((string) ($data['phone'] ?? ''));
+    $website = trim((string) ($data['website'] ?? ''));
+    $status = trim((string) ($data['status'] ?? 'ativo'));
+    $paymentMethod = trim((string) ($data['payment_method'] ?? ''));
+    $paymentReference = trim((string) ($data['payment_reference'] ?? ''));
+    $notes = trim((string) ($data['notes'] ?? ''));
+
+    if ($name === '') {
+        throw new RuntimeException('Informe o nome do parceiro.');
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        throw new RuntimeException('Informe um e-mail válido para o parceiro.');
+    }
+    if (!in_array($status, ['ativo', 'pausado'], true)) {
+        $status = 'ativo';
+    }
+    if ($website !== '' && !preg_match('/^https?:\/\//i', $website)) {
+        $website = 'https://' . $website;
+    }
+    if ($website !== '' && !filter_var($website, FILTER_VALIDATE_URL)) {
+        throw new RuntimeException('Informe um site válido ou deixe o campo vazio.');
+    }
+
+    if ($id > 0) {
+        $statement = $pdo->prepare("UPDATE affiliate_partners
+            SET name = ?, email = ?, company_name = ?, phone = ?, website = ?, status = ?,
+                payment_method = ?, payment_reference = ?, notes = ?, updated_at = NOW()
+            WHERE id = ?");
+        $statement->execute([
+            $name,
+            $email,
+            $companyName !== '' ? $companyName : null,
+            $phone !== '' ? $phone : null,
+            $website !== '' ? $website : null,
+            $status,
+            $paymentMethod !== '' ? $paymentMethod : null,
+            $paymentReference !== '' ? $paymentReference : null,
+            $notes !== '' ? $notes : null,
+            $id,
+        ]);
+
+        return $id;
+    }
+
+    $statement = $pdo->prepare("INSERT INTO affiliate_partners
+        (name, email, company_name, phone, website, status, payment_method, payment_reference, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $statement->execute([
+        $name,
+        $email,
+        $companyName !== '' ? $companyName : null,
+        $phone !== '' ? $phone : null,
+        $website !== '' ? $website : null,
+        $status,
+        $paymentMethod !== '' ? $paymentMethod : null,
+        $paymentReference !== '' ? $paymentReference : null,
+        $notes !== '' ? $notes : null,
+    ]);
+
+    return (int) $pdo->lastInsertId();
+}
+
 function affiliation_tracking_rows(): array
 {
     $pdo = db();
@@ -345,6 +444,203 @@ function affiliation_wallet_rows(): array
 function affiliation_smartlink_preview(int $campaignId, string $affiliatePlaceholder = '{affiliate_id}'): string
 {
     return 'https://cupons.oferto.digital/a.php?cid=' . $campaignId . '&aff=' . rawurlencode($affiliatePlaceholder);
+}
+
+function affiliation_campaign_by_id(int $id): ?array
+{
+    $pdo = db();
+    if (!$pdo || $id <= 0) {
+        return null;
+    }
+
+    $statement = $pdo->prepare("SELECT * FROM affiliate_campaigns WHERE id = ? LIMIT 1");
+    $statement->execute([$id]);
+    $row = $statement->fetch();
+
+    return $row ?: null;
+}
+
+function affiliation_destination_url(array $campaign, string $tid): string
+{
+    $url = trim((string) ($campaign['tracking_url'] ?? ''));
+    if ($url === '') {
+        $url = trim((string) ($campaign['landing_url'] ?? ''));
+    }
+
+    if (!preg_match('/^https?:\/\//i', $url)) {
+        return '';
+    }
+
+    $params = [
+        'tid' => $tid,
+        'aff_sub' => $tid,
+        'utm_source' => trim((string) ($campaign['utm_source_gate'] ?? 'oferto')) ?: 'oferto',
+        'utm_medium' => 'affiliate',
+        'utm_campaign' => 'oferto_' . (int) ($campaign['id'] ?? 0),
+    ];
+
+    foreach ($params as $key => $value) {
+        if (preg_match('/(?:\\?|&)' . preg_quote($key, '/') . '=/i', $url)) {
+            unset($params[$key]);
+        }
+    }
+
+    if (!$params) {
+        return $url;
+    }
+
+    return $url . (strpos($url, '?') === false ? '?' : '&') . http_build_query($params);
+}
+
+function affiliation_log_click(array $campaign, ?array $partner = null): string
+{
+    $pdo = db();
+    if (!$pdo) {
+        return '';
+    }
+
+    $tid = bin2hex(random_bytes(12));
+    $clickRef = trim((string) ($_GET['ref'] ?? ''));
+    $referer = substr((string) ($_SERVER['HTTP_REFERER'] ?? ''), 0, 500);
+    $userAgent = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500);
+    $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+    $ipHash = $ip !== '' ? hash('sha256', $ip) : null;
+    $utm = [];
+
+    foreach ($_GET as $key => $value) {
+        if (strpos((string) $key, 'utm_') === 0) {
+            $utm[$key] = is_scalar($value) ? (string) $value : '';
+        }
+    }
+
+    $statement = $pdo->prepare("INSERT INTO affiliate_clicks
+        (campaign_id, affiliate_partner_id, tid, click_ref, referer, user_agent, ip_hash, utm_json)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $statement->execute([
+        (int) $campaign['id'],
+        $partner ? (int) $partner['id'] : null,
+        $tid,
+        $clickRef !== '' ? $clickRef : null,
+        $referer !== '' ? $referer : null,
+        $userAgent !== '' ? $userAgent : null,
+        $ipHash,
+        $utm ? json_encode($utm, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null,
+    ]);
+
+    return $tid;
+}
+
+function affiliation_expected_signature(array $campaign, string $tid, string $orderId, string $value): string
+{
+    $secret = (string) ($campaign['postback_secret'] ?? '');
+    return hash_hmac('sha256', (int) $campaign['id'] . '|' . $tid . '|' . $orderId . '|' . $value, $secret);
+}
+
+function affiliation_register_conversion(array $payload): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        throw new RuntimeException('Banco de dados indisponível.');
+    }
+
+    $campaignId = (int) ($payload['cid'] ?? $payload['campaign_id'] ?? 0);
+    $campaign = affiliation_campaign_by_id($campaignId);
+    if (!$campaign) {
+        throw new RuntimeException('Campanha afiliada não encontrada.');
+    }
+
+    $tid = trim((string) ($payload['tid'] ?? ''));
+    $orderId = trim((string) ($payload['order_id'] ?? $payload['order'] ?? ''));
+    $value = number_format((float) str_replace(',', '.', (string) ($payload['value'] ?? $payload['sale_amount'] ?? 0)), 2, '.', '');
+    $commission = number_format((float) str_replace(',', '.', (string) ($payload['commission'] ?? $payload['commission_amount'] ?? 0)), 2, '.', '');
+    $currency = strtoupper(trim((string) ($payload['currency'] ?? 'BRL'))) ?: 'BRL';
+    $status = trim((string) ($payload['status'] ?? 'pending')) ?: 'pending';
+    $signature = trim((string) ($payload['sig'] ?? $payload['signature'] ?? ''));
+
+    if ($tid === '' || $orderId === '') {
+        throw new RuntimeException('Informe tid e order_id.');
+    }
+
+    $expected = affiliation_expected_signature($campaign, $tid, $orderId, $value);
+    if ($signature === '' || !hash_equals($expected, $signature)) {
+        throw new RuntimeException('Assinatura inválida.');
+    }
+
+    $click = null;
+    $clickStatement = $pdo->prepare("SELECT affiliate_partner_id
+        FROM affiliate_clicks
+        WHERE campaign_id = ? AND tid = ?
+        ORDER BY id DESC
+        LIMIT 1");
+    $clickStatement->execute([(int) $campaign['id'], $tid]);
+    $click = $clickStatement->fetch() ?: null;
+    $partnerId = $click && !empty($click['affiliate_partner_id']) ? (int) $click['affiliate_partner_id'] : null;
+
+    $statement = $pdo->prepare("INSERT INTO affiliate_campaign_conversions
+        (campaign_id, affiliate_partner_id, tid, order_id, value, commission_amount, currency, status, signature, raw_json)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          affiliate_partner_id = VALUES(affiliate_partner_id),
+          value = VALUES(value),
+          commission_amount = VALUES(commission_amount),
+          currency = VALUES(currency),
+          status = VALUES(status),
+          signature = VALUES(signature),
+          raw_json = VALUES(raw_json),
+          updated_at = NOW()");
+    $statement->execute([
+        (int) $campaign['id'],
+        $partnerId,
+        $tid,
+        $orderId,
+        $value,
+        $commission,
+        substr($currency, 0, 10),
+        substr($status, 0, 60),
+        $signature,
+        json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+    ]);
+
+    $conversionStatement = $pdo->prepare("SELECT id FROM affiliate_campaign_conversions WHERE campaign_id = ? AND order_id = ? LIMIT 1");
+    $conversionStatement->execute([(int) $campaign['id'], $orderId]);
+    $conversionId = (int) ($conversionStatement->fetchColumn() ?: 0);
+
+    if ($partnerId && $conversionId > 0 && (float) $commission > 0) {
+        $transactionStatement = $pdo->prepare("SELECT id FROM affiliate_transactions WHERE conversion_id = ? AND type = 'earning' LIMIT 1");
+        $transactionStatement->execute([$conversionId]);
+        $transactionId = (int) ($transactionStatement->fetchColumn() ?: 0);
+
+        if ($transactionId > 0) {
+            $updateTransaction = $pdo->prepare("UPDATE affiliate_transactions
+                SET amount = ?, status = ?, description = ?, updated_at = NOW()
+                WHERE id = ?");
+            $updateTransaction->execute([
+                $commission,
+                in_array($status, ['approved', 'confirmed', 'paid', 'completed'], true) ? 'approved' : 'pending',
+                'Comissão da campanha ' . (string) $campaign['title'],
+                $transactionId,
+            ]);
+        } else {
+            $insertTransaction = $pdo->prepare("INSERT INTO affiliate_transactions
+                (affiliate_partner_id, campaign_id, conversion_id, amount, type, status, description)
+                VALUES (?, ?, ?, ?, 'earning', ?, ?)");
+            $insertTransaction->execute([
+                $partnerId,
+                (int) $campaign['id'],
+                $conversionId,
+                $commission,
+                in_array($status, ['approved', 'confirmed', 'paid', 'completed'], true) ? 'approved' : 'pending',
+                'Comissão da campanha ' . (string) $campaign['title'],
+            ]);
+        }
+    }
+
+    return [
+        'campaign_id' => (int) $campaign['id'],
+        'conversion_id' => $conversionId,
+        'affiliate_partner_id' => $partnerId,
+        'status' => $status,
+    ];
 }
 
 function affiliation_conversion_summary(string $startDate, string $endDate): array

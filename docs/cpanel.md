@@ -103,6 +103,8 @@ As subguias de afiliação ficam separadas por função:
 - `Carteira`: ganhos, aprovações, pendências e saques.
 - `Selecionar cupons`: ponte manual entre vitrine pública e módulo afiliado.
 
+O redirect afiliado usa `/a.php?cid={campanha}&aff={parceiro}`. Ele registra o clique em `affiliate_clicks` e redireciona para a URL de tracking da campanha. Conversões assinadas entram por `/affiliate-postback.php`, que valida HMAC-SHA256 antes de gravar em `affiliate_campaign_conversions`.
+
 Em `Afiliação > Redes`, cada parceiro tem sua própria tela:
 
 - `Lomadee`: chave, busca de marcas, filtros, seleção de campanhas e importação.

@@ -35,12 +35,41 @@ Um cupom pode virar campanha afiliada, mas isso deve ser uma escolha. Por isso e
 - `Carteira`: lê `affiliate_transactions` e separa ganhos, pendências, aprovações e saques.
 - `Selecionar cupons`: ponte manual para copiar uma oferta da vitrine para `affiliate_campaigns`.
 
+## Redirect e postback implementados
+
+O redirect afiliado fica separado do `go.php` público de cupons:
+
+```http
+GET https://cupons.oferto.digital/a.php?cid=123&aff=45
+```
+
+Fluxo:
+
+1. Busca a campanha em `affiliate_campaigns`.
+2. Valida se a campanha não está pausada ou encerrada.
+3. Valida o parceiro de `affiliate_partners`, quando `aff` for informado.
+4. Gera um `tid`.
+5. Registra o clique em `affiliate_clicks`.
+6. Salva cookie `oferto_aff_tid`.
+7. Redireciona para `tracking_url` ou `landing_url`, acrescentando `tid`, `aff_sub` e UTMs quando esses parâmetros ainda não existem.
+
+O postback de conversão fica em:
+
+```http
+GET https://cupons.oferto.digital/affiliate-postback.php?cid=123&tid=abc&order_id=999&value=150.00&commission=12.00&status=approved&currency=BRL&sig=...
+```
+
+A assinatura é:
+
+```text
+HMAC-SHA256(cid|tid|order_id|value, postback_secret)
+```
+
+Quando a conversão chega, o sistema grava `affiliate_campaign_conversions`. Se o clique tiver parceiro atribuído e houver comissão, o CRM também cria ou atualiza uma movimentação `earning` em `affiliate_transactions`.
+
 ## Próximos blocos que ainda faltam
 
-- Cadastro completo de parceiros afiliados no CRM.
-- Smartlink por campanha e parceiro.
-- Endpoint de redirect afiliado separado do `go.php` de cupons.
-- Endpoint de postback/conversão com HMAC.
-- Carteira do parceiro com ganhos, saques e ajustes.
+- Fluxo de solicitação de saque pelo parceiro.
+- Aprovação manual de saque pelo CRM.
 - Importação das redes cair primeiro em `affiliate_campaigns` e só publicar na vitrine quando a campanha for aprovada.
 - Tela de detalhe de campanha com postback secret, snippet/pixel, allowed domains e modo de redirect.

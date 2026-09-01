@@ -592,19 +592,18 @@ function active_coupons(): array
     }
 
     $sql = "SELECT c.* FROM coupons c
-            LEFT JOIN integration_watchlist iw
-              ON iw.partner = 'Awin'
-             AND iw.external_id = c.external_id
+            LEFT JOIN integration_watchlist missing_awin
+              ON missing_awin.partner = 'Awin'
+             AND missing_awin.status = 'sumiu'
+             AND missing_awin.external_id = c.external_id
             WHERE c.status = 'ativo'
               AND c.starts_at <= CURDATE()
               AND c.ends_at >= CURDATE()
               AND c.title NOT LIKE 'BANNERS:%'
               AND c.title NOT LIKE 'BANNER:%'
               AND (
-                  c.partner_network <> 'Awin'
-                  OR c.partner_network IS NULL
-                  OR iw.status IS NULL
-                  OR iw.status <> 'sumiu'
+                  c.external_id NOT LIKE 'awin:%'
+                  OR missing_awin.id IS NULL
               )
             ORDER BY c.featured DESC, c.priority DESC, c.ends_at ASC, c.store ASC";
 

@@ -297,6 +297,10 @@ function ensure_affiliation_tables(PDO $pdo): void
         phone VARCHAR(80) DEFAULT NULL,
         website VARCHAR(255) DEFAULT NULL,
         status ENUM('ativo', 'pausado') NOT NULL DEFAULT 'ativo',
+        partner_code VARCHAR(80) DEFAULT NULL,
+        document VARCHAR(80) DEFAULT NULL,
+        traffic_source VARCHAR(160) DEFAULT NULL,
+        audience_profile VARCHAR(255) DEFAULT NULL,
         payment_method VARCHAR(60) DEFAULT NULL,
         payment_reference VARCHAR(255) DEFAULT NULL,
         notes TEXT DEFAULT NULL,
@@ -304,6 +308,7 @@ function ensure_affiliation_tables(PDO $pdo): void
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         UNIQUE KEY affiliate_partners_email_unique (email),
+        UNIQUE KEY affiliate_partners_code_unique (partner_code),
         KEY affiliate_partners_status_idx (status)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
@@ -325,16 +330,24 @@ function ensure_affiliation_tables(PDO $pdo): void
         rules TEXT DEFAULT NULL,
         payout DECIMAL(12,2) DEFAULT NULL,
         payout_model VARCHAR(60) DEFAULT NULL,
+        commission_type VARCHAR(60) DEFAULT NULL,
+        commission_rate DECIMAL(8,4) DEFAULT NULL,
         campaign_cap INT UNSIGNED DEFAULT NULL,
+        daily_cap INT UNSIGNED DEFAULT NULL,
+        monthly_cap INT UNSIGNED DEFAULT NULL,
         starts_at DATE DEFAULT NULL,
         ends_at DATE DEFAULT NULL,
         status ENUM('disponivel', 'selecionada', 'publicada', 'pausada', 'encerrada') NOT NULL DEFAULT 'disponivel',
+        approval_mode VARCHAR(60) NOT NULL DEFAULT 'manual',
         tracking_mode ENUM('CLASSIC_PIXEL', 'JOURNEY_JS') NOT NULL DEFAULT 'CLASSIC_PIXEL',
         redirect_mode ENUM('FAST_302', 'HTML_BRIDGE') NOT NULL DEFAULT 'FAST_302',
         postback_secret VARCHAR(120) NOT NULL,
         cookie_ttl_days INT UNSIGNED NOT NULL DEFAULT 180,
         utm_source_gate VARCHAR(120) NOT NULL DEFAULT 'oferto',
         allowed_domains TEXT DEFAULT NULL,
+        geo_countries VARCHAR(255) DEFAULT NULL,
+        device_rules VARCHAR(255) DEFAULT NULL,
+        creative_notes TEXT DEFAULT NULL,
         retargeting_config MEDIUMTEXT DEFAULT NULL,
         raw_json MEDIUMTEXT DEFAULT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -346,6 +359,8 @@ function ensure_affiliation_tables(PDO $pdo): void
         KEY affiliate_campaigns_network_idx (network),
         KEY affiliate_campaigns_expiration_idx (ends_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    ensure_affiliation_columns($pdo);
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS affiliate_clicks (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -402,6 +417,57 @@ function ensure_affiliation_tables(PDO $pdo): void
         KEY affiliate_transactions_campaign_idx (campaign_id),
         KEY affiliate_transactions_conversion_idx (conversion_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS affiliate_creatives (
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        campaign_id INT UNSIGNED NOT NULL,
+        creative_type VARCHAR(60) NOT NULL DEFAULT 'banner',
+        title VARCHAR(180) NOT NULL,
+        asset_url VARCHAR(500) DEFAULT NULL,
+        destination_url VARCHAR(500) DEFAULT NULL,
+        width INT UNSIGNED DEFAULT NULL,
+        height INT UNSIGNED DEFAULT NULL,
+        status ENUM('ativo', 'pausado') NOT NULL DEFAULT 'ativo',
+        notes TEXT DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY affiliate_creatives_campaign_idx (campaign_id, status),
+        KEY affiliate_creatives_type_idx (creative_type)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function ensure_affiliation_columns(PDO $pdo): void
+{
+    $partnerColumns = [
+        'partner_code' => "ALTER TABLE affiliate_partners ADD partner_code VARCHAR(80) DEFAULT NULL AFTER status",
+        'document' => "ALTER TABLE affiliate_partners ADD document VARCHAR(80) DEFAULT NULL AFTER partner_code",
+        'traffic_source' => "ALTER TABLE affiliate_partners ADD traffic_source VARCHAR(160) DEFAULT NULL AFTER document",
+        'audience_profile' => "ALTER TABLE affiliate_partners ADD audience_profile VARCHAR(255) DEFAULT NULL AFTER traffic_source",
+    ];
+
+    foreach ($partnerColumns as $column => $sql) {
+        if (!table_column_exists($pdo, 'affiliate_partners', $column)) {
+            $pdo->exec($sql);
+        }
+    }
+
+    $campaignColumns = [
+        'commission_type' => "ALTER TABLE affiliate_campaigns ADD commission_type VARCHAR(60) DEFAULT NULL AFTER payout_model",
+        'commission_rate' => "ALTER TABLE affiliate_campaigns ADD commission_rate DECIMAL(8,4) DEFAULT NULL AFTER commission_type",
+        'daily_cap' => "ALTER TABLE affiliate_campaigns ADD daily_cap INT UNSIGNED DEFAULT NULL AFTER campaign_cap",
+        'monthly_cap' => "ALTER TABLE affiliate_campaigns ADD monthly_cap INT UNSIGNED DEFAULT NULL AFTER daily_cap",
+        'approval_mode' => "ALTER TABLE affiliate_campaigns ADD approval_mode VARCHAR(60) NOT NULL DEFAULT 'manual' AFTER status",
+        'geo_countries' => "ALTER TABLE affiliate_campaigns ADD geo_countries VARCHAR(255) DEFAULT NULL AFTER allowed_domains",
+        'device_rules' => "ALTER TABLE affiliate_campaigns ADD device_rules VARCHAR(255) DEFAULT NULL AFTER geo_countries",
+        'creative_notes' => "ALTER TABLE affiliate_campaigns ADD creative_notes TEXT DEFAULT NULL AFTER device_rules",
+    ];
+
+    foreach ($campaignColumns as $column => $sql) {
+        if (!table_column_exists($pdo, 'affiliate_campaigns', $column)) {
+            $pdo->exec($sql);
+        }
+    }
 }
 
 function import_offer_classifications(PDO $pdo, string $path): array
@@ -586,6 +652,17 @@ function coupon_column_exists(PDO $pdo, string $column): bool
 function coupon_click_column_exists(PDO $pdo, string $column): bool
 {
     $statement = $pdo->prepare("SHOW COLUMNS FROM coupon_clicks LIKE ?");
+    $statement->execute([$column]);
+    return (bool) $statement->fetch();
+}
+
+function table_column_exists(PDO $pdo, string $table, string $column): bool
+{
+    if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
+        return false;
+    }
+
+    $statement = $pdo->prepare("SHOW COLUMNS FROM {$table} LIKE ?");
     $statement->execute([$column]);
     return (bool) $statement->fetch();
 }

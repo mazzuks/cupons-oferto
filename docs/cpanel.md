@@ -92,16 +92,20 @@ No CRM, acesse `Afiliação`. A vitrine pública de cupons continua na tabela `c
 - `affiliate_clicks`: cliques de tracking do módulo afiliado.
 - `affiliate_campaign_conversions`: conversões atribuídas a campanhas afiliadas.
 - `affiliate_transactions`: carteira e movimentações dos parceiros.
+- `affiliate_creatives`: banners, links de texto e materiais por campanha.
 
 Quando um cupom/desconto da vitrine fizer sentido para afiliação, use `Afiliação > Selecionar cupons`. Isso copia o item para `affiliate_campaigns`, sem misturar a tabela pública de cupons com a tabela operacional de afiliação.
 
 As subguias de afiliação ficam separadas por função:
 
 - `Campanhas`: campanhas afiliadas importadas, selecionadas, publicadas ou pausadas.
-- `Parceiros`: cadastro e desempenho dos afiliados/parceiros.
+- `Parceiros`: cadastro, origem de tráfego, audiência, pagamento e desempenho dos afiliados/parceiros.
 - `Tracking`: smartlinks, modo de redirect, cookie TTL e postback secret.
+- `Criativos`: biblioteca de banners, links e peças por campanha.
 - `Carteira`: ganhos, aprovações, pendências e saques.
 - `Selecionar cupons`: ponte manual entre vitrine pública e módulo afiliado.
+
+Em `Campanhas`, a ficha operacional aceita comissão fixa ou percentual, modelo CPA/CPL/CPS, aprovação manual ou automática, caps total/diário/mensal, países liberados, regra de dispositivo, URLs, código promocional e observações de criativo. Esses campos ajudam a operar campanhas como uma rede afiliada, sem transformar todo cupom público em campanha automaticamente.
 
 O redirect afiliado usa `/a.php?cid={campanha}&aff={parceiro}`. Ele registra o clique em `affiliate_clicks` e redireciona para a URL de tracking da campanha. Conversões assinadas entram por `/affiliate-postback.php`, que valida HMAC-SHA256 antes de gravar em `affiliate_campaign_conversions`.
 

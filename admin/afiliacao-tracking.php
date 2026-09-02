@@ -12,6 +12,7 @@ $selectedPartnerId = isset($_GET['partner_id']) ? (int) $_GET['partner_id'] : 0;
 $partners = affiliation_partner_options();
 $selectedPartner = $selectedPartnerId > 0 ? affiliation_partner_by_id($selectedPartnerId) : null;
 $rows = affiliation_tracking_rows();
+$postbackExample = $rows ? affiliation_postback_preview((int) $rows[0]['id']) : 'https://cupons.oferto.digital/affiliate-postback.php?cid={campanha}&tid={tid}&order_id={order_id}&value={value}&commission={commission}&status={status}&currency=BRL&sig={hmac_sha256}';
 ?>
 <?php admin_layout_start('Tracking de afiliação - Oferto Cupons', 'afiliacao', 'Afiliação'); ?>
       <section class="admin-hero">
@@ -42,8 +43,25 @@ $rows = affiliation_tracking_rows();
           <div>
             <p class="section-kicker">Contrato técnico</p>
             <h2>Redirect e postback</h2>
-            <p>O smartlink usa `a.php?cid={campanha}&aff={parceiro}`. O postback deve chamar `affiliate-postback.php` com `cid`, `tid`, `order_id`, `value`, `commission`, `status`, `currency` e `sig`. A assinatura é HMAC-SHA256 de `cid|tid|order_id|value` usando o secret da campanha.</p>
+            <p>O smartlink registra o clique antes de redirecionar. O postback recebe a conversão assinada e grava o resultado na tabela própria do módulo afiliado.</p>
           </div>
+        </div>
+        <div class="affiliate-copy-grid">
+          <article>
+            <span>Formato do smartlink</span>
+            <code>https://cupons.oferto.digital/a.php?cid={campanha}&amp;aff={parceiro}</code>
+            <button type="button" data-copy-value="https://cupons.oferto.digital/a.php?cid={campanha}&aff={parceiro}">Copiar formato</button>
+          </article>
+          <article>
+            <span>Postback S2S</span>
+            <code><?= e($postbackExample) ?></code>
+            <button type="button" data-copy-value="<?= e($postbackExample) ?>">Copiar postback</button>
+          </article>
+          <article>
+            <span>Assinatura</span>
+            <code>HMAC-SHA256: cid|tid|order_id|value</code>
+            <button type="button" data-copy-value="HMAC-SHA256 de cid|tid|order_id|value usando o postback_secret da campanha">Copiar regra</button>
+          </article>
         </div>
       </section>
 
@@ -70,15 +88,25 @@ $rows = affiliation_tracking_rows();
             </thead>
             <tbody>
               <?php foreach ($rows as $row): ?>
+                <?php
+                  $smartlink = affiliation_smartlink_preview((int) $row['id'], $selectedPartner ? (string) $selectedPartner['id'] : '{affiliate_id}');
+                  $postback = affiliation_postback_preview((int) $row['id']);
+                ?>
                 <tr>
                   <td><strong><?= e($row['advertiser']) ?></strong><br /><span><?= e($row['title']) ?></span><br /><small><?= e($row['network']) ?></small></td>
                   <td><span class="status-pill status-<?= e($row['status']) ?>"><?= e($row['status']) ?></span></td>
                   <td><?= e($row['tracking_mode']) ?></td>
                   <td><?= e($row['redirect_mode']) ?></td>
                   <td><?= (int) $row['cookie_ttl_days'] ?> dias</td>
-                  <td><small><?= e(affiliation_smartlink_preview((int) $row['id'], $selectedPartner ? (string) $selectedPartner['id'] : '{affiliate_id}')) ?></small></td>
+                  <td>
+                    <small><?= e($smartlink) ?></small>
+                    <div class="row-actions"><button type="button" data-copy-value="<?= e($smartlink) ?>">Copiar</button></div>
+                  </td>
                   <td><small><?= e(substr((string) $row['postback_secret'], 0, 10)) ?>...</small></td>
-                  <td><?= (int) $row['click_count'] ?> cliques<br /><?= (int) $row['conversion_count'] ?> conversões</td>
+                  <td>
+                    <?= (int) $row['click_count'] ?> cliques<br /><?= (int) $row['conversion_count'] ?> conversões
+                    <div class="row-actions"><button type="button" data-copy-value="<?= e($postback) ?>">Copiar postback</button></div>
+                  </td>
                 </tr>
               <?php endforeach; ?>
               <?php if (!$rows): ?>

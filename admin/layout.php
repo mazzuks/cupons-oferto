@@ -66,6 +66,38 @@ function admin_layout_end(): void
         </main>
       </div>
     </div>
+    <script>
+      document.querySelectorAll('[data-tabs]').forEach((shell) => {
+        const buttons = shell.querySelectorAll('[data-tab-target]');
+        const panels = shell.querySelectorAll('[data-tab-panel]');
+
+        buttons.forEach((button) => {
+          button.addEventListener('click', () => {
+            const target = button.getAttribute('data-tab-target');
+
+            buttons.forEach((item) => item.classList.toggle('is-active', item === button));
+            panels.forEach((panel) => panel.classList.toggle('is-active', panel.getAttribute('data-tab-panel') === target));
+          });
+        });
+      });
+
+      document.querySelectorAll('[data-copy-value]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const value = button.getAttribute('data-copy-value') || '';
+
+          try {
+            await navigator.clipboard.writeText(value);
+            button.dataset.originalText = button.dataset.originalText || button.textContent;
+            button.textContent = 'Copiado';
+            window.setTimeout(() => {
+              button.textContent = button.dataset.originalText || 'Copiar';
+            }, 1600);
+          } catch (error) {
+            button.textContent = 'Copie manualmente';
+          }
+        });
+      });
+    </script>
   </body>
 </html>
 <?php
@@ -78,6 +110,7 @@ function admin_affiliation_subnav(string $activeKey): void
         ['key' => 'campanhas', 'label' => 'Campanhas', 'href' => 'afiliacao-campanhas.php'],
         ['key' => 'parceiros', 'label' => 'Parceiros', 'href' => 'afiliacao-parceiros.php'],
         ['key' => 'tracking', 'label' => 'Tracking', 'href' => 'afiliacao-tracking.php'],
+        ['key' => 'criativos', 'label' => 'Criativos', 'href' => 'afiliacao-criativos.php'],
         ['key' => 'carteira', 'label' => 'Carteira', 'href' => 'afiliacao-carteira.php'],
         ['key' => 'selecionar', 'label' => 'Selecionar cupons', 'href' => 'afiliacao-selecionar.php'],
         ['key' => 'redes', 'label' => 'Redes', 'href' => 'apis.php'],

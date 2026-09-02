@@ -131,14 +131,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <?php foreach ($sweepstakes as $coupon): ?>
               <article class="coupon-card v2-list-card sweepstakes-card" data-category="<?= e($coupon['category']) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'sorteio') ?>" data-search="<?= e(normalize_search_text($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . ($coupon['tags'] ?? '') . ' ' . ($coupon['requirements'] ?? '') . ' ' . ($coupon['rules'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'sorteio'))) ?>">
                 <div class="v2-list-logo">
-                  <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="Banner da promoção <?= e($coupon['store']) ?>" onerror="this.onerror=null;this.src='<?= e(coupon_fallback_banner_src($coupon)) ?>';" />
-                  <span class="brand-mark">
-                    <?php if (coupon_logo_src($coupon)): ?>
-                      <img src="<?= e(coupon_logo_src($coupon)) ?>" alt="" />
-                    <?php else: ?>
-                      <?= e(coupon_brand_initials($coupon)) ?>
-                    <?php endif; ?>
-                  </span>
+                  <?= coupon_brand_image_markup($coupon) ?>
                 </div>
                 <div class="v2-list-content">
                   <div class="coupon-meta">

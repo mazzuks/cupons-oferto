@@ -2045,8 +2045,51 @@ h3 {
   position: relative;
 }
 
-.site-v2-compact .v2-card-media > img {
+.site-v2-compact .v2-card-media {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1.25 / 1;
+  padding: 18px;
+  background: #f4f8fd;
+  border-radius: 8px;
+}
+
+.site-v2-compact .v2-card-media > .brand-card-logo,
+.site-v2-compact .v2-list-logo > .brand-card-logo,
+.offer-rescue-media > .brand-card-logo {
   display: block;
+  width: min(100%, 150px);
+  height: auto;
+  max-height: 78%;
+  aspect-ratio: auto;
+  object-fit: contain;
+  background: transparent;
+  border-radius: 0;
+}
+
+.site-v2-compact .v2-list-logo > .brand-card-logo {
+  width: min(100%, 128px);
+}
+
+.offer-rescue-media > .brand-card-logo {
+  width: min(100%, 220px);
+  max-height: 82%;
+}
+
+.site-v2-compact .brand-card-initials,
+.offer-rescue-media > .brand-card-initials {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  color: var(--blue);
+  background: #ffffff;
+  border: 1px solid rgba(189, 207, 232, 0.95);
+  border-radius: 8px;
+  font-family: Kanit, Inter, sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .site-v2-compact .brand-mark {
@@ -2671,6 +2714,10 @@ h3 {
 
   .site-v2-compact .v2-store-card img {
     aspect-ratio: 1 / 1;
+  }
+
+  .site-v2-compact .v2-store-card .brand-card-logo {
+    aspect-ratio: auto;
   }
 
   .site-v2-compact .brand-mark {

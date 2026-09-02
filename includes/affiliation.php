@@ -331,6 +331,10 @@ function affiliation_save_partner(array $data): int
     $phone = trim((string) ($data['phone'] ?? ''));
     $website = trim((string) ($data['website'] ?? ''));
     $status = trim((string) ($data['status'] ?? 'ativo'));
+    $partnerCode = affiliation_slug(trim((string) ($data['partner_code'] ?? '')));
+    $document = trim((string) ($data['document'] ?? ''));
+    $trafficSource = trim((string) ($data['traffic_source'] ?? ''));
+    $audienceProfile = trim((string) ($data['audience_profile'] ?? ''));
     $paymentMethod = trim((string) ($data['payment_method'] ?? ''));
     $paymentReference = trim((string) ($data['payment_reference'] ?? ''));
     $notes = trim((string) ($data['notes'] ?? ''));
@@ -350,10 +354,14 @@ function affiliation_save_partner(array $data): int
     if ($website !== '' && !filter_var($website, FILTER_VALIDATE_URL)) {
         throw new RuntimeException('Informe um site válido ou deixe o campo vazio.');
     }
+    if ($partnerCode === '') {
+        $partnerCode = affiliation_slug($name);
+    }
 
     if ($id > 0) {
         $statement = $pdo->prepare("UPDATE affiliate_partners
             SET name = ?, email = ?, company_name = ?, phone = ?, website = ?, status = ?,
+                partner_code = ?, document = ?, traffic_source = ?, audience_profile = ?,
                 payment_method = ?, payment_reference = ?, notes = ?, updated_at = NOW()
             WHERE id = ?");
         $statement->execute([
@@ -363,6 +371,10 @@ function affiliation_save_partner(array $data): int
             $phone !== '' ? $phone : null,
             $website !== '' ? $website : null,
             $status,
+            $partnerCode,
+            $document !== '' ? $document : null,
+            $trafficSource !== '' ? $trafficSource : null,
+            $audienceProfile !== '' ? $audienceProfile : null,
             $paymentMethod !== '' ? $paymentMethod : null,
             $paymentReference !== '' ? $paymentReference : null,
             $notes !== '' ? $notes : null,
@@ -373,8 +385,8 @@ function affiliation_save_partner(array $data): int
     }
 
     $statement = $pdo->prepare("INSERT INTO affiliate_partners
-        (name, email, company_name, phone, website, status, payment_method, payment_reference, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        (name, email, company_name, phone, website, status, partner_code, document, traffic_source, audience_profile, payment_method, payment_reference, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $statement->execute([
         $name,
         $email,
@@ -382,6 +394,10 @@ function affiliation_save_partner(array $data): int
         $phone !== '' ? $phone : null,
         $website !== '' ? $website : null,
         $status,
+        $partnerCode,
+        $document !== '' ? $document : null,
+        $trafficSource !== '' ? $trafficSource : null,
+        $audienceProfile !== '' ? $audienceProfile : null,
         $paymentMethod !== '' ? $paymentMethod : null,
         $paymentReference !== '' ? $paymentReference : null,
         $notes !== '' ? $notes : null,
@@ -446,6 +462,20 @@ function affiliation_smartlink_preview(int $campaignId, string $affiliatePlaceho
     return 'https://cupons.oferto.digital/a.php?cid=' . $campaignId . '&aff=' . rawurlencode($affiliatePlaceholder);
 }
 
+function affiliation_postback_preview(int $campaignId, string $tid = '{tid}', string $orderId = '{order_id}', string $value = '{value}'): string
+{
+    return 'https://cupons.oferto.digital/affiliate-postback.php?' . http_build_query([
+        'cid' => $campaignId,
+        'tid' => $tid,
+        'order_id' => $orderId,
+        'value' => $value,
+        'commission' => '{commission}',
+        'status' => '{status}',
+        'currency' => 'BRL',
+        'sig' => '{hmac_sha256}',
+    ]);
+}
+
 function affiliation_campaign_by_id(int $id): ?array
 {
     $pdo = db();
@@ -458,6 +488,287 @@ function affiliation_campaign_by_id(int $id): ?array
     $row = $statement->fetch();
 
     return $row ?: null;
+}
+
+function affiliation_save_campaign(array $data): int
+{
+    $pdo = db();
+    if (!$pdo) {
+        throw new RuntimeException('Banco de dados indisponível.');
+    }
+
+    $id = (int) ($data['id'] ?? 0);
+    $advertiser = trim((string) ($data['advertiser'] ?? ''));
+    $title = trim((string) ($data['title'] ?? ''));
+    $description = trim((string) ($data['description'] ?? ''));
+    $category = trim((string) ($data['category'] ?? ''));
+    $network = trim((string) ($data['network'] ?? 'manual')) ?: 'manual';
+    $externalId = trim((string) ($data['external_id'] ?? ''));
+    $landingUrl = trim((string) ($data['landing_url'] ?? ''));
+    $trackingUrl = trim((string) ($data['tracking_url'] ?? ''));
+    $bannerUrl = trim((string) ($data['banner_url'] ?? ''));
+    $logoUrl = trim((string) ($data['logo_url'] ?? ''));
+    $code = trim((string) ($data['code'] ?? ''));
+    $rules = trim((string) ($data['rules'] ?? ''));
+    $payout = affiliation_optional_decimal($data['payout'] ?? null);
+    $payoutModel = trim((string) ($data['payout_model'] ?? ''));
+    $commissionType = trim((string) ($data['commission_type'] ?? ''));
+    $commissionRate = affiliation_optional_decimal($data['commission_rate'] ?? null);
+    $campaignCap = affiliation_optional_int($data['campaign_cap'] ?? null);
+    $dailyCap = affiliation_optional_int($data['daily_cap'] ?? null);
+    $monthlyCap = affiliation_optional_int($data['monthly_cap'] ?? null);
+    $startsAt = affiliation_optional_date($data['starts_at'] ?? null);
+    $endsAt = affiliation_optional_date($data['ends_at'] ?? null);
+    $status = trim((string) ($data['status'] ?? 'selecionada'));
+    $approvalMode = trim((string) ($data['approval_mode'] ?? 'manual'));
+    $trackingMode = trim((string) ($data['tracking_mode'] ?? 'CLASSIC_PIXEL'));
+    $redirectMode = trim((string) ($data['redirect_mode'] ?? 'FAST_302'));
+    $cookieTtlDays = max(1, (int) ($data['cookie_ttl_days'] ?? 180));
+    $utmSourceGate = trim((string) ($data['utm_source_gate'] ?? 'oferto')) ?: 'oferto';
+    $allowedDomains = trim((string) ($data['allowed_domains'] ?? ''));
+    $geoCountries = trim((string) ($data['geo_countries'] ?? ''));
+    $deviceRules = trim((string) ($data['device_rules'] ?? ''));
+    $creativeNotes = trim((string) ($data['creative_notes'] ?? ''));
+
+    if ($advertiser === '' || $title === '') {
+        throw new RuntimeException('Informe anunciante e título da campanha.');
+    }
+    if ($landingUrl === '' && $trackingUrl === '') {
+        throw new RuntimeException('Informe a URL final ou a URL de tracking.');
+    }
+    if ($landingUrl === '') {
+        $landingUrl = $trackingUrl;
+    }
+    if ($landingUrl !== '' && !preg_match('/^https?:\/\//i', $landingUrl)) {
+        $landingUrl = 'https://' . $landingUrl;
+    }
+    if ($trackingUrl !== '' && !preg_match('/^https?:\/\//i', $trackingUrl)) {
+        $trackingUrl = 'https://' . $trackingUrl;
+    }
+    if (!filter_var($landingUrl, FILTER_VALIDATE_URL)) {
+        throw new RuntimeException('Informe uma URL final válida.');
+    }
+    if ($trackingUrl !== '' && !filter_var($trackingUrl, FILTER_VALIDATE_URL)) {
+        throw new RuntimeException('Informe uma URL de tracking válida ou deixe vazio.');
+    }
+    if (!array_key_exists($status, affiliation_campaign_statuses())) {
+        $status = 'selecionada';
+    }
+    if (!array_key_exists($approvalMode, affiliation_approval_modes())) {
+        $approvalMode = 'manual';
+    }
+    if (!in_array($trackingMode, ['CLASSIC_PIXEL', 'JOURNEY_JS'], true)) {
+        $trackingMode = 'CLASSIC_PIXEL';
+    }
+    if (!in_array($redirectMode, ['FAST_302', 'HTML_BRIDGE'], true)) {
+        $redirectMode = 'FAST_302';
+    }
+
+    if ($id > 0) {
+        $statement = $pdo->prepare("UPDATE affiliate_campaigns
+            SET network = ?, external_id = ?, advertiser = ?, title = ?, description = ?, category = ?,
+                landing_url = ?, tracking_url = ?, banner_url = ?, logo_url = ?, code = ?, rules = ?,
+                payout = ?, payout_model = ?, commission_type = ?, commission_rate = ?, campaign_cap = ?,
+                daily_cap = ?, monthly_cap = ?, starts_at = ?, ends_at = ?, status = ?, approval_mode = ?,
+                tracking_mode = ?, redirect_mode = ?, cookie_ttl_days = ?, utm_source_gate = ?, allowed_domains = ?,
+                geo_countries = ?, device_rules = ?, creative_notes = ?, updated_at = NOW()
+            WHERE id = ?");
+        $statement->execute([
+            $network,
+            $externalId !== '' ? $externalId : null,
+            $advertiser,
+            $title,
+            $description !== '' ? $description : null,
+            $category !== '' ? $category : null,
+            $landingUrl,
+            $trackingUrl !== '' ? $trackingUrl : null,
+            $bannerUrl !== '' ? $bannerUrl : null,
+            $logoUrl !== '' ? $logoUrl : null,
+            $code !== '' ? $code : null,
+            $rules !== '' ? $rules : null,
+            $payout,
+            $payoutModel !== '' ? $payoutModel : null,
+            $commissionType !== '' ? $commissionType : null,
+            $commissionRate,
+            $campaignCap,
+            $dailyCap,
+            $monthlyCap,
+            $startsAt,
+            $endsAt,
+            $status,
+            $approvalMode,
+            $trackingMode,
+            $redirectMode,
+            $cookieTtlDays,
+            $utmSourceGate,
+            $allowedDomains !== '' ? $allowedDomains : null,
+            $geoCountries !== '' ? $geoCountries : null,
+            $deviceRules !== '' ? $deviceRules : null,
+            $creativeNotes !== '' ? $creativeNotes : null,
+            $id,
+        ]);
+
+        return $id;
+    }
+
+    $statement = $pdo->prepare("INSERT INTO affiliate_campaigns
+        (network, external_id, advertiser, title, description, category, landing_url, tracking_url, banner_url, logo_url,
+         code, rules, payout, payout_model, commission_type, commission_rate, campaign_cap, daily_cap, monthly_cap,
+         starts_at, ends_at, status, approval_mode, tracking_mode, redirect_mode, postback_secret, cookie_ttl_days,
+         utm_source_gate, allowed_domains, geo_countries, device_rules, creative_notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $statement->execute([
+        $network,
+        $externalId !== '' ? $externalId : null,
+        $advertiser,
+        $title,
+        $description !== '' ? $description : null,
+        $category !== '' ? $category : null,
+        $landingUrl,
+        $trackingUrl !== '' ? $trackingUrl : null,
+        $bannerUrl !== '' ? $bannerUrl : null,
+        $logoUrl !== '' ? $logoUrl : null,
+        $code !== '' ? $code : null,
+        $rules !== '' ? $rules : null,
+        $payout,
+        $payoutModel !== '' ? $payoutModel : null,
+        $commissionType !== '' ? $commissionType : null,
+        $commissionRate,
+        $campaignCap,
+        $dailyCap,
+        $monthlyCap,
+        $startsAt,
+        $endsAt,
+        $status,
+        $approvalMode,
+        $trackingMode,
+        $redirectMode,
+        bin2hex(random_bytes(24)),
+        $cookieTtlDays,
+        $utmSourceGate,
+        $allowedDomains !== '' ? $allowedDomains : null,
+        $geoCountries !== '' ? $geoCountries : null,
+        $deviceRules !== '' ? $deviceRules : null,
+        $creativeNotes !== '' ? $creativeNotes : null,
+    ]);
+
+    return (int) $pdo->lastInsertId();
+}
+
+function affiliation_creative_rows(array $filters = []): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return [];
+    }
+
+    $conditions = ['1 = 1'];
+    $params = [];
+
+    if (!empty($filters['campaign_id'])) {
+        $conditions[] = 'cr.campaign_id = :campaign_id';
+        $params['campaign_id'] = (int) $filters['campaign_id'];
+    }
+
+    $statement = $pdo->prepare("SELECT
+            cr.*,
+            ac.advertiser,
+            ac.title AS campaign_title,
+            ac.network
+        FROM affiliate_creatives cr
+        INNER JOIN affiliate_campaigns ac ON ac.id = cr.campaign_id
+        WHERE " . implode(' AND ', $conditions) . "
+        ORDER BY cr.status ASC, ac.advertiser ASC, cr.created_at DESC
+        LIMIT 250");
+    $statement->execute($params);
+
+    return $statement->fetchAll();
+}
+
+function affiliation_creative_by_id(int $id): ?array
+{
+    $pdo = db();
+    if (!$pdo || $id <= 0) {
+        return null;
+    }
+
+    $statement = $pdo->prepare('SELECT * FROM affiliate_creatives WHERE id = ? LIMIT 1');
+    $statement->execute([$id]);
+    $row = $statement->fetch();
+
+    return $row ?: null;
+}
+
+function affiliation_save_creative(array $data): int
+{
+    $pdo = db();
+    if (!$pdo) {
+        throw new RuntimeException('Banco de dados indisponível.');
+    }
+
+    $id = (int) ($data['id'] ?? 0);
+    $campaignId = (int) ($data['campaign_id'] ?? 0);
+    $creativeType = trim((string) ($data['creative_type'] ?? 'banner')) ?: 'banner';
+    $title = trim((string) ($data['title'] ?? ''));
+    $assetUrl = trim((string) ($data['asset_url'] ?? ''));
+    $destinationUrl = trim((string) ($data['destination_url'] ?? ''));
+    $width = affiliation_optional_int($data['width'] ?? null);
+    $height = affiliation_optional_int($data['height'] ?? null);
+    $status = trim((string) ($data['status'] ?? 'ativo'));
+    $notes = trim((string) ($data['notes'] ?? ''));
+
+    if ($campaignId <= 0 || !affiliation_campaign_by_id($campaignId)) {
+        throw new RuntimeException('Selecione uma campanha válida para o criativo.');
+    }
+    if ($title === '') {
+        throw new RuntimeException('Informe o nome do criativo.');
+    }
+    foreach (['asset_url' => $assetUrl, 'destination_url' => $destinationUrl] as $label => $url) {
+        if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new RuntimeException('Informe uma URL válida em ' . $label . ' ou deixe vazio.');
+        }
+    }
+    if (!in_array($status, ['ativo', 'pausado'], true)) {
+        $status = 'ativo';
+    }
+
+    if ($id > 0) {
+        $statement = $pdo->prepare("UPDATE affiliate_creatives
+            SET campaign_id = ?, creative_type = ?, title = ?, asset_url = ?, destination_url = ?,
+                width = ?, height = ?, status = ?, notes = ?, updated_at = NOW()
+            WHERE id = ?");
+        $statement->execute([
+            $campaignId,
+            $creativeType,
+            $title,
+            $assetUrl !== '' ? $assetUrl : null,
+            $destinationUrl !== '' ? $destinationUrl : null,
+            $width,
+            $height,
+            $status,
+            $notes !== '' ? $notes : null,
+            $id,
+        ]);
+
+        return $id;
+    }
+
+    $statement = $pdo->prepare("INSERT INTO affiliate_creatives
+        (campaign_id, creative_type, title, asset_url, destination_url, width, height, status, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $statement->execute([
+        $campaignId,
+        $creativeType,
+        $title,
+        $assetUrl !== '' ? $assetUrl : null,
+        $destinationUrl !== '' ? $destinationUrl : null,
+        $width,
+        $height,
+        $status,
+        $notes !== '' ? $notes : null,
+    ]);
+
+    return (int) $pdo->lastInsertId();
 }
 
 function affiliation_destination_url(array $campaign, string $tid): string
@@ -701,4 +1012,66 @@ function affiliation_campaign_statuses(): array
         'pausada' => 'Pausada',
         'encerrada' => 'Encerrada',
     ];
+}
+
+function affiliation_approval_modes(): array
+{
+    return [
+        'manual' => 'Aprovação manual',
+        'auto' => 'Aprovação automática',
+        'private' => 'Privada/convite',
+    ];
+}
+
+function affiliation_commission_types(): array
+{
+    return [
+        '' => 'Não informado',
+        'fixa' => 'Comissão fixa',
+        'percentual' => 'Percentual sobre venda',
+        'hibrida' => 'Híbrida',
+        'bonificacao' => 'Bônus',
+    ];
+}
+
+function affiliation_optional_decimal($value): ?string
+{
+    $value = trim(str_replace(',', '.', (string) $value));
+    if ($value === '' || !is_numeric($value)) {
+        return null;
+    }
+
+    return number_format((float) $value, 4, '.', '');
+}
+
+function affiliation_optional_int($value): ?int
+{
+    $value = trim((string) $value);
+    if ($value === '' || !ctype_digit($value)) {
+        return null;
+    }
+
+    return max(0, (int) $value);
+}
+
+function affiliation_optional_date($value): ?string
+{
+    $value = trim((string) $value);
+    return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : null;
+}
+
+function affiliation_slug(string $value): string
+{
+    $value = strtolower(trim($value));
+    $value = strtr($value, [
+        'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a',
+        'é' => 'e', 'ê' => 'e',
+        'í' => 'i',
+        'ó' => 'o', 'ô' => 'o', 'õ' => 'o',
+        'ú' => 'u',
+        'ç' => 'c',
+    ]);
+    $value = preg_replace('/[^a-z0-9]+/', '-', $value) ?? '';
+
+    return trim($value, '-');
 }

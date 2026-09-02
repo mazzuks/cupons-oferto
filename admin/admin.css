@@ -320,7 +320,8 @@ body {
   text-transform: uppercase;
 }
 
-.admin-report-filter input {
+.admin-report-filter input,
+.admin-report-filter select {
   min-height: 42px;
   padding: 0 12px;
   color: var(--ink);
@@ -826,6 +827,174 @@ body {
   color: var(--muted);
 }
 
+.admin-tab-shell {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(2, 6, 23, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+}
+
+.admin-tabs button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #cbd5e1;
+  background: transparent;
+  box-shadow: none;
+}
+
+.admin-tabs button.is-active,
+.admin-tabs button:hover {
+  color: #07111f;
+  background: var(--cyan);
+}
+
+.admin-tab-panel {
+  display: none;
+}
+
+.admin-tab-panel.is-active {
+  display: grid;
+}
+
+.affiliate-offer-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: 18px;
+  margin: 0 0 18px;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(15, 23, 42, 0.9)),
+    rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  border-radius: 8px;
+}
+
+.affiliate-offer-card h3 {
+  margin: 12px 0 8px;
+  color: #ffffff;
+  font-family: Kanit, Inter, sans-serif;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 0.98;
+}
+
+.affiliate-offer-card p {
+  max-width: 760px;
+  margin: 0;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.affiliate-offer-card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.affiliate-offer-card dl > div {
+  display: grid;
+  gap: 6px;
+  min-height: 82px;
+  padding: 14px;
+  background: rgba(2, 6, 23, 0.48);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 8px;
+}
+
+.affiliate-offer-card dt {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.affiliate-offer-card dd {
+  margin: 0;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.affiliate-copy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.affiliate-copy-grid article {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 8px;
+}
+
+.affiliate-copy-grid span {
+  color: #7dd3fc;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.affiliate-copy-grid code {
+  min-height: 68px;
+  overflow: hidden;
+  color: #dbeafe;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.affiliate-copy-grid button {
+  justify-self: start;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  color: #07111f;
+  background: var(--cyan);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.affiliate-creative-cell {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.affiliate-creative-cell img,
+.affiliate-creative-cell > span {
+  width: 86px;
+  height: 58px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.5);
+}
+
+.affiliate-creative-cell img {
+  object-fit: contain;
+}
+
+.affiliate-creative-cell > span {
+  display: grid;
+  place-items: center;
+  color: #7dd3fc;
+  font-family: Kanit, Inter, sans-serif;
+  font-weight: 900;
+}
+
 .status-pill {
   display: inline-flex;
   padding: 5px 9px;
@@ -1067,7 +1236,8 @@ body {
 .coupon-admin-form input,
 .coupon-admin-form textarea,
 .coupon-admin-form select,
-.admin-report-filter input {
+.admin-report-filter input,
+.admin-report-filter select {
   color: #f8fafc;
   background: #020617;
   border-color: rgba(148, 163, 184, 0.24);
@@ -1618,11 +1788,29 @@ body {
   }
 
   .admin-api-grid,
-  .admin-api-result-grid {
+  .admin-api-result-grid,
+  .affiliate-copy-grid,
+  .affiliate-offer-card,
+  .affiliate-offer-card dl {
     grid-template-columns: 1fr;
   }
 
   .admin-inline-form {
     grid-template-columns: 1fr;
   }
+}
+
+.coupon-admin-form .admin-tabs button {
+  min-height: 40px;
+  padding: 0 16px;
+  color: #cbd5e1;
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+.coupon-admin-form .admin-tabs button.is-active,
+.coupon-admin-form .admin-tabs button:hover {
+  color: #07111f;
+  background: var(--cyan);
 }

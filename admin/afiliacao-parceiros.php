@@ -35,6 +35,10 @@ $form = [
     'phone' => (string) ($editingPartner['phone'] ?? ''),
     'website' => (string) ($editingPartner['website'] ?? ''),
     'status' => (string) ($editingPartner['status'] ?? 'ativo'),
+    'partner_code' => (string) ($editingPartner['partner_code'] ?? ''),
+    'document' => (string) ($editingPartner['document'] ?? ''),
+    'traffic_source' => (string) ($editingPartner['traffic_source'] ?? ''),
+    'audience_profile' => (string) ($editingPartner['audience_profile'] ?? ''),
     'payment_method' => (string) ($editingPartner['payment_method'] ?? ''),
     'payment_reference' => (string) ($editingPartner['payment_reference'] ?? ''),
     'notes' => (string) ($editingPartner['notes'] ?? ''),
@@ -93,6 +97,12 @@ $form = [
               <label>Site
                 <input name="website" value="<?= e($form['website']) ?>" placeholder="https://..." />
               </label>
+              <label>Código do afiliado
+                <input name="partner_code" value="<?= e($form['partner_code']) ?>" placeholder="Ex: parceiro-midiasocial" />
+              </label>
+              <label>Documento
+                <input name="document" value="<?= e($form['document']) ?>" placeholder="CPF, CNPJ ou identificação interna" />
+              </label>
             </fieldset>
 
             <fieldset class="admin-fieldset">
@@ -108,6 +118,12 @@ $form = [
                   <option value="ativo" <?= $form['status'] === 'ativo' ? 'selected' : '' ?>>Ativo</option>
                   <option value="pausado" <?= $form['status'] === 'pausado' ? 'selected' : '' ?>>Pausado</option>
                 </select>
+              </label>
+              <label>Fonte de tráfego
+                <input name="traffic_source" value="<?= e($form['traffic_source']) ?>" placeholder="Instagram, WhatsApp, SEO, mídia paga..." />
+              </label>
+              <label>Perfil de audiência
+                <input name="audience_profile" value="<?= e($form['audience_profile']) ?>" placeholder="Famílias, pets, beleza, delivery..." />
               </label>
               <label>Método de pagamento
                 <input name="payment_method" value="<?= e($form['payment_method']) ?>" placeholder="Pix, TED, PayPal..." />
@@ -139,6 +155,7 @@ $form = [
               <tr>
                 <th>Parceiro</th>
                 <th>Status</th>
+                <th>Tráfego</th>
                 <th>Pagamento</th>
                 <th>Cliques</th>
                 <th>Conversões</th>
@@ -151,8 +168,9 @@ $form = [
             <tbody>
               <?php foreach ($rows as $row): ?>
                 <tr>
-                  <td><strong><?= e($row['name']) ?></strong><br /><span><?= e($row['email']) ?></span></td>
+                  <td><strong><?= e($row['name']) ?></strong><br /><span><?= e($row['email']) ?></span><br /><small><?= e($row['partner_code'] ?: '-') ?></small></td>
                   <td><span class="status-pill status-<?= e($row['status']) ?>"><?= e($row['status']) ?></span></td>
+                  <td><?= e($row['traffic_source'] ?: '-') ?><br /><span><?= e($row['audience_profile'] ?: '') ?></span></td>
                   <td><?= e($row['payment_method'] ?: '-') ?></td>
                   <td><strong><?= (int) $row['click_count'] ?></strong></td>
                   <td><?= (int) $row['conversion_count'] ?></td>
@@ -163,7 +181,7 @@ $form = [
                 </tr>
               <?php endforeach; ?>
               <?php if (!$rows): ?>
-                <tr><td colspan="9" class="admin-empty-cell">Nenhum parceiro afiliado cadastrado ainda.</td></tr>
+                <tr><td colspan="10" class="admin-empty-cell">Nenhum parceiro afiliado cadastrado ainda.</td></tr>
               <?php endif; ?>
             </tbody>
           </table>

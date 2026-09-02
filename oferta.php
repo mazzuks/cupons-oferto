@@ -103,14 +103,7 @@ $howToUse = $hasCode
 
         <aside class="offer-rescue-card" aria-label="Como usar esta oferta">
           <div class="offer-rescue-media">
-            <img src="<?= e(coupon_banner_src($coupon)) ?>" alt="Banner da oferta <?= e($store) ?>" onerror="this.onerror=null;this.src='<?= e(coupon_fallback_banner_src($coupon)) ?>';" />
-            <span class="brand-mark">
-              <?php if (coupon_logo_src($coupon)): ?>
-                <img src="<?= e(coupon_logo_src($coupon)) ?>" alt="" />
-              <?php else: ?>
-                <?= e(coupon_brand_initials($coupon)) ?>
-              <?php endif; ?>
-            </span>
+            <?= coupon_brand_image_markup($coupon) ?>
           </div>
 
           <?php if ($hasCode): ?>
@@ -188,14 +181,7 @@ $howToUse = $hasCode
             <?php foreach ($related as $item): ?>
               <a class="v2-store-card" href="<?= e(coupon_offer_url($item, 'relacionada')) ?>">
                 <div class="v2-card-media">
-                  <img src="<?= e(coupon_banner_src($item)) ?>" alt="" onerror="this.onerror=null;this.src='<?= e(coupon_fallback_banner_src($item)) ?>';" />
-                  <span class="brand-mark">
-                    <?php if (coupon_logo_src($item)): ?>
-                      <img src="<?= e(coupon_logo_src($item)) ?>" alt="" />
-                    <?php else: ?>
-                      <?= e(coupon_brand_initials($item)) ?>
-                    <?php endif; ?>
-                  </span>
+                  <?= coupon_brand_image_markup($item) ?>
                 </div>
                 <div class="v2-store-card-copy">
                   <span><?= e($item['store']) ?></span>

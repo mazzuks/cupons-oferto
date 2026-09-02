@@ -181,6 +181,19 @@ function coupon_brand_initials(array $coupon): string
     return $initials !== '' ? $initials : 'OF';
 }
 
+function coupon_brand_image_markup(array $coupon, string $class = 'brand-card-logo'): string
+{
+    $logo = coupon_logo_src($coupon);
+    $store = trim((string) ($coupon['store'] ?? 'marca'));
+    $fallback = '<span class="' . e($class . ' brand-card-initials') . '">' . e(coupon_brand_initials($coupon)) . '</span>';
+
+    if ($logo === '') {
+        return $fallback;
+    }
+
+    return '<img class="' . e($class) . '" src="' . e($logo) . '" alt="Logo ' . e($store) . '" onerror="this.outerHTML=\'' . e(addslashes($fallback)) . '\';" />';
+}
+
 function coupon_brand_domain(array $coupon): string
 {
     $store = normalize_search_text((string) ($coupon['store'] ?? ''));

@@ -7,6 +7,7 @@ require_once __DIR__ . '/bootstrap.php';
 $coupons = api_active_coupons();
 $categories = [];
 $niches = [];
+$flags = [];
 
 foreach ($coupons as $coupon) {
     $name = (string) ($coupon['category'] ?? 'Outros');
@@ -14,6 +15,7 @@ foreach ($coupons as $coupon) {
     $niche = trim((string) ($coupon['nicho_principal'] ?? ''));
     $nicheSlug = $niche !== '' ? api_slug(str_replace('_', ' ', $niche)) : '';
     $productTags = api_split_tags((string) ($coupon['tags_produto'] ?? ''));
+    $offerFlags = api_offer_flags($coupon);
 
     if (!isset($categories[$slug])) {
         $categories[$slug] = [
@@ -26,6 +28,7 @@ foreach ($coupons as $coupon) {
             'expires_soon_count' => 0,
             'niches' => [],
             'product_tags' => [],
+            'flags' => [],
             'url' => OFERTO_API_BASE_URL . '?categoria=' . rawurlencode($name) . '#cupons',
             'api_url' => OFERTO_API_BASE_URL . 'api/offers.php?category=' . rawurlencode($slug),
         ];
@@ -75,6 +78,11 @@ foreach ($coupons as $coupon) {
             $categories[$slug]['product_tags'][$tagKey] = $tag;
         }
     }
+
+    foreach ($offerFlags as $flag) {
+        $categories[$slug]['flags'][$flag] = $flag;
+        $flags[$flag] = $flag;
+    }
 }
 
 foreach ($categories as &$category) {
@@ -84,6 +92,8 @@ foreach ($categories as &$category) {
     });
     $category['product_tags'] = array_values($category['product_tags']);
     sort($category['product_tags']);
+    $category['flags'] = array_values($category['flags']);
+    sort($category['flags']);
 }
 unset($category);
 
@@ -101,6 +111,9 @@ usort($niches, function (array $a, array $b): int {
     return $b['offer_count'] <=> $a['offer_count'] ?: strcmp($a['name'], $b['name']);
 });
 
+$flags = array_values($flags);
+sort($flags);
+
 api_json_response([
     'ok' => true,
     'generated_at' => api_now(),
@@ -109,6 +122,7 @@ api_json_response([
     'total_categories' => count($categories),
     'total_niches' => count($niches),
     'total_active_offers' => count($coupons),
+    'flags' => $flags,
     'categories' => array_values($categories),
     'niches' => array_values($niches),
 ]);

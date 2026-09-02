@@ -30,6 +30,7 @@ Campos principais:
 - `expires_soon_count`: quantas vencem em até 3 dias.
 - `niches`: nichos existentes dentro daquela categoria, com contagem e `api_url`.
 - `product_tags`: tags de produto encontradas nas ofertas daquela categoria.
+- `flags`: marcadores já padronizados para pesquisa e orquestração.
 - `url`: link da categoria no site.
 - `api_url`: link para buscar ofertas dessa categoria.
 
@@ -46,6 +47,7 @@ Filtros opcionais:
 - `category`: slug ou nome da categoria. Exemplo: `alimentacao-e-bebidas`.
 - `niche` ou `nicho`: nicho principal. Exemplo: `saude_farmacia`.
 - `tag`: busca em tags de produto e tags públicas. Exemplo: `pizza`.
+- `flag`: busca em marcadores padronizados. Exemplo: `tem_codigo` ou `categoria:saude-e-beleza`.
 - `store`: busca parcial pelo nome da loja.
 - `q`: busca textual em loja, título, descrição, regras e tags.
 - `featured=1`: lista apenas ofertas em destaque.
@@ -57,6 +59,7 @@ Exemplos:
 GET https://cupons.oferto.digital/api/offers.php?category=alimentacao-e-bebidas&limit=10
 GET https://cupons.oferto.digital/api/offers.php?niche=saude_farmacia
 GET https://cupons.oferto.digital/api/offers.php?tag=pizza
+GET https://cupons.oferto.digital/api/offers.php?flag=tem_codigo
 GET https://cupons.oferto.digital/api/offers.php?q=pizza
 GET https://cupons.oferto.digital/api/offers.php?store=China%20in%20Box
 ```
@@ -91,6 +94,7 @@ Campos seguros para o bot:
 - `members_only`
 - `tags`
 - `tags_produto`
+- `flags`
 - `offer_url`
 - `rescue_url`
 - `share_text`
@@ -151,6 +155,10 @@ Também existe um script para rodar direto no servidor:
 ```bash
 php scripts/import-offer-classifications.php /caminho/para/ofertas_classificadas.csv
 ```
+
+## Logs de consulta
+
+As chamadas aos endpoints JSON são registradas em `api_request_logs`, com endpoint, query string, quantidade de resultados, user agent e IP em hash. Esse log começa a valer depois que esta versão estiver publicada; ele não reconstrói acessos antigos se o servidor não tiver access log disponível.
 
 ## Fluxo recomendado no WhatsApp
 

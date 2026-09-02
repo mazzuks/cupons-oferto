@@ -119,6 +119,7 @@ function ensure_database(PDO $pdo): void
 
     ensure_click_columns($pdo);
     ensure_integration_tables($pdo);
+    ensure_api_log_tables($pdo);
     ensure_affiliation_tables($pdo);
 
     $couponCount = (int) $pdo->query('SELECT COUNT(*) FROM coupons')->fetchColumn();
@@ -267,6 +268,22 @@ function ensure_integration_tables(PDO $pdo): void
         UNIQUE KEY affiliate_conversions_unique (partner, external_conversion_id),
         KEY affiliate_conversions_coupon_idx (coupon_id, conversion_at),
         KEY affiliate_conversions_partner_idx (partner, conversion_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function ensure_api_log_tables(PDO $pdo): void
+{
+    $pdo->exec("CREATE TABLE IF NOT EXISTS api_request_logs (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        endpoint VARCHAR(80) NOT NULL,
+        query_string VARCHAR(700) DEFAULT NULL,
+        total_results INT UNSIGNED DEFAULT NULL,
+        ip_hash CHAR(64) DEFAULT NULL,
+        user_agent VARCHAR(500) DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY api_request_logs_endpoint_idx (endpoint, created_at),
+        KEY api_request_logs_created_idx (created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 

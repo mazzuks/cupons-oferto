@@ -60,6 +60,19 @@ CREATE TABLE IF NOT EXISTS mapa_loja_nicho (
   KEY mapa_loja_nicho_nicho_idx (nicho_principal)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS api_request_logs (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  endpoint VARCHAR(80) NOT NULL,
+  query_string VARCHAR(700) DEFAULT NULL,
+  total_results INT UNSIGNED DEFAULT NULL,
+  ip_hash CHAR(64) DEFAULT NULL,
+  user_agent VARCHAR(500) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY api_request_logs_endpoint_idx (endpoint, created_at),
+  KEY api_request_logs_created_idx (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS coupon_clicks (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   coupon_id INT UNSIGNED NOT NULL,

@@ -20,6 +20,7 @@ api_json_response([
         'category' => trim((string) ($_GET['category'] ?? '')),
         'niche' => trim((string) ($_GET['niche'] ?? $_GET['nicho'] ?? '')),
         'tag' => trim((string) ($_GET['tag'] ?? '')),
+        'flag' => trim((string) ($_GET['flag'] ?? '')),
         'store' => trim((string) ($_GET['store'] ?? '')),
         'q' => trim((string) ($_GET['q'] ?? '')),
         'featured' => array_key_exists('featured', $_GET) ? trim((string) $_GET['featured']) : null,

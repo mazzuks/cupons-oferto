@@ -8,6 +8,10 @@ const OFERTO_API_BASE_URL = 'https://cupons.oferto.digital/';
 
 function api_json_response(array $payload, int $statusCode = 200): void
 {
+    if ($statusCode < 400) {
+        api_log_request($payload);
+    }
+
     http_response_code($statusCode);
     header('Content-Type: application/json; charset=utf-8');
     header('Access-Control-Allow-Origin: *');
@@ -21,6 +25,42 @@ function api_json_response(array $payload, int $statusCode = 200): void
 
     echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     exit;
+}
+
+function api_log_request(array $payload): void
+{
+    $pdo = db();
+    if (!$pdo) {
+        return;
+    }
+
+    $endpoint = basename((string) ($_SERVER['SCRIPT_NAME'] ?? 'api'));
+    $queryString = substr((string) ($_SERVER['QUERY_STRING'] ?? ''), 0, 700);
+    $userAgent = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500);
+    $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+    $ipHash = $ip !== '' ? hash('sha256', $ip) : null;
+    $total = null;
+
+    if (isset($payload['total'])) {
+        $total = (int) $payload['total'];
+    } elseif (isset($payload['total_categories'])) {
+        $total = (int) $payload['total_categories'];
+    }
+
+    try {
+        $statement = $pdo->prepare("INSERT INTO api_request_logs
+            (endpoint, query_string, total_results, ip_hash, user_agent)
+            VALUES (?, ?, ?, ?, ?)");
+        $statement->execute([
+            $endpoint,
+            $queryString !== '' ? $queryString : null,
+            $total,
+            $ipHash,
+            $userAgent !== '' ? $userAgent : null,
+        ]);
+    } catch (Throwable $error) {
+        // A API nunca deve falhar para o bot só porque o log não foi gravado.
+    }
 }
 
 function api_now(): string
@@ -149,10 +189,49 @@ function api_public_coupon(array $coupon): array
         'members_only' => (bool) ($coupon['members_only'] ?? false),
         'tags' => api_split_tags((string) ($coupon['tags'] ?? '')),
         'tags_produto' => api_split_tags((string) ($coupon['tags_produto'] ?? '')),
+        'flags' => api_offer_flags($coupon),
         'offer_url' => $offerUrl,
         'rescue_url' => $rescueUrl,
         'share_text' => api_share_text($coupon, $offerUrl),
     ];
+}
+
+function api_offer_flags(array $coupon): array
+{
+    $flags = [
+        'categoria:' . api_slug((string) ($coupon['category'] ?? 'Outros')),
+        'tipo:' . api_slug((string) ($coupon['offer_type'] ?? 'cupom')),
+        'resgate:' . api_slug((string) ($coupon['redemption_type'] ?? 'texto')),
+    ];
+
+    $niche = trim((string) ($coupon['nicho_principal'] ?? ''));
+    if ($niche !== '') {
+        $flags[] = 'nicho:' . $niche;
+        $flags[] = 'nicho_slug:' . api_slug(str_replace('_', ' ', $niche));
+    }
+
+    foreach (api_split_tags((string) ($coupon['tags'] ?? '')) as $tag) {
+        $flags[] = 'tag:' . api_slug($tag);
+    }
+
+    foreach (api_split_tags((string) ($coupon['tags_produto'] ?? '')) as $tag) {
+        $flags[] = 'produto:' . api_slug($tag);
+    }
+
+    if (!empty($coupon['featured'])) {
+        $flags[] = 'destaque';
+    }
+    if (!empty($coupon['sponsored'])) {
+        $flags[] = 'patrocinado';
+    }
+    if (!empty($coupon['members_only'])) {
+        $flags[] = 'membros';
+    }
+    if (coupon_shows_public_code($coupon)) {
+        $flags[] = 'tem_codigo';
+    }
+
+    return array_values(array_unique(array_filter($flags)));
 }
 
 function api_split_tags(string $tags): array
@@ -177,6 +256,7 @@ function api_filter_coupons(array $coupons): array
     $category = trim((string) ($_GET['category'] ?? ''));
     $niche = trim((string) ($_GET['niche'] ?? $_GET['nicho'] ?? ''));
     $tag = trim((string) ($_GET['tag'] ?? ''));
+    $flag = trim((string) ($_GET['flag'] ?? ''));
     $store = trim((string) ($_GET['store'] ?? ''));
     $query = trim((string) ($_GET['q'] ?? ''));
     $featured = api_bool_param('featured');
@@ -184,10 +264,11 @@ function api_filter_coupons(array $coupons): array
     $categorySlug = api_slug($category);
     $nicheText = function_exists('normalize_search_text') ? normalize_search_text($niche) : strtolower($niche);
     $tagText = function_exists('normalize_search_text') ? normalize_search_text($tag) : strtolower($tag);
+    $flagText = function_exists('normalize_search_text') ? normalize_search_text($flag) : strtolower($flag);
     $queryText = function_exists('normalize_search_text') ? normalize_search_text($query) : strtolower($query);
     $storeText = function_exists('normalize_search_text') ? normalize_search_text($store) : strtolower($store);
 
-    return array_values(array_filter($coupons, function (array $coupon) use ($category, $categorySlug, $nicheText, $tagText, $storeText, $queryText, $featured): bool {
+    return array_values(array_filter($coupons, function (array $coupon) use ($category, $categorySlug, $nicheText, $tagText, $flagText, $storeText, $queryText, $featured): bool {
         if ($featured !== null && (bool) ($coupon['featured'] ?? false) !== $featured) {
             return false;
         }
@@ -218,10 +299,22 @@ function api_filter_coupons(array $coupons): array
         }
 
         if ($tagText !== '') {
-            $couponTags = function_exists('normalize_search_text')
-                ? normalize_search_text((string) ($coupon['tags_produto'] ?? '') . ' ' . (string) ($coupon['tags'] ?? ''))
-                : strtolower((string) ($coupon['tags_produto'] ?? '') . ' ' . (string) ($coupon['tags'] ?? ''));
+            $couponTags = implode(' ', [
+                (string) ($coupon['tags_produto'] ?? ''),
+                (string) ($coupon['tags'] ?? ''),
+                implode(' ', api_offer_flags($coupon)),
+            ]);
+            $couponTags = function_exists('normalize_search_text') ? normalize_search_text($couponTags) : strtolower($couponTags);
             if (strpos($couponTags, $tagText) === false) {
+                return false;
+            }
+        }
+
+        if ($flagText !== '') {
+            $couponFlags = function_exists('normalize_search_text')
+                ? normalize_search_text(implode(' ', api_offer_flags($coupon)))
+                : strtolower(implode(' ', api_offer_flags($coupon)));
+            if (strpos($couponFlags, $flagText) === false) {
                 return false;
             }
         }
@@ -236,6 +329,7 @@ function api_filter_coupons(array $coupons): array
                 (string) ($coupon['tags'] ?? ''),
                 (string) ($coupon['nicho_principal'] ?? ''),
                 (string) ($coupon['tags_produto'] ?? ''),
+                implode(' ', api_offer_flags($coupon)),
                 (string) ($coupon['requirements'] ?? ''),
             ]);
             $haystack = function_exists('normalize_search_text') ? normalize_search_text($haystack) : strtolower($haystack);

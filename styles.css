@@ -2009,7 +2009,7 @@ h3 {
 
 .site-v2-compact .v2-store-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
   margin-top: 18px;
 }
@@ -2023,10 +2023,12 @@ h3 {
 
 .site-v2-compact .v2-store-card {
   display: grid;
-  grid-template-columns: 104px minmax(0, 1fr);
-  gap: 16px;
-  min-height: 210px;
-  padding: 18px;
+  grid-template-rows: 132px minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  min-height: 326px;
+  padding: 14px;
+  overflow: hidden;
   color: var(--navy);
   background: var(--paper);
   border: 1px solid var(--line);
@@ -2042,9 +2044,10 @@ h3 {
 
 .site-v2-compact .v2-store-card img {
   width: 100%;
-  aspect-ratio: 1.25 / 1;
+  height: 100%;
+  aspect-ratio: auto;
   object-fit: contain;
-  background: #f4f8fd;
+  background: transparent;
   border-radius: 8px;
 }
 
@@ -2056,9 +2059,11 @@ h3 {
 .site-v2-compact .v2-card-media {
   display: grid;
   place-items: center;
-  width: 104px;
-  min-height: 104px;
-  aspect-ratio: 1 / 1;
+  width: 100%;
+  min-width: 0;
+  height: 132px;
+  min-height: 132px;
+  aspect-ratio: auto;
   padding: 14px;
   background: #f4f8fd;
   border-radius: 8px;
@@ -2078,7 +2083,8 @@ h3 {
 }
 
 .site-v2-compact .v2-card-media > .brand-card-logo {
-  width: min(100%, 92px);
+  width: min(100%, 132px);
+  max-height: 92px;
 }
 
 .site-v2-compact .v2-list-logo > .brand-card-logo {
@@ -2141,24 +2147,35 @@ h3 {
 
 .site-v2-compact .v2-store-card-copy {
   display: grid;
+  align-content: start;
   gap: 8px;
+  min-width: 0;
 }
 
 .site-v2-compact .v2-store-card-copy h3 {
-  font-size: 24px;
-  line-height: 1.02;
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-size: 21px;
+  line-height: 1.08;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .site-v2-compact .v2-store-card-copy p {
+  display: -webkit-box;
   margin: 0;
+  overflow: hidden;
   color: #35425b;
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 700;
   line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .site-v2-compact .v2-store-card-copy small {
-  display: -webkit-box;
+  display: none;
   margin: 0;
   color: var(--muted);
   font-size: 13px;
@@ -2203,8 +2220,10 @@ h3 {
 }
 
 .site-v2-compact .v2-store-card em {
+  max-width: 100%;
   justify-self: start;
   padding: 8px 10px;
+  overflow: hidden;
   color: var(--navy);
   background: #f7fbff;
   border: 1px dashed rgba(25, 76, 140, 0.24);
@@ -2212,6 +2231,8 @@ h3 {
   font-style: normal;
   font-size: 13px;
   font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .site-v2-compact .v2-layout {
@@ -2652,7 +2673,7 @@ h3 {
 
 @media (max-width: 1180px) {
   .site-v2-compact .v2-store-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
 
   .site-v2-compact .v2-list-card {
@@ -2840,23 +2861,24 @@ h3 {
   }
 
   .site-v2-compact .v2-store-card {
-    grid-template-columns: 76px minmax(0, 1fr);
-    align-items: start;
-    flex: 0 0 min(88vw, 360px);
-    min-height: 178px;
+    grid-template-columns: none;
+    grid-template-rows: 104px minmax(0, 1fr);
+    flex: 0 0 min(78vw, 280px);
+    min-height: 300px;
     padding: 12px;
     scroll-snap-align: start;
     box-shadow: 0 10px 22px rgba(22, 42, 78, 0.08);
   }
 
   .site-v2-compact .v2-card-media {
-    width: 76px;
-    min-height: 76px;
+    width: 100%;
+    height: 104px;
+    min-height: 104px;
     padding: 10px;
   }
 
   .site-v2-compact .v2-store-card img {
-    aspect-ratio: 1 / 1;
+    aspect-ratio: auto;
   }
 
   .site-v2-compact .v2-store-card .brand-card-logo {
@@ -2878,18 +2900,11 @@ h3 {
   }
 
   .site-v2-compact .v2-store-card-copy h3 {
-    font-size: 20px;
+    font-size: 19px;
   }
 
   .site-v2-compact .v2-store-card-copy small {
     display: none;
-  }
-
-  .site-v2-compact .v2-store-card em {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .site-v2-compact .v2-list-logo {

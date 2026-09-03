@@ -279,7 +279,7 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
             <div>
               <p class="section-kicker">Diagnostico bruto</p>
               <h2>Retorno direto da HasOffers</h2>
-              <p>Este bloco nao aplica importacao nem exige tracking. Ele serve para descobrir qual metodo da Ybox realmente retorna campanhas.</p>
+              <p>Este bloco nao aplica importacao nem exige tracking. Ele serve para descobrir qual metodo da rede selecionada realmente retorna campanhas.</p>
             </div>
           </div>
 

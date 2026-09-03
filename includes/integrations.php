@@ -1055,7 +1055,11 @@ function hasoffers_request(array $account, string $target, string $method, array
     $ok = (int) ($response['status'] ?? 1);
     if ($ok !== 1) {
         $errors = $response['errors'] ?? $response['errorMessage'] ?? 'Erro na API';
-        throw new RuntimeException('HasOffers recusou a chamada: ' . integration_error_message($errors));
+        $message = integration_error_message($errors);
+        if ($message === 'Array') {
+            $message .= ' - ' . integration_error_message($response);
+        }
+        throw new RuntimeException('HasOffers recusou a chamada: ' . $message);
     }
 
     return $response;

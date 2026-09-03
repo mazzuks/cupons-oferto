@@ -37,6 +37,9 @@ $shareImage = is_remote_banner_url(coupon_banner_src($coupon))
 $brandCopy = $description !== ''
     ? $description
     : 'Esta oferta foi separada pelo Oferto para quem quer comparar oportunidades antes de comprar. Confira o cupom, veja a validade e leia as condicoes antes de seguir para o site parceiro.';
+$heroSubtitle = coupon_title_was_shortened($coupon, $title)
+    ? $originalTitle
+    : $brandCopy;
 
 $howToUse = $hasCode
     ? 'Copie o codigo, abra a loja parceira e cole no campo de cupom ou vale-desconto antes de finalizar a compra.'
@@ -90,7 +93,7 @@ $howToUse = $hasCode
           <a class="offer-back-link" href="/">Voltar para ofertas</a>
           <p class="eyebrow"><?= e($category) ?></p>
           <h1><?= e($title) ?></h1>
-          <p><?= e($brandCopy) ?></p>
+          <p><?= e($heroSubtitle) ?></p>
           <div class="offer-badges">
             <span><?= e($store) ?></span>
             <span><?= e($validity) ?></span>
@@ -141,9 +144,6 @@ $howToUse = $hasCode
             <h2>Regras e validade</h2>
             <ul class="offer-check-list">
               <li>Loja ou marca: <strong><?= e($store) ?></strong></li>
-              <?php if (coupon_title_was_shortened($coupon, $title)): ?>
-                <li>Condição original: <strong><?= e($originalTitle) ?></strong></li>
-              <?php endif; ?>
               <li>Categoria: <strong><?= e($category) ?></strong></li>
               <li>Validade: <strong><?= e($validity) ?></strong></li>
               <?php if ($rules !== ''): ?>

@@ -1685,6 +1685,108 @@ body {
   font-weight: 800;
 }
 
+.admin-hasoffers-accounts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.admin-hasoffers-account {
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  color: #cbd5e1;
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+}
+
+.admin-hasoffers-account.is-active {
+  background:
+    linear-gradient(135deg, rgba(26, 186, 226, 0.18), rgba(2, 6, 23, 0.54)),
+    rgba(2, 6, 23, 0.5);
+  border-color: rgba(26, 186, 226, 0.5);
+}
+
+.admin-hasoffers-account-badge {
+  justify-self: start;
+  padding: 5px 8px;
+  color: #07111f;
+  background: var(--cyan);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-hasoffers-account:not(.is-active) .admin-hasoffers-account-badge {
+  color: #bfdbfe;
+  background: rgba(96, 165, 250, 0.14);
+}
+
+.admin-hasoffers-account strong {
+  color: #ffffff;
+  font-family: Kanit, Inter, sans-serif;
+  font-size: 24px;
+  line-height: 1.05;
+}
+
+.admin-hasoffers-account small {
+  overflow-wrap: anywhere;
+  color: #94a3b8;
+  font-weight: 800;
+}
+
+.admin-hasoffers-account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.admin-hasoffers-account-actions a,
+.admin-hasoffers-account-actions button {
+  min-height: 32px;
+  padding: 8px 10px;
+  color: #dbeafe;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.admin-hasoffers-account-actions form {
+  margin: 0;
+}
+
+.admin-hasoffers-account-actions button {
+  color: #fecaca;
+  cursor: pointer;
+}
+
+.admin-hasoffers-empty {
+  padding: 14px;
+  color: #dbeafe;
+  background: rgba(2, 6, 23, 0.52);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.admin-hasoffers-account-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+}
+
+.admin-hasoffers-account-form .admin-actions {
+  grid-column: 1 / -1;
+}
+
 .admin-api-roadmap {
   display: grid;
   gap: 10px;
@@ -1831,6 +1933,10 @@ body {
   }
 
   .admin-inline-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-hasoffers-account-form {
     grid-template-columns: 1fr;
   }
 }

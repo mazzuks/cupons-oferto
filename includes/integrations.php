@@ -893,30 +893,54 @@ function hasoffers_accounts(): array
 function save_hasoffers_account(array $account): void
 {
     $accounts = hasoffers_accounts();
+    $accountIndex = isset($account['account_index']) ? (int) $account['account_index'] : -1;
+    $existingAccount = $accountIndex >= 0 && isset($accounts[$accountIndex]) && is_array($accounts[$accountIndex])
+        ? $accounts[$accountIndex]
+        : [];
+
     $account = [
         'label' => trim((string) ($account['label'] ?? 'HasOffers')),
         'network_id' => hasoffers_normalize_network_id((string) ($account['network_id'] ?? '')),
         'api_key' => trim((string) ($account['api_key'] ?? '')),
         'affiliate_id' => trim((string) ($account['affiliate_id'] ?? '')),
     ];
+
+    if ($account['api_key'] === '' && $existingAccount) {
+        $account['api_key'] = trim((string) ($existingAccount['api_key'] ?? ''));
+    }
+
     if ($account['network_id'] === '' || $account['api_key'] === '') {
         throw new RuntimeException('Informe nome da conta, Network ID e API key do HasOffers.');
     }
 
+    if ($accountIndex >= 0 && isset($accounts[$accountIndex])) {
+        $accounts[$accountIndex] = $account;
+        save_integration_json_setting('hasoffers_accounts', array_values($accounts));
+        return;
+    }
+
     $key = hasoffers_account_key($account);
-    $updated = false;
     foreach ($accounts as $index => $existing) {
         if (hasoffers_account_key($existing) === $key) {
             $accounts[$index] = $account;
-            $updated = true;
-            break;
+            save_integration_json_setting('hasoffers_accounts', array_values($accounts));
+            return;
         }
     }
-    if (!$updated) {
-        $accounts[] = $account;
+
+    $accounts[] = $account;
+    save_integration_json_setting('hasoffers_accounts', array_values($accounts));
+}
+
+function delete_hasoffers_account(int $index): void
+{
+    $accounts = hasoffers_accounts();
+    if (!isset($accounts[$index])) {
+        throw new RuntimeException('Conta HasOffers nao encontrada.');
     }
 
-    save_integration_json_setting('hasoffers_accounts', $accounts);
+    unset($accounts[$index]);
+    save_integration_json_setting('hasoffers_accounts', array_values($accounts));
 }
 
 function hasoffers_account_key(array $account): string
@@ -942,6 +966,12 @@ function hasoffers_account(int $index = 0): array
 {
     $accounts = hasoffers_accounts();
     return $accounts[$index] ?? [];
+}
+
+function hasoffers_account_endpoint(array $account): string
+{
+    $networkId = trim((string) ($account['network_id'] ?? ''));
+    return $networkId === '' ? '' : 'https://' . $networkId . '.api.hasoffers.com';
 }
 
 function hasoffers_status_options(): array
@@ -1312,45 +1342,76 @@ function hasoffers_import_offers(array $filters = []): array
 function sync_hasoffers_watchlist(): array
 {
     $profile = integration_profile('hasoffers', []);
-    $filters = hasoffers_normalize_filters($profile);
-    $offers = hasoffers_offers($filters);
+    $accounts = hasoffers_accounts();
     $seen = [];
     $updated = 0;
     $new = 0;
+    $read = 0;
+    $accountErrors = 0;
     $diagnostics = hasoffers_empty_diagnostics();
-    foreach ($offers as $offer) {
-        if (!is_array($offer)) {
-            $diagnostics['invalid_rows']++;
+
+    if (!$accounts) {
+        throw new RuntimeException('Configure uma conta HasOffers antes de buscar ofertas.');
+    }
+
+    foreach ($accounts as $accountIndex => $account) {
+        $filters = hasoffers_normalize_filters(array_merge($profile, ['account_index' => $accountIndex]));
+
+        try {
+            $offers = hasoffers_offers($filters);
+        } catch (Throwable $exception) {
+            $accountErrors++;
+            create_system_log(
+                'hasoffers_sync_account_error',
+                'Erro em conta HasOffers',
+                (string) ($account['label'] ?? 'HasOffers') . ': ' . $exception->getMessage(),
+                'HasOffers'
+            );
             continue;
         }
-        if (!hasoffers_offer_passes_filters($offer, $filters)) {
-            $diagnostics['filtered_out']++;
-            continue;
+
+        $read += count($offers);
+        foreach ($offers as $offer) {
+            if (!is_array($offer)) {
+                $diagnostics['invalid_rows']++;
+                continue;
+            }
+            if (!hasoffers_offer_passes_filters($offer, $filters)) {
+                $diagnostics['filtered_out']++;
+                continue;
+            }
+            $payload = hasoffers_offer_payload($offer, $filters['publish_status'], $filters['account_index'], $diagnostics);
+            if (!$payload) {
+                continue;
+            }
+            $seen[$payload['external_id']] = true;
+            $existing = coupon_by_external_id($payload['external_id']);
+            save_coupon($payload, $existing ? (int) $existing['id'] : null);
+            monitor_integration_offer('HasOffers', $payload, hasoffers_offer_id($offer), hasoffers_value($offer, ['Advertiser.id', 'advertiser_id'], ''));
+            $existing ? $updated++ : $new++;
         }
-        $payload = hasoffers_offer_payload($offer, $filters['publish_status'], $filters['account_index'], $diagnostics);
-        if (!$payload) {
-            continue;
-        }
-        $seen[$payload['external_id']] = true;
-        $existing = coupon_by_external_id($payload['external_id']);
-        save_coupon($payload, $existing ? (int) $existing['id'] : null);
-        monitor_integration_offer('HasOffers', $payload, hasoffers_offer_id($offer), hasoffers_value($offer, ['Advertiser.id', 'advertiser_id'], ''));
-        $existing ? $updated++ : $new++;
+    }
+
+    if ($accountErrors === count($accounts)) {
+        throw new RuntimeException('Nenhuma conta HasOffers respondeu durante a sincronizacao.');
     }
 
     $missing = 0;
-    foreach (monitored_integration_offers('HasOffers') as $watch) {
-        if (!isset($seen[(string) $watch['external_id']])) {
-            mark_monitor_missing($watch);
-            $missing++;
-        } else {
-            mark_monitor_seen('HasOffers', (string) $watch['external_id']);
+    if ($accountErrors === 0) {
+        foreach (monitored_integration_offers('HasOffers') as $watch) {
+            if (!isset($seen[(string) $watch['external_id']])) {
+                mark_monitor_missing($watch);
+                $missing++;
+            } else {
+                mark_monitor_seen('HasOffers', (string) $watch['external_id']);
+            }
         }
     }
 
-    create_system_log('hasoffers_sync', 'Sincronizacao HasOffers', count($offers) . ' lidas, ' . $updated . ' atualizadas, ' . $new . ' novas e ' . $missing . ' ausentes. ' . hasoffers_diagnostics_summary($diagnostics), 'HasOffers');
+    $errorSummary = $accountErrors > 0 ? ' Contas com erro: ' . $accountErrors . '.' : '';
+    create_system_log('hasoffers_sync', 'Sincronizacao HasOffers', $read . ' lidas, ' . $updated . ' atualizadas, ' . $new . ' novas e ' . $missing . ' ausentes.' . $errorSummary . ' ' . hasoffers_diagnostics_summary($diagnostics), 'HasOffers');
 
-    return ['partner' => 'HasOffers', 'read' => count($offers), 'updated' => $updated, 'new' => $new, 'missing' => $missing, 'diagnostics' => $diagnostics];
+    return ['partner' => 'HasOffers', 'read' => $read, 'updated' => $updated, 'new' => $new, 'missing' => $missing, 'errors' => $accountErrors, 'diagnostics' => $diagnostics];
 }
 
 function hasoffers_empty_diagnostics(): array

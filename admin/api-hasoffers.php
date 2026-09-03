@@ -43,6 +43,11 @@ $filters = hasoffers_normalize_filters(integration_profile('hasoffers', [
     'publish_status' => 'rascunho',
 ]));
 
+$editingAccountIndex = isset($_GET['edit_account']) ? max(0, (int) $_GET['edit_account']) : -1;
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && isset($_GET['account_index'])) {
+    $filters['account_index'] = max(0, (int) $_GET['account_index']);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     $action = $_POST['action'] ?? '';
@@ -55,8 +60,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'network_id' => $_POST['hasoffers_network_id'] ?? '',
                 'api_key' => $_POST['hasoffers_api_key'] ?? '',
                 'affiliate_id' => $_POST['hasoffers_affiliate_id'] ?? '',
+                'account_index' => $_POST['hasoffers_account_index'] ?? -1,
             ]);
             $success = 'Conta HasOffers salva.';
+            $editingAccountIndex = -1;
+        }
+
+        if ($action === 'delete_hasoffers_account') {
+            delete_hasoffers_account((int) ($_POST['hasoffers_account_index'] ?? -1));
+            $filters['account_index'] = 0;
+            $success = 'Conta HasOffers removida.';
+            $editingAccountIndex = -1;
         }
 
         if ($action === 'preview_hasoffers') {
@@ -89,6 +103,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $accounts = hasoffers_accounts();
+$filters['account_index'] = min($filters['account_index'], max(0, count($accounts) - 1));
+$editingAccount = $editingAccountIndex >= 0 && isset($accounts[$editingAccountIndex]) ? $accounts[$editingAccountIndex] : null;
+$selectedAccount = $accounts[$filters['account_index']] ?? null;
 $monitoredBrands = monitored_integration_brands('HasOffers');
 ?>
 <?php admin_layout_start('HasOffers - Oferto Cupons', 'afiliacao', 'HasOffers'); ?>
@@ -118,24 +135,44 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
             </div>
           </div>
 
-          <div class="admin-api-roadmap">
-            <?php foreach ($accounts as $account): ?>
-              <span><?= e($account['label'] ?? 'HasOffers') ?> - <?= e($account['network_id'] ?? '') ?> - <?= e(offer18_mask((string) ($account['api_key'] ?? ''))) ?></span>
+          <div class="admin-hasoffers-accounts">
+            <?php foreach ($accounts as $index => $account): ?>
+              <article class="admin-hasoffers-account <?= $filters['account_index'] === $index ? 'is-active' : '' ?>">
+                <span class="admin-hasoffers-account-badge"><?= $filters['account_index'] === $index ? 'em uso' : 'conectada' ?></span>
+                <strong><?= e($account['label'] ?? 'HasOffers') ?></strong>
+                <small><?= e(hasoffers_account_endpoint($account)) ?></small>
+                <small>Key <?= e(offer18_mask((string) ($account['api_key'] ?? ''))) ?></small>
+                <?php if (!empty($account['affiliate_id'])): ?>
+                  <small>Affiliate ID <?= e((string) $account['affiliate_id']) ?></small>
+                <?php endif; ?>
+                <div class="admin-hasoffers-account-actions">
+                  <a href="api-hasoffers.php?account_index=<?= (int) $index ?>">Usar</a>
+                  <a href="api-hasoffers.php?edit_account=<?= (int) $index ?>">Editar</a>
+                  <form method="post" onsubmit="return confirm('Remover esta conta HasOffers?');">
+                    <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
+                    <input type="hidden" name="action" value="delete_hasoffers_account" />
+                    <input type="hidden" name="hasoffers_account_index" value="<?= (int) $index ?>" />
+                    <button type="submit">Remover</button>
+                  </form>
+                </div>
+              </article>
             <?php endforeach; ?>
             <?php if (!$accounts): ?>
-              <span>Nenhuma conta HasOffers cadastrada ainda.</span>
+              <div class="admin-hasoffers-empty">Nenhuma conta HasOffers cadastrada ainda.</div>
             <?php endif; ?>
           </div>
 
-          <form method="post" class="coupon-admin-form admin-inline-form">
+          <form method="post" class="coupon-admin-form admin-hasoffers-account-form">
             <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
             <input type="hidden" name="action" value="save_hasoffers_account" />
-            <label>Nome da conta<input name="hasoffers_label" placeholder="Ex: Rede HasOffers" /></label>
-            <label>Network ID<input name="hasoffers_network_id" placeholder="Ex: minharede" /></label>
-            <label>API key<input name="hasoffers_api_key" type="password" autocomplete="off" /></label>
-            <label>Affiliate ID opcional<input name="hasoffers_affiliate_id" inputmode="numeric" placeholder="Opcional" /></label>
+            <input type="hidden" name="hasoffers_account_index" value="<?= $editingAccount ? (int) $editingAccountIndex : -1 ?>" />
+            <label>Nome da conta<input name="hasoffers_label" value="<?= e((string) ($editingAccount['label'] ?? '')) ?>" placeholder="Ex: DGMax" /></label>
+            <label>Network ID<input name="hasoffers_network_id" value="<?= e((string) ($editingAccount['network_id'] ?? '')) ?>" placeholder="Ex: dgmax" /></label>
+            <label>API key<input name="hasoffers_api_key" type="password" autocomplete="off" placeholder="<?= $editingAccount ? 'Deixe em branco para manter a atual' : '' ?>" /></label>
+            <label>Affiliate ID opcional<input name="hasoffers_affiliate_id" value="<?= e((string) ($editingAccount['affiliate_id'] ?? '')) ?>" inputmode="numeric" placeholder="Opcional" /></label>
             <div class="admin-actions">
-              <button type="submit">Salvar conta</button>
+              <button type="submit"><?= $editingAccount ? 'Atualizar conta' : 'Salvar conta' ?></button>
+              <?php if ($editingAccount): ?><a class="admin-secondary-link" href="api-hasoffers.php">Cancelar edição</a><?php endif; ?>
             </div>
           </form>
         </section>
@@ -164,6 +201,13 @@ $monitoredBrands = monitored_integration_brands('HasOffers');
               <p class="section-kicker">Busca</p>
               <h2>Pesquisar campanhas</h2>
               <p>Para listar tudo que estiver ativo, deixe busca, segmentos e termos bloqueados em branco.</p>
+              <?php if ($selectedAccount): ?>
+                <div class="admin-api-connected">
+                  <span>Conta selecionada</span>
+                  <strong><?= e((string) ($selectedAccount['label'] ?? 'HasOffers')) ?></strong>
+                  <small><?= e(hasoffers_account_endpoint($selectedAccount)) ?></small>
+                </div>
+              <?php endif; ?>
             </div>
           </div>
 

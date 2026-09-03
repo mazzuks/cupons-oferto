@@ -1055,10 +1055,27 @@ function hasoffers_request(array $account, string $target, string $method, array
     $ok = (int) ($response['status'] ?? 1);
     if ($ok !== 1) {
         $errors = $response['errors'] ?? $response['errorMessage'] ?? 'Erro na API';
-        throw new RuntimeException('HasOffers recusou a chamada: ' . (is_array($errors) ? implode(', ', array_map('strval', $errors)) : (string) $errors));
+        throw new RuntimeException('HasOffers recusou a chamada: ' . integration_error_message($errors));
     }
 
     return $response;
+}
+
+function integration_error_message($errors): string
+{
+    if (!is_array($errors)) {
+        return (string) $errors;
+    }
+
+    $messages = [];
+    array_walk_recursive($errors, static function ($value) use (&$messages): void {
+        $text = trim((string) $value);
+        if ($text !== '') {
+            $messages[] = $text;
+        }
+    });
+
+    return $messages ? implode(', ', array_unique($messages)) : json_encode($errors, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 }
 
 function hasoffers_query_string(array $query): string

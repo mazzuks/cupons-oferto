@@ -1069,6 +1069,41 @@ body {
   text-decoration: underline;
 }
 
+.admin-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 230px;
+}
+
+.admin-inline-actions form {
+  margin: 0;
+}
+
+.admin-inline-actions button {
+  min-height: 34px;
+  padding: 0 12px;
+  color: #082f49;
+  background: #e0f2fe;
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  border-radius: 999px;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-inline-actions button:hover:not(:disabled) {
+  background: #bae6fd;
+}
+
+.admin-inline-actions button:disabled {
+  color: #64748b;
+  background: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.35);
+  cursor: not-allowed;
+}
+
 .admin-section-heading {
   margin-bottom: 16px;
 }

@@ -46,6 +46,16 @@ $networks = affiliation_network_rows();
           <strong><?= (int) $summary['conversions_30d'] ?></strong>
           <small>R$ <?= number_format((float) $summary['commission_30d'], 2, ',', '.') ?> em comissão</small>
         </article>
+        <article class="admin-kpi-card">
+          <span>Taxa de conversão</span>
+          <strong><?= number_format((float) $summary['conversion_rate_30d'], 2, ',', '.') ?>%</strong>
+          <small>Conversões sobre cliques em 30 dias</small>
+        </article>
+        <article class="admin-kpi-card">
+          <span>EPC 30d</span>
+          <strong>R$ <?= number_format((float) $summary['epc_30d'], 2, ',', '.') ?></strong>
+          <small>Comissão média por clique</small>
+        </article>
       </section>
 
       <section class="admin-panel">

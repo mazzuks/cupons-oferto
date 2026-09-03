@@ -27,6 +27,7 @@ $rows = affiliation_wallet_rows();
             <p class="section-kicker">Financeiro afiliado</p>
             <h2><?= count($rows) ?> carteiras encontradas</h2>
           </div>
+          <span>Saldo aprovado menos saques pagos</span>
         </div>
         <div class="admin-table-wrap">
           <table class="admin-table admin-report-table">
@@ -38,6 +39,7 @@ $rows = affiliation_wallet_rows();
                 <th>Pendente</th>
                 <th>Aprovado</th>
                 <th>Sacado</th>
+                <th>Disponível</th>
                 <th>Transações</th>
                 <th>Última movimentação</th>
               </tr>
@@ -51,12 +53,13 @@ $rows = affiliation_wallet_rows();
                   <td>R$ <?= number_format((float) $row['pending'], 2, ',', '.') ?></td>
                   <td>R$ <?= number_format((float) $row['approved'], 2, ',', '.') ?></td>
                   <td>R$ <?= number_format((float) $row['withdrawn'], 2, ',', '.') ?></td>
+                  <td><strong>R$ <?= number_format((float) $row['available_balance'], 2, ',', '.') ?></strong></td>
                   <td><?= (int) $row['transaction_count'] ?></td>
                   <td><?= e($row['last_transaction_at'] ? date('d/m/Y H:i', strtotime($row['last_transaction_at'])) : '-') ?></td>
                 </tr>
               <?php endforeach; ?>
               <?php if (!$rows): ?>
-                <tr><td colspan="8" class="admin-empty-cell">Nenhuma carteira afiliada movimentada ainda.</td></tr>
+                <tr><td colspan="9" class="admin-empty-cell">Nenhuma carteira afiliada movimentada ainda.</td></tr>
               <?php endif; ?>
             </tbody>
           </table>

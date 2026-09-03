@@ -6,7 +6,7 @@ function admin_nav_items(): array
 {
     return [
         ['key' => 'dashboard', 'label' => 'Dashboard', 'hint' => 'Visão geral', 'href' => 'dashboard.php'],
-        ['key' => 'ofertas', 'label' => 'Ofertas', 'hint' => 'Cupons e campanhas', 'href' => 'index.php'],
+        ['key' => 'ofertas', 'label' => 'Ofertas', 'hint' => 'Cupons e campanhas', 'href' => 'ofertas-lista.php'],
         ['key' => 'afiliacao', 'label' => 'Afiliação', 'hint' => 'Redes e campanhas', 'href' => 'afiliacao.php'],
         ['key' => 'notificacoes', 'label' => 'Notificações', 'hint' => 'Alertas do sistema', 'href' => 'notificacoes.php'],
         ['key' => 'logs', 'label' => 'Logs', 'hint' => 'Alterações e eventos', 'href' => 'logs.php'],
@@ -120,6 +120,21 @@ function admin_affiliation_subnav(string $activeKey): void
     ];
     ?>
       <nav class="admin-subnav" aria-label="Subguias de afiliação">
+        <?php foreach ($items as $item): ?>
+          <a class="<?= $activeKey === $item['key'] ? 'is-active' : '' ?>" href="<?= e($item['href']) ?>"><?= e($item['label']) ?></a>
+        <?php endforeach; ?>
+      </nav>
+<?php
+}
+
+function admin_offers_subnav(string $activeKey): void
+{
+    $items = [
+        ['key' => 'lista', 'label' => 'Ofertas criadas', 'href' => 'ofertas-lista.php'],
+        ['key' => 'criar', 'label' => 'Criar oferta', 'href' => 'index.php'],
+    ];
+    ?>
+      <nav class="admin-subnav" aria-label="Subguias de ofertas">
         <?php foreach ($items as $item): ?>
           <a class="<?= $activeKey === $item['key'] ? 'is-active' : '' ?>" href="<?= e($item['href']) ?>"><?= e($item['label']) ?></a>
         <?php endforeach; ?>

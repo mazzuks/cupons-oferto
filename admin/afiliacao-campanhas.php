@@ -342,11 +342,13 @@ $form = [
                   <td><?= (int) $row['conversion_count'] ?></td>
                   <td>R$ <?= number_format((float) $row['commission_total'], 2, ',', '.') ?></td>
                   <td>
-                    <?php if (!empty($row['published_coupon_id'])): ?>
-                      <a class="admin-primary-link" href="index.php?edit=<?= (int) $row['published_coupon_id'] ?>">Cupom</a>
-                    <?php else: ?>
+                    <div class="row-actions">
                       <a class="admin-secondary-link" href="afiliacao-campanhas.php?edit=<?= (int) $row['id'] ?>">Editar</a>
-                    <?php endif; ?>
+                      <a class="admin-secondary-link" href="afiliacao-tracking.php?campaign_id=<?= (int) $row['id'] ?>">Tracking</a>
+                      <?php if (!empty($row['published_coupon_id'])): ?>
+                        <a class="admin-primary-link" href="index.php?edit=<?= (int) $row['published_coupon_id'] ?>">Cupom</a>
+                      <?php endif; ?>
+                    </div>
                   </td>
                 </tr>
               <?php endforeach; ?>

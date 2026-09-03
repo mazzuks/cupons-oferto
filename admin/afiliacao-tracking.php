@@ -9,9 +9,10 @@ require_once __DIR__ . '/layout.php';
 require_admin();
 
 $selectedPartnerId = isset($_GET['partner_id']) ? (int) $_GET['partner_id'] : 0;
+$selectedCampaignId = isset($_GET['campaign_id']) ? (int) $_GET['campaign_id'] : 0;
 $partners = affiliation_partner_options();
 $selectedPartner = $selectedPartnerId > 0 ? affiliation_partner_by_id($selectedPartnerId) : null;
-$rows = affiliation_tracking_rows();
+$rows = affiliation_tracking_rows($selectedCampaignId);
 $postbackExample = $rows ? affiliation_postback_preview((int) $rows[0]['id']) : 'https://cupons.oferto.digital/affiliate-postback.php?cid={campanha}&tid={tid}&order_id={order_id}&value={value}&commission={commission}&status={status}&currency=BRL&sig={hmac_sha256}';
 ?>
 <?php admin_layout_start('Tracking de afiliação - Oferto Cupons', 'afiliacao', 'Afiliação'); ?>
@@ -24,7 +25,7 @@ $postbackExample = $rows ? affiliation_postback_preview((int) $rows[0]['id']) : 
         <form class="admin-report-filter" method="get">
           <label>Parceiro
             <select name="partner_id">
-              <option value="">Placeholder</option>
+              <option value="">Sem parceiro selecionado</option>
               <?php foreach ($partners as $partner): ?>
                 <option value="<?= (int) $partner['id'] ?>" <?= $selectedPartnerId === (int) $partner['id'] ? 'selected' : '' ?>>
                   <?= e($partner['name']) ?><?= $partner['status'] !== 'ativo' ? ' (pausado)' : '' ?>
@@ -32,7 +33,13 @@ $postbackExample = $rows ? affiliation_postback_preview((int) $rows[0]['id']) : 
               <?php endforeach; ?>
             </select>
           </label>
+          <?php if ($selectedCampaignId > 0): ?>
+            <input type="hidden" name="campaign_id" value="<?= (int) $selectedCampaignId ?>" />
+          <?php endif; ?>
           <button type="submit">Gerar links</button>
+          <?php if ($selectedCampaignId > 0): ?>
+            <a href="afiliacao-tracking.php">Ver todas</a>
+          <?php endif; ?>
         </form>
       </section>
 

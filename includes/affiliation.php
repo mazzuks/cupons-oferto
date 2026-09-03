@@ -31,6 +31,10 @@ function affiliation_summary(): array
             (SELECT COALESCE(SUM(commission_amount), 0) FROM affiliate_campaign_conversions WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS commission_30d
         ")->fetch() ?: [];
 
+    $clicks = (int) ($tracking['clicks_30d'] ?? 0);
+    $conversions = (int) ($tracking['conversions_30d'] ?? 0);
+    $commission = (float) ($tracking['commission_30d'] ?? 0);
+
     return [
         'total_campaigns' => (int) ($campaigns['total_campaigns'] ?? 0),
         'published_campaigns' => (int) ($campaigns['published_campaigns'] ?? 0),
@@ -40,9 +44,11 @@ function affiliation_summary(): array
         'networks' => (int) ($campaigns['networks'] ?? 0),
         'total_partners' => (int) ($partners['total_partners'] ?? 0),
         'active_partners' => (int) ($partners['active_partners'] ?? 0),
-        'clicks_30d' => (int) ($tracking['clicks_30d'] ?? 0),
-        'conversions_30d' => (int) ($tracking['conversions_30d'] ?? 0),
-        'commission_30d' => (float) ($tracking['commission_30d'] ?? 0),
+        'clicks_30d' => $clicks,
+        'conversions_30d' => $conversions,
+        'commission_30d' => $commission,
+        'conversion_rate_30d' => $clicks > 0 ? ($conversions / $clicks) * 100 : 0,
+        'epc_30d' => $clicks > 0 ? $commission / $clicks : 0,
     ];
 }
 
@@ -60,6 +66,8 @@ function affiliation_empty_summary(): array
         'clicks_30d' => 0,
         'conversions_30d' => 0,
         'commission_30d' => 0,
+        'conversion_rate_30d' => 0,
+        'epc_30d' => 0,
     ];
 }
 
@@ -406,14 +414,21 @@ function affiliation_save_partner(array $data): int
     return (int) $pdo->lastInsertId();
 }
 
-function affiliation_tracking_rows(): array
+function affiliation_tracking_rows(int $campaignId = 0): array
 {
     $pdo = db();
     if (!$pdo) {
         return [];
     }
 
-    return $pdo->query("SELECT
+    $conditions = ['1 = 1'];
+    $params = [];
+    if ($campaignId > 0) {
+        $conditions[] = 'ac.id = :campaign_id';
+        $params['campaign_id'] = $campaignId;
+    }
+
+    $statement = $pdo->prepare("SELECT
             ac.id,
             ac.network,
             ac.advertiser,
@@ -428,8 +443,12 @@ function affiliation_tracking_rows(): array
             (SELECT COUNT(*) FROM affiliate_clicks clk WHERE clk.campaign_id = ac.id) AS click_count,
             (SELECT COUNT(*) FROM affiliate_campaign_conversions conv WHERE conv.campaign_id = ac.id) AS conversion_count
         FROM affiliate_campaigns ac
+        WHERE " . implode(' AND ', $conditions) . "
         ORDER BY FIELD(ac.status, 'publicada', 'selecionada', 'disponivel', 'pausada', 'encerrada'), ac.updated_at DESC
-        LIMIT 250")->fetchAll();
+        LIMIT 250");
+    $statement->execute($params);
+
+    return $statement->fetchAll();
 }
 
 function affiliation_wallet_rows(): array
@@ -448,6 +467,8 @@ function affiliation_wallet_rows(): array
             COALESCE(SUM(CASE WHEN tx.type = 'earning' AND tx.status = 'pending' THEN tx.amount ELSE 0 END), 0) AS pending,
             COALESCE(SUM(CASE WHEN tx.type = 'earning' AND tx.status IN ('approved', 'completed') THEN tx.amount ELSE 0 END), 0) AS approved,
             COALESCE(SUM(CASE WHEN tx.type = 'withdrawal' AND tx.status IN ('approved', 'completed') THEN tx.amount ELSE 0 END), 0) AS withdrawn,
+            COALESCE(SUM(CASE WHEN tx.type = 'earning' AND tx.status IN ('approved', 'completed') THEN tx.amount ELSE 0 END), 0)
+              - COALESCE(SUM(CASE WHEN tx.type = 'withdrawal' AND tx.status IN ('approved', 'completed') THEN tx.amount ELSE 0 END), 0) AS available_balance,
             COUNT(tx.id) AS transaction_count,
             MAX(tx.created_at) AS last_transaction_at
         FROM affiliate_partners ap
@@ -927,7 +948,7 @@ function affiliation_register_conversion(array $payload): array
                 WHERE id = ?");
             $updateTransaction->execute([
                 $commission,
-                in_array($status, ['approved', 'confirmed', 'paid', 'completed'], true) ? 'approved' : 'pending',
+                affiliation_transaction_status_from_conversion($status),
                 'Comissão da campanha ' . (string) $campaign['title'],
                 $transactionId,
             ]);
@@ -940,7 +961,7 @@ function affiliation_register_conversion(array $payload): array
                 (int) $campaign['id'],
                 $conversionId,
                 $commission,
-                in_array($status, ['approved', 'confirmed', 'paid', 'completed'], true) ? 'approved' : 'pending',
+                affiliation_transaction_status_from_conversion($status),
                 'Comissão da campanha ' . (string) $campaign['title'],
             ]);
         }
@@ -1001,6 +1022,155 @@ function affiliation_conversion_rows(string $startDate, string $endDate): array
     $statement->execute(['start_date' => $startDate, 'end_date' => $endDate]);
 
     return $statement->fetchAll();
+}
+
+function affiliation_conversion_detail_rows(string $startDate, string $endDate, array $filters = []): array
+{
+    $pdo = db();
+    if (!$pdo) {
+        return [];
+    }
+
+    $conditions = [
+        'conv.created_at >= :start_date',
+        'conv.created_at < DATE_ADD(:end_date, INTERVAL 1 DAY)',
+    ];
+    $params = [
+        'start_date' => $startDate,
+        'end_date' => $endDate,
+    ];
+
+    if (($filters['status'] ?? '') !== '') {
+        $conditions[] = 'conv.status = :status';
+        $params['status'] = $filters['status'];
+    }
+
+    if (($filters['q'] ?? '') !== '') {
+        $conditions[] = '(ac.advertiser LIKE :q OR ac.title LIKE :q OR ap.name LIKE :q OR conv.order_id LIKE :q OR conv.tid LIKE :q)';
+        $params['q'] = '%' . $filters['q'] . '%';
+    }
+
+    $statement = $pdo->prepare("SELECT
+            conv.*,
+            ac.network,
+            ac.advertiser,
+            ac.title AS campaign_title,
+            ap.name AS affiliate_name,
+            ap.email AS affiliate_email
+        FROM affiliate_campaign_conversions conv
+        INNER JOIN affiliate_campaigns ac ON ac.id = conv.campaign_id
+        LEFT JOIN affiliate_partners ap ON ap.id = conv.affiliate_partner_id
+        WHERE " . implode(' AND ', $conditions) . "
+        ORDER BY conv.created_at DESC, conv.id DESC
+        LIMIT 250");
+    $statement->execute($params);
+
+    return $statement->fetchAll();
+}
+
+function affiliation_conversion_statuses(): array
+{
+    return [
+        '' => 'Todos',
+        'pending' => 'Pendente',
+        'approved' => 'Aprovada',
+        'confirmed' => 'Confirmada',
+        'paid' => 'Paga',
+        'completed' => 'Concluída',
+        'rejected' => 'Reprovada',
+        'cancelled' => 'Cancelada',
+    ];
+}
+
+function affiliation_transaction_status_from_conversion(string $status): string
+{
+    if (in_array($status, ['paid', 'completed'], true)) {
+        return 'completed';
+    }
+
+    if (in_array($status, ['approved', 'confirmed'], true)) {
+        return 'approved';
+    }
+
+    if (in_array($status, ['rejected', 'cancelled'], true)) {
+        return 'cancelled';
+    }
+
+    return 'pending';
+}
+
+function affiliation_update_conversion_status(int $conversionId, string $status): void
+{
+    $pdo = db();
+    if (!$pdo) {
+        throw new RuntimeException('Banco de dados indisponível.');
+    }
+
+    $allowed = array_keys(affiliation_conversion_statuses());
+    $status = trim($status);
+    if ($conversionId <= 0 || $status === '' || !in_array($status, $allowed, true)) {
+        throw new RuntimeException('Status de conversão inválido.');
+    }
+
+    $pdo->beginTransaction();
+    try {
+        $detail = $pdo->prepare("SELECT
+                acc.id,
+                acc.campaign_id,
+                acc.affiliate_partner_id,
+                acc.commission_amount,
+                ac.title AS campaign_title
+            FROM affiliate_campaign_conversions acc
+            LEFT JOIN affiliate_campaigns ac ON ac.id = acc.campaign_id
+            WHERE acc.id = ?
+            LIMIT 1");
+        $detail->execute([$conversionId]);
+        $conversion = $detail->fetch();
+
+        if (!$conversion) {
+            throw new RuntimeException('Conversão não encontrada.');
+        }
+
+        $statement = $pdo->prepare("UPDATE affiliate_campaign_conversions
+            SET status = ?, updated_at = NOW()
+            WHERE id = ?");
+        $statement->execute([$status, $conversionId]);
+
+        $transactionStatus = affiliation_transaction_status_from_conversion($status);
+        $partnerId = (int) ($conversion['affiliate_partner_id'] ?? 0);
+        $commission = (float) ($conversion['commission_amount'] ?? 0);
+
+        if ($partnerId > 0 && $commission > 0) {
+            $transaction = $pdo->prepare("SELECT id FROM affiliate_transactions WHERE conversion_id = ? AND type = 'earning' LIMIT 1");
+            $transaction->execute([$conversionId]);
+            $transactionId = (int) ($transaction->fetchColumn() ?: 0);
+            $description = 'Comissão da campanha ' . (string) ($conversion['campaign_title'] ?? ('#' . $conversion['campaign_id']));
+
+            if ($transactionId > 0) {
+                $updateTransaction = $pdo->prepare("UPDATE affiliate_transactions
+                    SET amount = ?, status = ?, description = ?, updated_at = NOW()
+                    WHERE id = ?");
+                $updateTransaction->execute([$commission, $transactionStatus, $description, $transactionId]);
+            } else {
+                $insertTransaction = $pdo->prepare("INSERT INTO affiliate_transactions
+                    (affiliate_partner_id, campaign_id, conversion_id, amount, type, status, description)
+                    VALUES (?, ?, ?, ?, 'earning', ?, ?)");
+                $insertTransaction->execute([
+                    $partnerId,
+                    (int) $conversion['campaign_id'],
+                    $conversionId,
+                    $commission,
+                    $transactionStatus,
+                    $description,
+                ]);
+            }
+        }
+
+        $pdo->commit();
+    } catch (Throwable $error) {
+        $pdo->rollBack();
+        throw $error;
+    }
 }
 
 function affiliation_campaign_statuses(): array

@@ -335,13 +335,13 @@ try {
             $deleted = coupon_by_id((int) $_POST['id']);
             delete_coupon((int) $_POST['id']);
             create_system_log('coupon_deleted', 'Campanha excluida', ($deleted['store'] ?? 'Oferta') . ' - ' . ($deleted['title'] ?? 'campanha') . ' foi removida do CRM.');
-            redirect('index.php?deleted=1');
+            redirect('ofertas-lista.php?deleted=1');
         }
 
         if ($action === 'clear_campaigns') {
             $count = clear_campaign_data();
             create_system_log('campaigns_cleared', 'Campanhas limpas', $count . ' campanhas foram removidas da base pelo CRM.');
-            redirect('index.php?cleared=' . $count);
+            redirect('ofertas-lista.php?cleared=' . $count);
         }
 
         if ($action === 'save') {
@@ -365,13 +365,13 @@ try {
                 $payload['partner_network'] ?? '',
                 $id ? (string) $id : ''
             );
-            redirect('index.php?saved=1');
+            redirect('ofertas-lista.php?saved=1');
         }
 
         if ($action === 'import_csv') {
             $count = import_campaigns_from_csv();
             create_system_log('csv_imported', 'CSV importado', $count . ' campanhas foram importadas por arquivo CSV.');
-            redirect('index.php?imported=' . $count);
+            redirect('ofertas-lista.php?imported=' . $count);
         }
     }
 } catch (Throwable $exception) {
@@ -418,8 +418,8 @@ $form = array_merge($defaults, $editing ?: []);
       <section class="admin-hero">
         <div>
           <p class="section-kicker">CRM Oferto</p>
-          <h1>Central de ofertas e campanhas</h1>
-          <p>Cadastre cupons, sorteios, campanhas de cadastro e ofertas patrocinadas com validade, banner, tracking e importacao em lote.</p>
+          <h1>Criar e editar ofertas</h1>
+          <p>Preencha a ficha da oferta, defina validade, forma de resgate, banner e links comerciais. A consulta das ofertas cadastradas fica em uma tela separada.</p>
         </div>
         <div class="admin-hero-stats" aria-label="Resumo do CRM">
           <span><strong><?= count($coupons) ?></strong> ofertas</span>
@@ -427,7 +427,8 @@ $form = array_merge($defaults, $editing ?: []);
         </div>
       </section>
 
-      <div class="admin-campaign-workspace">
+      <?php admin_offers_subnav('criar'); ?>
+
       <section class="admin-panel admin-campaign-create">
         <p class="section-kicker"><?= $editing ? 'Editar oferta' : 'Nova oferta' ?></p>
         <div class="admin-panel-title-row">
@@ -435,7 +436,7 @@ $form = array_merge($defaults, $editing ?: []);
             <h1><?= $editing ? e($editing['store']) : 'Criar campanha' ?></h1>
             <p>Preencha os dados da vitrine, escolha a forma de resgate e configure links, validade e tracking comercial.</p>
           </div>
-          <a href="#campanhas-cadastradas" class="admin-secondary-link">Ver cadastradas</a>
+          <a href="ofertas-lista.php" class="admin-secondary-link">Ver ofertas criadas</a>
         </div>
         <?php if ($error): ?><p class="admin-alert"><?= e($error) ?></p><?php endif; ?>
         <?php if (isset($_GET['saved'])): ?><p class="admin-success">Oferta salva.</p><?php endif; ?>
@@ -563,7 +564,7 @@ $form = array_merge($defaults, $editing ?: []);
           </div>
           <div class="admin-actions">
             <button type="submit">Salvar oferta</button>
-            <?php if ($editing): ?><a href="index.php">Cancelar edicao</a><?php endif; ?>
+            <?php if ($editing): ?><a href="ofertas-lista.php">Cancelar edicao</a><?php endif; ?>
           </div>
         </form>
 
@@ -587,78 +588,4 @@ $form = array_merge($defaults, $editing ?: []);
           </div>
         </form>
       </section>
-
-      <section class="admin-panel admin-campaign-list" id="campanhas-cadastradas">
-        <p class="section-kicker">Ofertas cadastradas</p>
-        <div class="admin-panel-title-row">
-          <div>
-            <h2>Campanhas cadastradas</h2>
-            <p><?= count($coupons) ?> itens na base, entre cupons, sorteios, cadastros e ofertas diretas.</p>
-          </div>
-          <a href="index.php" class="admin-primary-link">Criar nova</a>
-        </div>
-        <?php if (count($coupons) > 0): ?>
-          <form method="post" class="admin-clear-form" onsubmit="return confirm('Apagar todas as campanhas cadastradas? Esta acao nao apaga usuarios, chaves de API nem marcas monitoradas.');">
-            <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
-            <input type="hidden" name="action" value="clear_campaigns" />
-            <button type="submit">Limpar campanhas cadastradas</button>
-            <span>Remove apenas as campanhas cadastradas. Usuarios, APIs, historico e marcas monitoradas continuam salvos.</span>
-          </form>
-        <?php endif; ?>
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Loja</th>
-                <th>Logo</th>
-                <th>Tipo</th>
-                <th>Resgate</th>
-                <th>Categoria</th>
-                <th>Status</th>
-                <th>Acesso</th>
-                <th>Tracking</th>
-                <th>Banner</th>
-                <th>Parceiro</th>
-                <th>Validade</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($coupons as $coupon): ?>
-                <tr>
-                  <td><strong><?= e($coupon['store']) ?></strong><br /><span><?= e($coupon['title']) ?></span></td>
-                  <td>
-                    <span class="admin-brand-logo" aria-label="Logo <?= e($coupon['store']) ?>">
-                      <?php if (coupon_logo_src($coupon)): ?>
-                        <img src="<?= e(coupon_logo_src($coupon)) ?>" alt="" />
-                      <?php else: ?>
-                        <?= e(coupon_brand_initials($coupon)) ?>
-                      <?php endif; ?>
-                    </span>
-                  </td>
-                  <td><span class="admin-pill admin-pill-type"><?= e(offer_type_label($coupon['offer_type'] ?? 'cupom')) ?></span></td>
-                  <td><span class="admin-pill"><?= e(redemption_type_label($coupon['redemption_type'] ?? 'texto')) ?></span></td>
-                  <td><?= e($coupon['category']) ?></td>
-                  <td><span class="status-pill status-<?= e($coupon['status']) ?>"><?= e($coupon['status']) ?></span></td>
-                  <td><span class="admin-pill <?= (int) ($coupon['members_only'] ?? 0) === 1 ? 'admin-pill-locked' : '' ?>"><?= (int) ($coupon['members_only'] ?? 0) === 1 ? 'Conectados' : 'Publico' ?></span></td>
-                  <td><span class="status-pill <?= e(coupon_tracking_status_class($coupon)) ?>"><?= e(coupon_tracking_label($coupon)) ?></span></td>
-                  <td><span class="admin-pill <?= coupon_uses_fallback_banner($coupon) ? 'admin-pill-fallback' : '' ?>"><?= e(coupon_banner_status_label($coupon)) ?></span></td>
-                  <td><?= e($coupon['partner_network'] ?? '') ?></td>
-                  <td><?= e(date('d/m/Y', strtotime($coupon['ends_at']))) ?></td>
-                  <td class="row-actions">
-                    <a href="?edit=<?= (int) $coupon['id'] ?>">Editar</a>
-                    <form method="post" onsubmit="return confirm('Excluir esta oferta?');">
-                      <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
-                      <input type="hidden" name="action" value="delete" />
-                      <input type="hidden" name="id" value="<?= (int) $coupon['id'] ?>" />
-                      <button type="submit">Excluir</button>
-                    </form>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
-        </div>
-      </section>
-      </div>
 <?php admin_layout_end(); ?>

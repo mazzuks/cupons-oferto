@@ -135,14 +135,23 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           </div>
           <div class="v2-store-grid">
             <?php foreach ($topCoupons as $coupon): ?>
+              <?php $featuredNiche = coupon_primary_niche($coupon); ?>
               <a class="v2-store-card" href="<?= e(coupon_offer_url($coupon, 'destaque')) ?>">
                 <div class="v2-card-media">
                   <?= coupon_brand_image_markup($coupon) ?>
                 </div>
                 <div class="v2-store-card-copy">
-                  <span><?= e($coupon['store']) ?></span>
-                  <p><?= e($coupon['title']) ?></p>
-                  <strong><?= e(validity_label($coupon['ends_at'])) ?></strong>
+                  <span class="v2-featured-store"><?= e($coupon['store']) ?></span>
+                  <h3><?= e($coupon['title']) ?></h3>
+                  <p><?= e($coupon['description']) ?></p>
+                  <small><?= e(trim((string) ($coupon['rules'] ?? '')) !== '' ? $coupon['rules'] : 'Confira as regras antes de finalizar.') ?></small>
+                  <div class="v2-featured-meta">
+                    <span><?= e($featuredNiche) ?></span>
+                    <strong><?= e(validity_label($coupon['ends_at'])) ?></strong>
+                  </div>
+                  <?php if (coupon_shows_public_code($coupon)): ?>
+                    <em><?= e(coupon_mechanic_label($coupon)) ?>: <?= e(coupon_mechanic_value($coupon)) ?></em>
+                  <?php endif; ?>
                 </div>
               </a>
             <?php endforeach; ?>

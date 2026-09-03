@@ -132,7 +132,8 @@ $heroSeed = oferto_slug('oferto categoria ' . $pageName);
               <?php foreach ($pageCoupons as $coupon): ?>
                 <?php
                   $couponOfferUrl = 'https://cupons.oferto.digital/' . coupon_offer_url($coupon, 'categoria_' . ($selectedGroup['slug'] ?? 'nicho'));
-                  $couponShareText = rawurlencode('Olha essa oferta da ' . $coupon['store'] . ': ' . $coupon['title'] . '. Veja os detalhes e copie o cupom aqui: ' . $couponOfferUrl);
+                  $couponDisplayTitle = coupon_display_title($coupon, 82);
+                  $couponShareText = rawurlencode('Olha essa oferta da ' . $coupon['store'] . ': ' . $couponDisplayTitle . '. Veja os detalhes e copie o cupom aqui: ' . $couponOfferUrl);
                 ?>
                 <article class="coupon-card v2-list-card">
                   <div class="v2-list-logo">
@@ -142,7 +143,7 @@ $heroSeed = oferto_slug('oferto categoria ' . $pageName);
                     <div class="coupon-meta">
                       <span class="store"><?= e($coupon['store']) ?></span>
                     </div>
-                    <h3><?= e($coupon['title']) ?></h3>
+                    <h3><?= e($couponDisplayTitle) ?></h3>
                     <p class="offer-condition"><?= e($coupon['description']) ?></p>
                     <p class="offer-rule"><?= e(trim((string) ($coupon['rules'] ?? '')) !== '' ? $coupon['rules'] : 'Confira as regras no site parceiro antes de finalizar.') ?></p>
                     <div class="v2-list-tags">

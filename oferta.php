@@ -17,7 +17,8 @@ $related = array_values(array_filter($allPublicCoupons, function (array $item) u
 $related = array_slice($related, 0, 3);
 
 $store = trim((string) ($coupon['store'] ?? 'loja parceira'));
-$title = trim((string) ($coupon['title'] ?? 'Oferta selecionada'));
+$originalTitle = trim((string) ($coupon['title'] ?? 'Oferta selecionada'));
+$title = coupon_display_title($coupon, 76);
 $description = trim((string) ($coupon['description'] ?? ''));
 $rules = trim((string) ($coupon['rules'] ?? ''));
 $category = trim((string) ($coupon['category'] ?? 'Ofertas'));
@@ -140,6 +141,9 @@ $howToUse = $hasCode
             <h2>Regras e validade</h2>
             <ul class="offer-check-list">
               <li>Loja ou marca: <strong><?= e($store) ?></strong></li>
+              <?php if (coupon_title_was_shortened($coupon, $title)): ?>
+                <li>Condição original: <strong><?= e($originalTitle) ?></strong></li>
+              <?php endif; ?>
               <li>Categoria: <strong><?= e($category) ?></strong></li>
               <li>Validade: <strong><?= e($validity) ?></strong></li>
               <?php if ($rules !== ''): ?>
@@ -174,13 +178,14 @@ $howToUse = $hasCode
           </div>
           <div class="v2-store-grid">
             <?php foreach ($related as $item): ?>
+              <?php $relatedTitle = coupon_display_title($item, 64); ?>
               <a class="v2-store-card" href="<?= e(coupon_offer_url($item, 'relacionada')) ?>">
                 <div class="v2-card-media">
                   <?= coupon_brand_image_markup($item) ?>
                 </div>
                 <div class="v2-store-card-copy">
                   <span><?= e($item['store']) ?></span>
-                  <p><?= e($item['title']) ?></p>
+                  <h3><?= e($relatedTitle) ?></h3>
                   <strong><?= e(validity_label($item['ends_at'])) ?></strong>
                 </div>
               </a>

@@ -713,6 +713,61 @@ function coupon_mechanic_value(array $coupon): string
     return $values[$coupon['offer_type'] ?? ''] ?? 'Oferta direta';
 }
 
+function coupon_display_title(array $coupon, int $maxLength = 78): string
+{
+    $title = trim((string) ($coupon['title'] ?? 'Oferta selecionada'));
+    $store = trim((string) ($coupon['store'] ?? ''));
+    if ($title === '') {
+        return $store !== '' ? 'Oferta ' . $store : 'Oferta selecionada';
+    }
+
+    $length = function_exists('mb_strlen') ? mb_strlen($title, 'UTF-8') : strlen($title);
+    if ($length <= $maxLength) {
+        return $title;
+    }
+
+    $plain = normalize_search_text($title);
+    if (strpos($plain, 'cupom progressivo') !== false) {
+        return trim('Cupom progressivo' . ($store !== '' ? ' ' . $store : ''));
+    }
+
+    if (preg_match('/(?:ate\s*)?\d+%\s*off/i', $title, $match)) {
+        return trim($match[0] . ($store !== '' ? ' em ' . $store : ''));
+    }
+
+    if (preg_match('/R\$\s*\d+(?:[,.]\d{2})?\s*OFF/i', $title, $match)) {
+        return trim($match[0] . ($store !== '' ? ' em ' . $store : ''));
+    }
+
+    $cutPatterns = [
+        '/\s+V[aá]lido\s+para\s+/iu',
+        '/\s+para\s+compras\s+acima\s+/iu',
+        '/\s+em\s+produtos\s+selecionados\b/iu',
+        '/,\s*somente\s+/iu',
+        '/\s+somente\s+uma\s+/iu',
+    ];
+
+    foreach ($cutPatterns as $pattern) {
+        $short = preg_split($pattern, $title, 2)[0] ?? '';
+        $short = trim($short);
+        $shortLength = function_exists('mb_strlen') ? mb_strlen($short, 'UTF-8') : strlen($short);
+        if ($short !== '' && $shortLength >= 12 && $shortLength <= $maxLength) {
+            return $short;
+        }
+    }
+
+    $slice = function_exists('mb_substr')
+        ? mb_substr($title, 0, max(20, $maxLength - 1), 'UTF-8')
+        : substr($title, 0, max(20, $maxLength - 1));
+
+    return rtrim($slice, " \t\n\r\0\x0B,.;:-") . '...';
+}
+
+function coupon_title_was_shortened(array $coupon, string $displayTitle): bool
+{
+    return trim((string) ($coupon['title'] ?? '')) !== trim($displayTitle);
+}
+
 function active_coupons(): array
 {
     $pdo = db();

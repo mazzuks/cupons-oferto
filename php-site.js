@@ -3,8 +3,13 @@ const title = document.querySelector("#coupon-title");
 const resultCount = document.querySelector("#result-count");
 const search = document.querySelector("#coupon-search");
 const empty = document.querySelector("#empty-state");
+const params = new URLSearchParams(window.location.search);
 
-let category = document.querySelector("[data-category].is-active")?.dataset.category || "Todos";
+if (search && params.get("q")) {
+  search.value = params.get("q") || "";
+}
+
+let category = document.querySelector("button[data-category].is-active")?.dataset.category || "Todos";
 let offerType = document.querySelector("[data-offer-type].is-active")?.dataset.offerType || "Todos";
 
 function normalizeText(value) {
@@ -31,7 +36,9 @@ function applyFilters() {
 
   const activeOffer = document.querySelector(`[data-offer-type="${offerType}"]`)?.dataset.label || "Todas as ofertas";
   const baseTitle = offerType === "Todos" ? "Todas as ofertas" : activeOffer;
-  title.textContent = category === "Todos" ? baseTitle : `${baseTitle} em ${category}`;
+  const activeCategory = document.querySelector(`button[data-category="${category}"]`);
+  const categoryLabel = activeCategory?.dataset.label || category;
+  title.textContent = category === "Todos" ? baseTitle : `${baseTitle} em ${categoryLabel}`;
   resultCount.textContent = `${visible} ${visible === 1 ? "encontrado" : "encontrados"}`;
   empty.hidden = visible > 0;
 }
@@ -67,10 +74,10 @@ async function copyText(value) {
 }
 
 document.addEventListener("click", (event) => {
-  const categoryChip = event.target.closest("[data-category]");
+  const categoryChip = event.target.closest("button[data-category]");
   if (categoryChip) {
     category = categoryChip.dataset.category || "Todos";
-    document.querySelectorAll("[data-category]").forEach((item) => item.classList.toggle("is-active", item === categoryChip));
+    document.querySelectorAll("button[data-category]").forEach((item) => item.classList.toggle("is-active", item === categoryChip));
     applyFilters();
     return;
   }

@@ -9,9 +9,7 @@ if (strpos($host, 'crm.') === 0) {
 }
 
 $coupons = active_coupons();
-$categories = array_values(array_unique(array_map(fn ($coupon) => $coupon['category'], $coupons)));
-sort($categories);
-$categoryCounts = array_count_values(array_map(fn ($coupon) => $coupon['category'], $coupons));
+$nicheGroups = coupon_niche_groups($coupons);
 $availableOfferTypes = array_values(array_unique(array_map(fn ($coupon) => $coupon['offer_type'] ?? 'cupom', $coupons)));
 $featured = array_slice(array_values(array_filter($coupons, fn ($coupon) => (int) ($coupon['featured'] ?? 0) === 1)), 0, 6);
 $topCoupons = $featured ?: array_slice($coupons, 0, 6);
@@ -19,17 +17,15 @@ $expiring = expiring_soon_coupons($coupons);
 $guides = all_guides();
 $homeGuides = array_slice($guides, 0, 8);
 $searchSuggestions = array_values(array_unique(array_filter(array_merge(
-    $categories,
+    array_column($nicheGroups, 'name'),
     array_column($coupons, 'store'),
     array_column($coupons, 'title'),
     ['pizza', 'seguro', 'games', 'mercado', 'sorteio', 'promocao', 'cupom']
 ))));
 sort($searchSuggestions);
-$defaultCategory = $categories[0] ?? 'Todos';
-$initialCoupons = $defaultCategory === 'Todos'
-    ? $coupons
-    : array_values(array_filter($coupons, fn ($coupon) => $coupon['category'] === $defaultCategory));
-$initialTitle = $defaultCategory === 'Todos' ? 'Todas as ofertas' : 'Ofertas em ' . $defaultCategory;
+$defaultCategory = 'Todos';
+$initialCoupons = $coupons;
+$initialTitle = 'Todas as ofertas';
 $shareTitle = 'Oferto Cupons - cupons, promocoes e sorteios';
 $shareDescription = 'Ache cupons, promocoes e sorteios ativos por loja ou categoria e economize antes de comprar.';
 $shareUrl = 'https://cupons.oferto.digital/';
@@ -81,14 +77,8 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
         <span>Cupons</span>
       </a>
-      <nav class="nav-links" aria-label="Navegacao principal">
-        <a href="#top-cupons">Destaques</a>
-        <a href="#cupons">Todos</a>
-        <a href="/sorteios/">Sorteios</a>
-        <a href="#dicas">Dicas de economia</a>
-        <a href="/sobre-a-oferto-digital.php">Sobre</a>
-      </nav>
-      <a class="header-cta" href="admin/">Admin</a>
+      <?php render_public_nav($coupons, 'home'); ?>
+      <a class="header-cta" href="#cupons">Ver ofertas</a>
     </header>
 
     <main id="top">
@@ -124,7 +114,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
 
       <section class="v2-quick-bar" aria-label="Resumo e filtros">
         <div class="v2-quick-stat"><strong><?= count($coupons) ?></strong><span>ofertas ativas</span></div>
-        <div class="v2-quick-stat"><strong><?= count($categories) ?></strong><span>categorias</span></div>
+        <div class="v2-quick-stat"><strong><?= count($nicheGroups) ?></strong><span>nichos</span></div>
         <div class="v2-quick-stat"><strong><?= count($expiring) ?></strong><span>vencendo em breve</span></div>
         <div class="v2-quick-note">Abra a oferta, veja como aproveitar e siga para o site parceiro quando quiser resgatar.</div>
       </section>
@@ -196,8 +186,8 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <div class="v2-local-filters" aria-label="Filtros de ofertas">
             <section class="v2-category-strip" aria-label="Categorias">
               <button class="category-chip <?= $defaultCategory === 'Todos' ? 'is-active' : '' ?>" type="button" data-category="Todos" data-label="Todas as ofertas">Todos</button>
-              <?php foreach ($categories as $filterCategory): ?>
-                <button class="category-chip <?= $defaultCategory === $filterCategory ? 'is-active' : '' ?>" type="button" data-category="<?= e($filterCategory) ?>" data-label="<?= e($filterCategory) ?>"><?= e($filterCategory) ?> <small><?= (int) ($categoryCounts[$filterCategory] ?? 0) ?></small></button>
+              <?php foreach ($nicheGroups as $filterCategory): ?>
+                <button class="category-chip" type="button" data-category="<?= e($filterCategory['slug']) ?>" data-label="<?= e($filterCategory['name']) ?>"><?= e($filterCategory['name']) ?> <small><?= (int) ($filterCategory['count'] ?? 0) ?></small></button>
               <?php endforeach; ?>
             </section>
 
@@ -226,7 +216,8 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                     'Olha essa oferta da ' . $coupon['store'] . ': ' . $coupon['title'] . '. Veja os detalhes e copie o cupom aqui: ' . $couponOfferUrl
                 );
               ?>
-              <article class="coupon-card v2-list-card" <?= $defaultCategory !== 'Todos' && $coupon['category'] !== $defaultCategory ? 'hidden' : '' ?> data-category="<?= e($coupon['category']) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'cupom') ?>" data-search="<?= e(normalize_search_text($coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'] . ' ' . ($coupon['tags'] ?? '') . ' ' . ($coupon['requirements'] ?? '') . ' ' . ($coupon['rules'] ?? '') . ' ' . ($coupon['partner_network'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'cupom') . ' ' . redemption_type_label($coupon['redemption_type'] ?? 'texto'))) ?>">
+              <?php $couponNiche = coupon_primary_niche($coupon); ?>
+              <article class="coupon-card v2-list-card" data-category="<?= e(coupon_niche_slug($coupon)) ?>" data-offer-type="<?= e($coupon['offer_type'] ?? 'cupom') ?>" data-search="<?= e(normalize_search_text($couponNiche . ' ' . $coupon['category'] . ' ' . $coupon['store'] . ' ' . $coupon['title'] . ' ' . $coupon['description'] . ' ' . $coupon['code'] . ' ' . ($coupon['tags'] ?? '') . ' ' . ($coupon['nicho_principal'] ?? '') . ' ' . ($coupon['tags_produto'] ?? '') . ' ' . ($coupon['requirements'] ?? '') . ' ' . ($coupon['rules'] ?? '') . ' ' . ($coupon['partner_network'] ?? '') . ' ' . offer_type_label($coupon['offer_type'] ?? 'cupom') . ' ' . redemption_type_label($coupon['redemption_type'] ?? 'texto'))) ?>">
                 <div class="v2-list-logo">
                   <?= coupon_brand_image_markup($coupon) ?>
                 </div>
@@ -235,9 +226,10 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                     <span class="store"><?= e($coupon['store']) ?></span>
                   </div>
                   <h3><?= e($coupon['title']) ?></h3>
-                  <p><?= e($coupon['description']) ?></p>
+                  <p class="offer-condition"><?= e($coupon['description']) ?></p>
+                  <p class="offer-rule"><?= e(trim((string) ($coupon['rules'] ?? '')) !== '' ? $coupon['rules'] : 'Confira as regras no site parceiro antes de finalizar.') ?></p>
                   <div class="v2-list-tags">
-                    <span><?= e($coupon['category']) ?></span>
+                    <a href="/categorias/<?= e(coupon_niche_slug($coupon)) ?>"><?= e($couponNiche) ?></a>
                     <span><?= e(validity_label($coupon['ends_at'])) ?></span>
                     <?php if (coupon_shows_public_code($coupon)): ?>
                       <span><?= e(coupon_mechanic_label($coupon)) ?>: <?= e(coupon_mechanic_value($coupon)) ?></span>

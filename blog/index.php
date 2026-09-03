@@ -3,6 +3,7 @@ require_once __DIR__ . '/../includes/coupons.php';
 require_once __DIR__ . '/../includes/guides.php';
 
 $guides = all_guides();
+$publicCoupons = active_coupons();
 $categories = array_values(array_unique(array_map(fn ($guide) => $guide['category'] ?? 'Dicas', $guides)));
 sort($categories);
 $shareTitle = 'Blog Oferto Cupons - dicas para economizar';
@@ -54,14 +55,8 @@ function blog_anchor(string $value): string
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
         <span>Cupons</span>
       </a>
-      <nav class="nav-links" aria-label="Navegacao principal">
-        <a href="/">Cupons</a>
-        <a href="/sorteios/">Sorteios</a>
-        <a href="/#top-cupons">Destaques</a>
-        <a href="/blog/">Dicas de economia</a>
-        <a href="/sobre-a-oferto-digital.php">Sobre</a>
-      </nav>
-      <a class="header-cta" href="/admin/">Admin</a>
+      <?php render_public_nav($publicCoupons, 'blog'); ?>
+      <a class="header-cta" href="/">Ver ofertas</a>
     </header>
 
     <main id="top">

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/coupons.php';
 
+$publicCoupons = active_coupons();
 $shareTitle = 'Oferto Digital - cupons, promoções e economia online';
 $shareDescription = 'Conheça a Oferto Digital, a marca por trás do Oferto Cupons, e entenda como encontrar cupons, promoções e sorteios com mais segurança.';
 $shareUrl = 'https://cupons.oferto.digital/sobre-a-oferto-digital.php';
@@ -45,13 +46,8 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
         <span>Cupons</span>
       </a>
-      <nav class="nav-links" aria-label="Navegação principal">
-        <a href="/">Cupons</a>
-        <a href="/sorteios/">Sorteios</a>
-        <a href="/blog/">Dicas de economia</a>
-        <a href="/sobre-a-oferto-digital.php">Sobre</a>
-      </nav>
-      <a class="header-cta" href="/admin/">Admin</a>
+      <?php render_public_nav($publicCoupons, 'sobre'); ?>
+      <a class="header-cta" href="/">Ver ofertas</a>
     </header>
 
     <main id="top">

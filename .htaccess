@@ -4,6 +4,8 @@ AddType image/png .png
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  RewriteRule ^categorias/?$ categorias.php [L,QSA]
+  RewriteRule ^categorias/([^/]+)/?$ categorias.php?slug=$1 [L,QSA]
   RewriteRule ^v2/?$ / [R=302,L]
 </IfModule>
 

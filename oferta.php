@@ -9,7 +9,8 @@ if (!$coupon) {
     exit('Oferta nao encontrada.');
 }
 
-$related = array_values(array_filter(active_coupons(), function (array $item) use ($coupon): bool {
+$allPublicCoupons = active_coupons();
+$related = array_values(array_filter($allPublicCoupons, function (array $item) use ($coupon): bool {
     return (int) ($item['id'] ?? 0) !== (int) ($coupon['id'] ?? 0)
         && ($item['category'] ?? '') === ($coupon['category'] ?? '');
 }));
@@ -78,14 +79,8 @@ $howToUse = $hasCode
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
         <span>Cupons</span>
       </a>
-      <nav class="nav-links" aria-label="Navegacao principal">
-        <a href="/#top-cupons">Destaques</a>
-        <a href="/#cupons">Todos</a>
-        <a href="/sorteios/">Sorteios</a>
-        <a href="/blog/">Dicas de economia</a>
-        <a href="/sobre-a-oferto-digital.php">Sobre</a>
-      </nav>
-      <a class="header-cta" href="/admin/">Admin</a>
+      <?php render_public_nav($allPublicCoupons); ?>
+      <a class="header-cta" href="/#cupons">Ver ofertas</a>
     </header>
 
     <main id="top">

@@ -294,6 +294,122 @@ function normalize_search_text(string $value): string
     return preg_replace('/\s+/', ' ', $value) ?: '';
 }
 
+function oferto_slug(string $value): string
+{
+    $slug = preg_replace('/[^a-z0-9]+/', '-', normalize_search_text($value));
+    return trim((string) $slug, '-') ?: 'ofertas';
+}
+
+function oferto_niche_label(string $value): string
+{
+    $value = trim($value);
+    $key = str_replace('-', '_', oferto_slug($value));
+    $labels = [
+        'saude_farmacia' => 'Farmácia e saúde',
+        'beleza_cosmeticos' => 'Beleza e cosméticos',
+        'casa_utensilios' => 'Casa e utensílios',
+        'ferramentas_construcao' => 'Ferramentas e construção',
+        'esporte_fitness' => 'Esporte e fitness',
+        'moda_acessorios' => 'Moda e acessórios',
+        'moda_calcados' => 'Moda e calçados',
+        'joias_presentes' => 'Joias e presentes',
+        'livros_papelaria' => 'Livros e papelaria',
+        'alimentacao_delivery' => 'Alimentação e delivery',
+        'viagem_passagens' => 'Viagem e passagens',
+        'servicos_assinaturas' => 'Serviços e assinaturas',
+        'outros' => 'Outros',
+    ];
+
+    if (isset($labels[$key])) {
+        return $labels[$key];
+    }
+
+    if ($value !== '' && strpbrk($value, '_-') !== false && strpos($value, ' ') === false) {
+        return ucwords(str_replace(['_', '-'], ' ', strtolower($value)));
+    }
+
+    return $value !== '' ? $value : 'Outros';
+}
+
+function coupon_primary_niche(array $coupon): string
+{
+    $niche = trim((string) ($coupon['nicho_principal'] ?? ''));
+    if ($niche !== '') {
+        return oferto_niche_label($niche);
+    }
+
+    $category = trim((string) ($coupon['category'] ?? ''));
+    return oferto_niche_label($category);
+}
+
+function coupon_niche_slug(array $coupon): string
+{
+    return oferto_slug(coupon_primary_niche($coupon));
+}
+
+function active_sweepstakes_count(?array $coupons = null): int
+{
+    $items = $coupons ?? active_coupons();
+    return count(array_filter($items, fn (array $coupon): bool => in_array($coupon['offer_type'] ?? '', ['sorteio', 'compre_concorra'], true)));
+}
+
+function coupon_niche_groups(?array $coupons = null): array
+{
+    $groups = [];
+    foreach ($coupons ?? active_coupons() as $coupon) {
+        $name = coupon_primary_niche($coupon);
+        $slug = oferto_slug($name);
+        if (!isset($groups[$slug])) {
+            $groups[$slug] = [
+                'name' => $name,
+                'slug' => $slug,
+                'count' => 0,
+                'stores' => [],
+                'coupons' => [],
+            ];
+        }
+
+        $groups[$slug]['count']++;
+        $groups[$slug]['coupons'][] = $coupon;
+        $store = trim((string) ($coupon['store'] ?? ''));
+        if ($store !== '') {
+            $groups[$slug]['stores'][$store] = true;
+        }
+    }
+
+    foreach ($groups as &$group) {
+        $group['stores'] = array_keys($group['stores']);
+        sort($group['stores']);
+    }
+    unset($group);
+
+    uasort($groups, fn (array $a, array $b): int => [$b['count'], $a['name']] <=> [$a['count'], $b['name']]);
+
+    return $groups;
+}
+
+function coupon_niche_group_by_slug(string $slug, ?array $coupons = null): ?array
+{
+    $groups = coupon_niche_groups($coupons);
+    return $groups[oferto_slug($slug)] ?? null;
+}
+
+function render_public_nav(array $coupons, string $active = ''): void
+{
+    $showSweepstakes = active_sweepstakes_count($coupons) > 0;
+    ?>
+      <nav class="nav-links" aria-label="Navegacao principal">
+        <a <?= $active === 'home' ? 'aria-current="page"' : '' ?> href="/">Cupons</a>
+        <a <?= $active === 'categorias' ? 'aria-current="page"' : '' ?> href="/categorias/">Categorias</a>
+        <?php if ($showSweepstakes): ?>
+          <a <?= $active === 'sorteios' ? 'aria-current="page"' : '' ?> href="/sorteios/">Sorteios</a>
+        <?php endif; ?>
+        <a <?= $active === 'blog' ? 'aria-current="page"' : '' ?> href="/blog/">Dicas de economia</a>
+        <a <?= $active === 'sobre' ? 'aria-current="page"' : '' ?> href="/sobre-a-oferto-digital.php">Sobre</a>
+      </nav>
+    <?php
+}
+
 function offer_types(): array
 {
     return [
@@ -604,7 +720,13 @@ function active_coupons(): array
         return array_map('normalize_coupon_record', fallback_coupons());
     }
 
-    $sql = "SELECT c.* FROM coupons c
+    $sql = "SELECT c.*,
+              COALESCE(NULLIF(c.nicho_principal, ''), mapa.nicho_principal) AS nicho_principal,
+              COALESCE(NULLIF(c.tags_produto, ''), mapa.tags_produto) AS tags_produto
+            FROM coupons c
+            LEFT JOIN mapa_loja_nicho mapa
+              ON mapa.status = 'ativo'
+             AND LOWER(mapa.nome_loja) = LOWER(c.store)
             LEFT JOIN integration_watchlist missing_awin
               ON missing_awin.partner = 'Awin'
              AND missing_awin.status = 'sumiu'
@@ -640,7 +762,14 @@ function coupon_by_id(int $id): ?array
         return null;
     }
 
-    $statement = $pdo->prepare('SELECT * FROM coupons WHERE id = ?');
+    $statement = $pdo->prepare("SELECT c.*,
+              COALESCE(NULLIF(c.nicho_principal, ''), mapa.nicho_principal) AS nicho_principal,
+              COALESCE(NULLIF(c.tags_produto, ''), mapa.tags_produto) AS tags_produto
+            FROM coupons c
+            LEFT JOIN mapa_loja_nicho mapa
+              ON mapa.status = 'ativo'
+             AND LOWER(mapa.nome_loja) = LOWER(c.store)
+            WHERE c.id = ?");
     $statement->execute([$id]);
     $coupon = $statement->fetch();
 

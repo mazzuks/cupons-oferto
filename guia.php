@@ -18,6 +18,7 @@ if (!$guide) {
 }
 
 $relatedGuides = array_values(array_filter(all_guides(), fn ($item) => ($item['slug'] ?? '') !== $slug));
+$publicCoupons = active_coupons();
 $shareTitle = $guide['title'] . ' - Oferto Cupons';
 $shareDescription = $guide['summary'];
 $shareSlug = $guide['slug'] ?? $slug;
@@ -105,12 +106,7 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
         <span>Cupons</span>
       </a>
-      <nav class="nav-links" aria-label="Navegação principal">
-        <a href="/#cupons">Cupons</a>
-        <a href="/sorteios/">Sorteios</a>
-        <a href="/#dicas">Dicas</a>
-        <a href="/sobre-a-oferto-digital.php">Sobre</a>
-      </nav>
+      <?php render_public_nav($publicCoupons, 'blog'); ?>
       <a class="header-cta" href="/#cupons">Ver cupons</a>
     </header>
 

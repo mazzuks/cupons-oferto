@@ -91,7 +91,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <aside class="v2-side-panel">
             <section>
               <p class="section-kicker">Resumo</p>
-              <h2>O catalogo agora</h2>
+              <h2>&#127777;&#65039;</h2>
               <div class="v2-stat-list">
                 <div><strong><?= count($coupons) ?></strong><span>ofertas ativas</span></div>
                 <div><strong><?= count($nicheGroups) ?></strong><span>categorias</span></div>
@@ -104,7 +104,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <div class="section-heading">
               <div>
                 <p class="section-kicker">Destaques</p>
-                <h2>Destaques da vez</h2>
+                <h2>Em alta &#128293;</h2>
                 <p class="v2-section-subtitle">Cupons e promocoes para olhar agora.</p>
               </div>
               <a class="text-action" href="#cupons">Ver ofertas</a>
@@ -164,7 +164,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <div class="section-heading">
             <div>
               <p class="section-kicker">Categorias</p>
-              <h2><?= count($nicheGroups) ?> <?= count($nicheGroups) === 1 ? 'categoria com ofertas ativas' : 'categorias com ofertas ativas' ?></h2>
+              <h2>Cupons por nicho</h2>
             </div>
             <a class="text-action" href="/categorias/">Ver todas</a>
           </div>
@@ -213,6 +213,13 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         </aside>
 
         <section class="v2-results" aria-live="polite">
+          <div class="section-heading">
+            <div>
+              <h2 id="coupon-title"><?= e($initialTitle) ?></h2>
+            </div>
+            <span id="result-count"><?= count($initialCoupons) ?> <?= count($initialCoupons) === 1 ? 'encontrado' : 'encontrados' ?></span>
+          </div>
+
           <div class="v2-local-filters" aria-label="Filtros de ofertas">
             <section class="v2-category-strip" aria-label="Categorias">
               <button class="category-chip <?= $defaultCategory === 'Todos' ? 'is-active' : '' ?>" type="button" data-category="Todos" data-label="Todas as ofertas">Todos</button>
@@ -229,13 +236,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                 <?php endif; ?>
               <?php endforeach; ?>
             </section>
-          </div>
-
-          <div class="section-heading">
-            <div>
-              <h2 id="coupon-title"><?= e($initialTitle) ?></h2>
-            </div>
-            <span id="result-count"><?= count($initialCoupons) ?> <?= count($initialCoupons) === 1 ? 'encontrado' : 'encontrados' ?></span>
           </div>
 
           <div class="v2-list" id="coupon-grid">
@@ -285,6 +285,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <?php endforeach; ?>
           </div>
           <p class="empty-state" id="empty-state" hidden>Nenhuma oferta encontrada para esse filtro.</p>
+          <nav class="v2-pagination" id="coupon-pagination" aria-label="Paginacao de ofertas" hidden></nav>
         </section>
       </section>
 

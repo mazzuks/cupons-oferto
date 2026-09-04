@@ -76,7 +76,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <section class="v2-compact-hero">
         <div>
           <p class="eyebrow">Cupons, promocoes e sorteios para hoje</p>
-          <h1>Cupons, promocoes e sorteios para economizar hoje.</h1>
+          <h1>Cupons, descontos e sorteios para economizar muito.</h1>
           <p>Antes de comprar, procure um cupom, veja uma promocao ou participe de um sorteio. O Oferto junta oportunidades em um so lugar para voce gastar menos.</p>
         </div>
       </section>

@@ -2235,6 +2235,28 @@ h3 {
   white-space: nowrap;
 }
 
+/* Destaques da vez: cartoes verticais e simples, no mesmo padrao do grid de categorias. */
+.site-v2-compact .v2-store-grid-4up {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.site-v2-compact .v2-store-card-minimal {
+  grid-template-columns: none;
+  grid-template-rows: none;
+  min-height: 170px;
+  padding: 20px;
+}
+
+.site-v2-compact .v2-store-card-minimal .v2-store-card-copy {
+  gap: 6px;
+}
+
+.site-v2-compact .v2-store-card-minimal .v2-store-card-copy p {
+  -webkit-line-clamp: 1;
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .site-v2-compact .v2-layout {
   display: grid;
   grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
@@ -2676,6 +2698,10 @@ h3 {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
 
+  .site-v2-compact .v2-store-grid-4up {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .site-v2-compact .v2-list-card {
     grid-template-columns: 138px minmax(0, 1fr);
   }
@@ -2909,6 +2935,21 @@ h3 {
 
   .site-v2-compact .v2-list-logo {
     aspect-ratio: 1.6 / 1;
+  }
+
+  .site-v2-compact .v2-store-grid-4up {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 14px 0 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .site-v2-compact .v2-store-card-minimal {
+    grid-template-rows: none;
+    flex: initial;
+    min-height: 0;
+    padding: 18px;
   }
 }
 

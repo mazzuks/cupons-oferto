@@ -79,11 +79,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <p class="eyebrow">Cupons, promocoes e sorteios para hoje</p>
           <h1>Cupons, promocoes e sorteios para economizar hoje.</h1>
           <p>Antes de comprar, procure um cupom, veja uma promocao ou participe de um sorteio. O Oferto junta oportunidades em um so lugar para voce gastar menos.</p>
-          <div class="v2-hero-points" aria-label="O que encontrar no Oferto Cupons">
-            <span>Descontos do dia</span>
-            <span>Promocoes por categoria</span>
-            <span>Sorteios abertos</span>
-          </div>
         </div>
       </section>
 

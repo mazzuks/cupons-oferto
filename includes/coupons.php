@@ -347,6 +347,17 @@ function coupon_niche_slug(array $coupon): string
     return oferto_slug(coupon_primary_niche($coupon));
 }
 
+function category_hero_image(string $slug): ?string
+{
+    $slug = trim($slug);
+    if ($slug === '') {
+        return null;
+    }
+
+    $relativePath = 'assets/categorias/' . $slug . '.webp';
+    return is_file(__DIR__ . '/../' . $relativePath) ? $relativePath : null;
+}
+
 function active_sweepstakes_count(?array $coupons = null): int
 {
     $items = $coupons ?? active_coupons();

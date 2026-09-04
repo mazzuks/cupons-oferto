@@ -40,14 +40,14 @@ jobs:
         if: env.CPANEL_DEPLOY_READY != 'true'
         run: echo "cPanel FTP secrets are not configured yet. Validation passed, publish skipped."
 
-      - name: Publish files by FTPS
+      - name: Publish files by FTP
         if: env.CPANEL_DEPLOY_READY == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.CPANEL_FTP_SERVER }}
           username: ${{ secrets.CPANEL_FTP_USERNAME }}
           password: ${{ secrets.CPANEL_FTP_PASSWORD }}
-          protocol: ftps
+          protocol: ftp
           local-dir: ./
           server-dir: ${{ secrets.CPANEL_FTP_SERVER_DIR }}
           exclude: |

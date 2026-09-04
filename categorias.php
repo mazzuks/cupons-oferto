@@ -25,10 +25,7 @@ $shareUrl = $isIndex
 $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
 
 $categoryHeroSlug = (string) ($selectedGroup['slug'] ?? '');
-$categoryHeroImage = 'assets/hero-cupons.webp';
-if ($categoryHeroSlug !== '' && is_file(__DIR__ . '/assets/categorias/' . $categoryHeroSlug . '.webp')) {
-    $categoryHeroImage = 'assets/categorias/' . $categoryHeroSlug . '.webp';
-}
+$categoryHeroImage = category_hero_image($categoryHeroSlug) ?? 'assets/hero-cupons.webp';
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -96,7 +93,12 @@ if ($categoryHeroSlug !== '' && is_file(__DIR__ . '/assets/categorias/' . $categ
           </div>
           <div class="niche-grid">
             <?php foreach ($groups as $group): ?>
-              <a class="niche-card" href="/categorias/<?= e($group['slug']) ?>">
+              <?php $groupPhoto = category_hero_image($group['slug']); ?>
+              <a
+                class="niche-card<?= $groupPhoto ? ' niche-card-photo' : '' ?>"
+                href="/categorias/<?= e($group['slug']) ?>"
+                <?php if ($groupPhoto): ?>style="--card-photo: url('/<?= e($groupPhoto) ?>')"<?php endif; ?>
+              >
                 <span><?= (int) $group['count'] ?> <?= (int) $group['count'] === 1 ? 'oferta' : 'ofertas' ?></span>
                 <h2><?= e($group['name']) ?></h2>
                 <p><?= e(implode(', ', array_slice($group['stores'], 0, 4))) ?></p>

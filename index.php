@@ -169,7 +169,12 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           </div>
           <div class="niche-grid">
             <?php foreach (array_slice($nicheGroups, 0, 8) as $group): ?>
-              <a class="niche-card" href="/categorias/<?= e($group['slug']) ?>">
+              <?php $groupPhoto = category_hero_image($group['slug']); ?>
+              <a
+                class="niche-card<?= $groupPhoto ? ' niche-card-photo' : '' ?>"
+                href="/categorias/<?= e($group['slug']) ?>"
+                <?php if ($groupPhoto): ?>style="--card-photo: url('/<?= e($groupPhoto) ?>')"<?php endif; ?>
+              >
                 <span><?= (int) $group['count'] ?> <?= (int) $group['count'] === 1 ? 'oferta' : 'ofertas' ?></span>
                 <h2><?= e($group['name']) ?></h2>
                 <p><?= e(implode(', ', array_slice($group['stores'], 0, 4))) ?></p>

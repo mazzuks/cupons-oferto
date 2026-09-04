@@ -2477,6 +2477,17 @@ h3 {
   line-height: 1.4;
 }
 
+.niche-card-photo {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.94) 78%),
+    var(--card-photo) center / cover no-repeat;
+}
+
+.niche-card-photo p {
+  color: var(--navy);
+  font-weight: 700;
+}
+
 .site-v2-compact .v2-list-actions {
   display: grid;
   gap: 10px;

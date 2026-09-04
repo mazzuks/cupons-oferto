@@ -680,6 +680,13 @@ function e(?string $value): string
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
+function asset_version(string $relativePath): string
+{
+    $path = dirname(__DIR__) . '/' . ltrim($relativePath, '/');
+    $mtime = is_file($path) ? filemtime($path) : false;
+    return $mtime !== false ? (string) $mtime : '1';
+}
+
 function render_json_ld(array $data): void
 {
     echo '<script type="application/ld+json">' . json_encode(

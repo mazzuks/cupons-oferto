@@ -38,7 +38,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20260828-brand-search" />
+    <link rel="stylesheet" href="/styles.css?v=<?= asset_version('styles.css') ?>" />
   </head>
   <body class="site-v2 site-v2-compact brand-about-page" style="--seo-bg-image: url('https://picsum.photos/seed/oferto-digital-marca/1600/900.webp');">
     <header class="site-header v2-compact-header">

@@ -58,13 +58,12 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <meta name="twitter:image" content="<?= e($shareImage) ?>" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1725208559538025" crossorigin="anonymous"></script>
     <?php render_oferto_brand_schema($shareUrl, 'Oferto Cupons'); ?>
-    <link rel="preconnect" href="https://picsum.photos" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css?v=20260828-picsum-seo" />
   </head>
-  <body class="site-v2 site-v2-compact" style="--seo-bg-image: url('https://picsum.photos/seed/oferto-cupons-economia/1600/900.webp');">
+  <body class="site-v2 site-v2-compact" style="--seo-bg-image: url('/assets/hero-cupons.webp');">
     <header class="site-header v2-compact-header">
       <a class="brand" href="/" aria-label="Oferto Cupons">
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />

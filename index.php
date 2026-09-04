@@ -96,12 +96,9 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             </div>
             <a class="text-action" href="#cupons">Ver ofertas</a>
           </div>
-          <div class="v2-store-grid">
+          <div class="v2-store-grid v2-store-grid-featured">
             <?php foreach ($topCoupons as $coupon): ?>
-              <?php
-                $featuredNiche = coupon_primary_niche($coupon);
-                $featuredTitle = coupon_display_title($coupon, 64);
-              ?>
+              <?php $featuredTitle = coupon_display_title($coupon, 64); ?>
               <a class="v2-store-card" href="<?= e(coupon_offer_url($coupon, 'destaque')) ?>">
                 <div class="v2-card-media">
                   <?= coupon_brand_image_markup($coupon) ?>
@@ -110,9 +107,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                   <span class="v2-featured-store"><?= e($coupon['store']) ?></span>
                   <h3><?= e($featuredTitle) ?></h3>
                   <p><?= e($coupon['description']) ?></p>
-                  <small><?= e(trim((string) ($coupon['rules'] ?? '')) !== '' ? $coupon['rules'] : 'Confira as regras antes de finalizar.') ?></small>
                   <div class="v2-featured-meta">
-                    <span><?= e($featuredNiche) ?></span>
                     <strong><?= e(validity_label($coupon['ends_at'])) ?></strong>
                   </div>
                   <?php if (coupon_shows_public_code($coupon)): ?>

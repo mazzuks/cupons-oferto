@@ -2235,11 +2235,6 @@ h3 {
   white-space: nowrap;
 }
 
-/* Destaques da vez: grid fixo e previsivel, no mesmo espirito do grid de categorias. */
-.site-v2-compact .v2-store-grid-featured {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
 .site-v2-compact .v2-layout {
   display: grid;
   grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
@@ -2300,6 +2295,32 @@ h3 {
   margin-top: 10px;
   color: var(--muted);
   line-height: 1.45;
+}
+
+.site-v2-compact .v2-stat-list {
+  display: grid;
+  margin-top: 14px;
+}
+
+.site-v2-compact .v2-stat-list div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(221, 229, 240, 0.86);
+}
+
+.site-v2-compact .v2-stat-list strong {
+  color: var(--navy);
+  font-size: 20px;
+}
+
+.site-v2-compact .v2-stat-list span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-align: right;
 }
 
 .site-v2-compact .v2-results {
@@ -2681,10 +2702,6 @@ h3 {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
 
-  .site-v2-compact .v2-store-grid-featured {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .site-v2-compact .v2-list-card {
     grid-template-columns: 138px minmax(0, 1fr);
   }
@@ -2918,14 +2935,6 @@ h3 {
 
   .site-v2-compact .v2-list-logo {
     aspect-ratio: 1.6 / 1;
-  }
-
-  .site-v2-compact .v2-store-grid-featured {
-    display: grid;
-    grid-template-columns: 1fr;
-    margin: 14px 0 0;
-    padding: 0;
-    overflow: visible;
   }
 }
 

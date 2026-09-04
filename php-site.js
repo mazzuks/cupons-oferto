@@ -20,9 +20,9 @@ function normalizeText(value) {
 }
 
 function applyFilters() {
-  if (!grid || !search || !title || !resultCount || !empty) return;
+  if (!grid || !title || !resultCount || !empty) return;
 
-  const term = normalizeText(search.value.trim());
+  const term = normalizeText(search ? search.value.trim() : "");
   let visible = 0;
 
   grid.querySelectorAll(".coupon-card").forEach((card) => {

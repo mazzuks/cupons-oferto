@@ -23,7 +23,12 @@ $shareUrl = $isIndex
     ? 'https://cupons.oferto.digital/categorias/'
     : 'https://cupons.oferto.digital/categorias/' . rawurlencode((string) ($selectedGroup['slug'] ?? $slug));
 $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
-$heroSeed = oferto_slug('oferto categoria ' . $pageName);
+
+$categoryHeroSlug = (string) ($selectedGroup['slug'] ?? '');
+$categoryHeroImage = 'assets/hero-cupons.webp';
+if ($categoryHeroSlug !== '' && is_file(__DIR__ . '/assets/categorias/' . $categoryHeroSlug . '.webp')) {
+    $categoryHeroImage = 'assets/categorias/' . $categoryHeroSlug . '.webp';
+}
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -52,13 +57,12 @@ $heroSeed = oferto_slug('oferto categoria ' . $pageName);
     <meta name="twitter:image" content="<?= e($shareImage) ?>" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1725208559538025" crossorigin="anonymous"></script>
     <?php render_oferto_brand_schema($shareUrl, $shareTitle); ?>
-    <link rel="preconnect" href="https://picsum.photos" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css?v=20260903-taxonomia" />
   </head>
-  <body class="site-v2 site-v2-compact category-page" style="--seo-bg-image: url('https://picsum.photos/seed/<?= e($heroSeed) ?>/1600/900.webp');">
+  <body class="site-v2 site-v2-compact category-page" style="--seo-bg-image: url('/<?= e($categoryHeroImage) ?>');">
     <header class="site-header v2-compact-header">
       <a class="brand" href="/" aria-label="Oferto Cupons">
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />

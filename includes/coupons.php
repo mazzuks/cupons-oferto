@@ -431,7 +431,7 @@ function offer_type_label(?string $type): string
 function default_cta_label(?string $type, ?string $code = ''): string
 {
     $labels = [
-        'cupom' => $code ? 'Resgatar cupom' : 'Resgatar oferta',
+        'cupom' => 'Resgatar oferta',
         'sorteio' => 'Participar',
         'cadastro' => 'Cadastrar agora',
         'cashback' => 'Ativar cashback',

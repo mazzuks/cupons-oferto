@@ -57,7 +57,7 @@ $categoryHeroImage = category_hero_image($categoryHeroSlug) ?? 'assets/hero-cupo
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20260903-taxonomia" />
+    <link rel="stylesheet" href="/styles.css?v=<?= asset_version('styles.css') ?>" />
   </head>
   <body class="site-v2 site-v2-compact category-page" style="--seo-bg-image: url('/<?= e($categoryHeroImage) ?>');">
     <header class="site-header v2-compact-header">
@@ -190,6 +190,6 @@ $categoryHeroImage = category_hero_image($categoryHeroSlug) ?? 'assets/hero-cupo
       <strong>Oferto Cupons</strong>
       <span>Cupons, promoções e sorteios para economizar hoje.</span>
     </footer>
-    <script src="/php-site.js?v=20260903-taxonomia"></script>
+    <script src="/php-site.js?v=<?= asset_version('php-site.js') ?>"></script>
   </body>
 </html>

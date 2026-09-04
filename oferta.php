@@ -75,7 +75,7 @@ $howToUse = $hasCode
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20260828-offer-page" />
+    <link rel="stylesheet" href="/styles.css?v=<?= asset_version('styles.css') ?>" />
   </head>
   <body class="site-v2 site-v2-compact offer-page">
     <header class="site-header v2-compact-header">
@@ -199,7 +199,7 @@ $howToUse = $hasCode
       <strong>Oferto Cupons</strong>
       <span>Cupons, promocoes e sorteios para economizar hoje.</span>
     </footer>
-    <script src="/php-site.js?v=20260828-offer-page"></script>
-    <script src="/pwa.js?v=20260825-cache-fix"></script>
+    <script src="/php-site.js?v=<?= asset_version('php-site.js') ?>"></script>
+    <script src="/pwa.js?v=<?= asset_version('pwa.js') ?>"></script>
   </body>
 </html>

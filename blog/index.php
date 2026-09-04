@@ -47,7 +47,7 @@ function blog_anchor(string $value): string
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20260828-picsum-seo" />
+    <link rel="stylesheet" href="/styles.css?v=<?= asset_version('styles.css') ?>" />
   </head>
   <body class="site-v2 site-v2-compact" style="--seo-bg-image: url('https://picsum.photos/seed/oferto-dicas-economia/1600/900.webp');">
     <header class="site-header v2-compact-header">
@@ -112,6 +112,6 @@ function blog_anchor(string $value): string
       <strong>Oferto Cupons</strong>
       <span>Cupons, promoções, sorteios e dicas para economizar hoje.</span>
     </footer>
-    <script src="/pwa.js?v=20260825-cache-fix"></script>
+    <script src="/pwa.js?v=<?= asset_version('pwa.js') ?>"></script>
   </body>
 </html>

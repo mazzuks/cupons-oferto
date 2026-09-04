@@ -87,36 +87,75 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       </aside>
 
       <?php if ($topCoupons): ?>
-        <section class="v2-section" id="top-cupons">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">Destaques</p>
-              <h2>Destaques da vez</h2>
-              <p class="v2-section-subtitle">Cupons e promocoes para olhar agora.</p>
+        <section class="v2-layout" id="top-cupons">
+          <aside class="v2-side-panel">
+            <section>
+              <p class="section-kicker">Resumo</p>
+              <h2>O catalogo agora</h2>
+              <div class="v2-stat-list">
+                <div><strong><?= count($coupons) ?></strong><span>ofertas ativas</span></div>
+                <div><strong><?= count($nicheGroups) ?></strong><span>categorias</span></div>
+                <div><strong><?= count($expiring) ?></strong><span>vencendo em breve</span></div>
+              </div>
+            </section>
+          </aside>
+
+          <section class="v2-results">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">Destaques</p>
+                <h2>Destaques da vez</h2>
+                <p class="v2-section-subtitle">Cupons e promocoes para olhar agora.</p>
+              </div>
+              <a class="text-action" href="#cupons">Ver ofertas</a>
             </div>
-            <a class="text-action" href="#cupons">Ver ofertas</a>
-          </div>
-          <div class="v2-store-grid v2-store-grid-featured">
-            <?php foreach ($topCoupons as $coupon): ?>
-              <?php $featuredTitle = coupon_display_title($coupon, 64); ?>
-              <a class="v2-store-card" href="<?= e(coupon_offer_url($coupon, 'destaque')) ?>">
-                <div class="v2-card-media">
-                  <?= coupon_brand_image_markup($coupon) ?>
-                </div>
-                <div class="v2-store-card-copy">
-                  <span class="v2-featured-store"><?= e($coupon['store']) ?></span>
-                  <h3><?= e($featuredTitle) ?></h3>
-                  <p><?= e($coupon['description']) ?></p>
-                  <div class="v2-featured-meta">
-                    <strong><?= e(validity_label($coupon['ends_at'])) ?></strong>
+            <div class="v2-list">
+              <?php foreach ($topCoupons as $coupon): ?>
+                <?php
+                  $couponOfferUrl = 'https://cupons.oferto.digital/' . coupon_offer_url($coupon, 'whatsapp');
+                  $couponDisplayTitle = coupon_display_title($coupon, 82);
+                  $couponShareText = rawurlencode(
+                      'Olha essa oferta da ' . $coupon['store'] . ': ' . $couponDisplayTitle . '. Veja os detalhes e copie o cupom aqui: ' . $couponOfferUrl
+                  );
+                  $couponNiche = coupon_primary_niche($coupon);
+                ?>
+                <article class="coupon-card v2-list-card">
+                  <div class="v2-list-logo">
+                    <?= coupon_brand_image_markup($coupon) ?>
                   </div>
-                  <?php if (coupon_shows_public_code($coupon)): ?>
-                    <em><?= e(coupon_mechanic_label($coupon)) ?>: <?= e(coupon_mechanic_value($coupon)) ?></em>
-                  <?php endif; ?>
-                </div>
-              </a>
-            <?php endforeach; ?>
-          </div>
+                  <div class="v2-list-content">
+                    <div class="coupon-meta">
+                      <span class="store"><?= e($coupon['store']) ?></span>
+                    </div>
+                    <h3><?= e($couponDisplayTitle) ?></h3>
+                    <p class="offer-condition"><?= e($coupon['description']) ?></p>
+                    <p class="offer-rule"><?= e(trim((string) ($coupon['rules'] ?? '')) !== '' ? $coupon['rules'] : 'Confira as regras no site parceiro antes de finalizar.') ?></p>
+                    <div class="v2-list-tags">
+                      <a href="/categorias/<?= e(coupon_niche_slug($coupon)) ?>"><?= e($couponNiche) ?></a>
+                      <span><?= e(validity_label($coupon['ends_at'])) ?></span>
+                      <?php if (coupon_shows_public_code($coupon)): ?>
+                        <span><?= e(coupon_mechanic_label($coupon)) ?>: <?= e(coupon_mechanic_value($coupon)) ?></span>
+                      <?php endif; ?>
+                    </div>
+                  </div>
+                  <div class="v2-list-actions">
+                    <?php if (coupon_shows_public_code($coupon)): ?>
+                      <button class="copy-button" type="button" data-code="<?= e($coupon['code']) ?>">Copiar codigo</button>
+                    <?php endif; ?>
+                    <?php if (coupon_shows_rescue_button($coupon)): ?>
+                      <a class="use-button" href="<?= e(coupon_go_url($coupon, 'destaque_cta')) ?>" target="_blank" rel="noopener"><?= e(coupon_cta_label($coupon)) ?></a>
+                    <?php endif; ?>
+                    <a class="whatsapp-share-button" href="https://wa.me/?text=<?= e($couponShareText) ?>" target="_blank" rel="noopener" aria-label="Compartilhar <?= e($couponDisplayTitle) ?> no WhatsApp">
+                      <svg viewBox="0 0 32 32" aria-hidden="true">
+                        <path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.6 28.8l6.6-1.5A12.7 12.7 0 1 0 16 3.2Zm0 2.4a10.3 10.3 0 0 1 8.8 15.7 10.4 10.4 0 0 1-13.9 3.7l-.4-.2-3.5.8.8-3.4-.2-.4A10.3 10.3 0 0 1 16 5.6Zm-4.1 5.2c-.3 0-.7.1-1 .5-.4.4-1.3 1.2-1.3 3s1.3 3.5 1.5 3.8c.2.2 2.5 4 6.2 5.4 3.1 1.2 3.7.9 4.4.9.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.7.2-1.8-.1-.2-.3-.3-.7-.5l-2.5-1.2c-.3-.1-.6-.2-.8.2-.2.3-.9 1.2-1.1 1.5-.2.2-.4.3-.8.1-.3-.2-1.4-.5-2.7-1.7-1-1-1.7-2.1-1.9-2.4-.2-.4 0-.6.2-.8l.5-.6c.2-.2.2-.4.3-.6.1-.2.1-.4 0-.6l-1.1-2.6c-.3-.6-.5-.6-.8-.6h-.8Z" />
+                      </svg>
+                      <span>Compartilhar</span>
+                    </a>
+                  </div>
+                </article>
+              <?php endforeach; ?>
+            </div>
+          </section>
         </section>
       <?php endif; ?>
 

@@ -2302,6 +2302,32 @@ h3 {
   line-height: 1.45;
 }
 
+.site-v2-compact .v2-stat-list {
+  display: grid;
+  margin-top: 14px;
+}
+
+.site-v2-compact .v2-stat-list div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(221, 229, 240, 0.86);
+}
+
+.site-v2-compact .v2-stat-list strong {
+  color: var(--navy);
+  font-size: 20px;
+}
+
+.site-v2-compact .v2-stat-list span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-align: right;
+}
+
 .site-v2-compact .v2-results {
   min-width: 0;
 }

@@ -162,6 +162,27 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         </section>
       <?php endif; ?>
 
+      <?php if ($nicheGroups): ?>
+        <section class="v2-section category-index" id="categorias">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Categorias</p>
+              <h2><?= count($nicheGroups) ?> <?= count($nicheGroups) === 1 ? 'categoria com ofertas ativas' : 'categorias com ofertas ativas' ?></h2>
+            </div>
+            <a class="text-action" href="/categorias/">Ver todas</a>
+          </div>
+          <div class="niche-grid">
+            <?php foreach (array_slice($nicheGroups, 0, 8) as $group): ?>
+              <a class="niche-card" href="/categorias/<?= e($group['slug']) ?>">
+                <span><?= (int) $group['count'] ?> <?= (int) $group['count'] === 1 ? 'oferta' : 'ofertas' ?></span>
+                <h2><?= e($group['name']) ?></h2>
+                <p><?= e(implode(', ', array_slice($group['stores'], 0, 4))) ?></p>
+              </a>
+            <?php endforeach; ?>
+          </div>
+        </section>
+      <?php endif; ?>
+
       <aside class="inventory-band v2-ad-band v2-ad-band-between" aria-label="Publicidade">
         <?php render_ad_slot('v2_entre_destaques_e_lista'); ?>
       </aside>

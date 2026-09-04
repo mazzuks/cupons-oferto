@@ -15,7 +15,7 @@ $featured = array_slice(array_values(array_filter($coupons, fn ($coupon) => (int
 $topCoupons = $featured ?: array_slice($coupons, 0, 6);
 $expiring = expiring_soon_coupons($coupons);
 $guides = all_guides();
-$homeGuides = array_slice($guides, 0, 8);
+$homeGuides = array_slice($guides, 0, 4);
 $defaultCategory = 'Todos';
 $initialCoupons = $coupons;
 $initialTitle = 'Todas as ofertas';
@@ -301,7 +301,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         <div class="section-heading">
           <div>
             <p class="section-kicker">Dicas de economia</p>
-            <h2>Aprenda a economizar melhor antes de comprar</h2>
+            <h2>Blog Oferto</h2>
           </div>
           <a class="primary-action v2-more-content" href="/blog/">Ver mais dicas</a>
         </div>

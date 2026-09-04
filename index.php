@@ -16,13 +16,6 @@ $topCoupons = $featured ?: array_slice($coupons, 0, 6);
 $expiring = expiring_soon_coupons($coupons);
 $guides = all_guides();
 $homeGuides = array_slice($guides, 0, 8);
-$searchSuggestions = array_values(array_unique(array_filter(array_merge(
-    array_column($nicheGroups, 'name'),
-    array_column($coupons, 'store'),
-    array_column($coupons, 'title'),
-    ['pizza', 'seguro', 'games', 'mercado', 'sorteio', 'promocao', 'cupom']
-))));
-sort($searchSuggestions);
 $defaultCategory = 'Todos';
 $initialCoupons = $coupons;
 $initialTitle = 'Todas as ofertas';
@@ -77,7 +70,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         <img src="https://oferto.digital/wp-content/uploads/2024/08/oferto.png" alt="Oferto" />
         <span>Cupons</span>
       </a>
-      <?php render_public_nav($coupons, 'home'); ?>
       <a class="header-cta" href="#cupons">Ver ofertas</a>
     </header>
 
@@ -93,30 +85,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
             <span>Sorteios abertos</span>
           </div>
         </div>
-        <label class="v2-hero-search">
-          <span>Procure sua loja, produto ou cupom</span>
-          <div class="v2-search-control">
-            <input id="coupon-search" type="search" list="coupon-search-suggestions" placeholder="Pizza, seguros, games, mercado..." autocomplete="off" />
-            <button id="coupon-search-submit" type="button" aria-label="Buscar ofertas">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M10.8 18.1a7.3 7.3 0 1 1 0-14.6 7.3 7.3 0 0 1 0 14.6Zm5.4-1.9 4.3 4.3" />
-              </svg>
-            </button>
-          </div>
-          <datalist id="coupon-search-suggestions">
-            <?php foreach (array_slice($searchSuggestions, 0, 40) as $suggestion): ?>
-              <option value="<?= e($suggestion) ?>"></option>
-            <?php endforeach; ?>
-          </datalist>
-          <small>Exemplo: pizza, seguro, games, mercado ou o nome de uma loja.</small>
-        </label>
-      </section>
-
-      <section class="v2-quick-bar" aria-label="Resumo e filtros">
-        <div class="v2-quick-stat"><strong><?= count($coupons) ?></strong><span>ofertas ativas</span></div>
-        <div class="v2-quick-stat"><strong><?= count($nicheGroups) ?></strong><span>nichos</span></div>
-        <div class="v2-quick-stat"><strong><?= count($expiring) ?></strong><span>vencendo em breve</span></div>
-        <div class="v2-quick-note">Abra a oferta, veja como aproveitar e siga para o site parceiro quando quiser resgatar.</div>
       </section>
 
       <aside class="inventory-band v2-ad-band" aria-label="Publicidade">
@@ -321,27 +289,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <span>Cupons, promocoes e sorteios para economizar hoje.</span>
     </footer>
     <script src="php-site.js?v=20260825-copy-fix"></script>
-    <script>
-      (() => {
-        const search = document.querySelector("#coupon-search");
-        const submit = document.querySelector("#coupon-search-submit");
-        const goToResults = () => {
-          search?.dispatchEvent(new Event("input", { bubbles: true }));
-          document.querySelector("#cupons")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        };
-
-        search?.addEventListener("keydown", (event) => {
-          if (event.key !== "Enter") return;
-          event.preventDefault();
-          goToResults();
-        });
-
-        submit?.addEventListener("click", () => {
-          search?.focus();
-          goToResults();
-        });
-      })();
-    </script>
     <script src="pwa.js?v=20260825-cache-fix"></script>
   </body>
 </html>

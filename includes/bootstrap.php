@@ -788,9 +788,28 @@ function render_ad_slot(string $slot, string $class = 'inventory-slot-wide'): vo
         return;
     }
 
+    $insId = 'ads-' . preg_replace('/[^a-z0-9]+/i', '-', $slot) . '-' . substr(md5($slot . microtime()), 0, 6);
+
     echo '<div class="' . e($classes) . ' adsense-slot" data-filled="true" data-inventory-slot="' . e($slot) . '">';
-    echo '<ins class="adsbygoogle" style="display:block" data-ad-client="' . e(adsense_client_id()) . '" data-ad-slot="' . e($slotId) . '" data-ad-format="auto" data-full-width-responsive="true"></ins>';
+    echo '<ins id="' . e($insId) . '" class="adsbygoogle" style="display:block" data-ad-client="' . e(adsense_client_id()) . '" data-ad-slot="' . e($slotId) . '" data-ad-format="auto" data-full-width-responsive="true"></ins>';
     echo '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>';
+    echo '<script>' . sprintf(
+        '(function () {'
+        . 'var ins = document.getElementById(%s);'
+        . 'if (!ins) return;'
+        . 'var collapse = function () {'
+        . 'var host = ins.closest(".inventory-band") || ins.closest("aside[aria-label=Publicidade]") || ins.closest(".inventory-slot");'
+        . 'if (host) host.classList.add("ad-slot-empty");'
+        . '};'
+        . 'if (ins.dataset.adStatus === "unfilled") { collapse(); return; }'
+        . 'new MutationObserver(function (muts) {'
+        . 'muts.forEach(function (m) {'
+        . 'if (m.attributeName === "data-ad-status" && ins.dataset.adStatus === "unfilled") collapse();'
+        . '});'
+        . '}).observe(ins, { attributes: true });'
+        . '})();',
+        json_encode($insId)
+    ) . '</script>';
     echo '</div>';
 }
 

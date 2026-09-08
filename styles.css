@@ -1841,6 +1841,10 @@ h3 {
   line-height: 0.98;
 }
 
+.site-v2-compact .v2-compact-hero h1 .hero-highlight {
+  color: var(--cyan);
+}
+
 .site-v2-compact .v2-compact-hero p:not(.eyebrow) {
   max-width: 760px;
   margin: 14px 0 0;

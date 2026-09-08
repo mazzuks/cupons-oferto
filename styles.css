@@ -726,6 +726,12 @@ h3 {
   min-width: 250px;
 }
 
+.ad-slot-empty {
+  display: none !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: minmax(260px, 330px) 1fr;
@@ -1377,6 +1383,10 @@ h3 {
 
   .inventory-slot-wide,
   .inventory-slot-rectangle {
+    min-height: 96px;
+  }
+
+  .site-v2-compact .v2-side-ad {
     min-height: 96px;
   }
 

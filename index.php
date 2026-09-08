@@ -88,13 +88,12 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <?php if ($topCoupons): ?>
         <section class="v2-layout" id="top-cupons">
           <aside class="v2-side-panel">
-            <section>
-              <p class="section-kicker">Resumo</p>
-              <h2>&#127777;&#65039;</h2>
+            <section class="v2-summary-card">
+              <p class="section-kicker">Hoje no Oferto</p>
               <div class="v2-stat-list">
-                <div><strong><?= count($coupons) ?></strong><span>ofertas ativas</span></div>
-                <div><strong><?= count($nicheGroups) ?></strong><span>categorias</span></div>
-                <div><strong><?= count($expiring) ?></strong><span>vencendo em breve</span></div>
+                <div><span class="stat-icon" aria-hidden="true">&#127991;&#65039;</span><strong><?= count($coupons) ?></strong><span class="stat-label">ofertas ativas</span></div>
+                <div><span class="stat-icon" aria-hidden="true">&#128193;</span><strong><?= count($nicheGroups) ?></strong><span class="stat-label">categorias</span></div>
+                <div><span class="stat-icon" aria-hidden="true">&#8987;</span><strong><?= count($expiring) ?></strong><span class="stat-label">vencendo em breve</span></div>
               </div>
             </section>
           </aside>

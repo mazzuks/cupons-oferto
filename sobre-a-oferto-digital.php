@@ -95,6 +95,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <footer class="site-footer">
       <strong>Oferto Cupons</strong>
       <span>Cupons, promoções e sorteios para comprar melhor.</span>
+      <p class="footer-disclaimer">As ofertas têm tempo limitado. Confira a validade, o código e as regras no site parceiro antes de finalizar sua compra.</p>
     </footer>
   </body>
 </html>

@@ -126,8 +126,12 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                       <span class="store"><?= e($coupon['store']) ?></span>
                     </div>
                     <h3><?= e($couponDisplayTitle) ?></h3>
-                    <p class="offer-condition"><?= e($coupon['description']) ?></p>
-                    <p class="offer-rule"><?= e(trim((string) ($coupon['rules'] ?? '')) !== '' ? $coupon['rules'] : 'Confira as regras no site parceiro antes de finalizar.') ?></p>
+                    <?php if (!coupon_has_generic_description($coupon)): ?>
+                      <p class="offer-condition"><?= e($coupon['description']) ?></p>
+                    <?php endif; ?>
+                    <?php if ($customRule = coupon_custom_rule($coupon)): ?>
+                      <p class="offer-rule"><?= e($customRule) ?></p>
+                    <?php endif; ?>
                     <div class="v2-list-tags">
                       <a href="/categorias/<?= e(coupon_niche_slug($coupon)) ?>"><?= e($couponNiche) ?></a>
                       <span><?= e(validity_label($coupon['ends_at'])) ?></span>
@@ -259,8 +263,12 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
                     <span class="store"><?= e($coupon['store']) ?></span>
                   </div>
                   <h3><?= e($couponDisplayTitle) ?></h3>
-                  <p class="offer-condition"><?= e($coupon['description']) ?></p>
-                  <p class="offer-rule"><?= e(trim((string) ($coupon['rules'] ?? '')) !== '' ? $coupon['rules'] : 'Confira as regras no site parceiro antes de finalizar.') ?></p>
+                  <?php if (!coupon_has_generic_description($coupon)): ?>
+                    <p class="offer-condition"><?= e($coupon['description']) ?></p>
+                  <?php endif; ?>
+                  <?php if ($customRule = coupon_custom_rule($coupon)): ?>
+                    <p class="offer-rule"><?= e($customRule) ?></p>
+                  <?php endif; ?>
                   <div class="v2-list-tags">
                     <a href="/categorias/<?= e(coupon_niche_slug($coupon)) ?>"><?= e($couponNiche) ?></a>
                     <span><?= e(validity_label($coupon['ends_at'])) ?></span>
@@ -319,6 +327,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <footer class="site-footer">
       <strong>Oferto Cupons</strong>
       <span>Cupons, promocoes e sorteios para economizar hoje.</span>
+      <p class="footer-disclaimer">As ofertas tem tempo limitado. Confira a validade, o codigo e as regras no site parceiro antes de finalizar sua compra.</p>
     </footer>
     <script src="php-site.js?v=<?= asset_version('php-site.js') ?>"></script>
     <script src="pwa.js?v=<?= asset_version('pwa.js') ?>"></script>

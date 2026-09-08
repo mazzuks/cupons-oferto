@@ -150,8 +150,12 @@ $categoryHeroImage = category_hero_image($categoryHeroSlug) ?? 'assets/hero-cupo
                       <span class="store"><?= e($coupon['store']) ?></span>
                     </div>
                     <h3><?= e($couponDisplayTitle) ?></h3>
-                    <p class="offer-condition"><?= e($coupon['description']) ?></p>
-                    <p class="offer-rule"><?= e(trim((string) ($coupon['rules'] ?? '')) !== '' ? $coupon['rules'] : 'Confira as regras no site parceiro antes de finalizar.') ?></p>
+                    <?php if (!coupon_has_generic_description($coupon)): ?>
+                      <p class="offer-condition"><?= e($coupon['description']) ?></p>
+                    <?php endif; ?>
+                    <?php if ($customRule = coupon_custom_rule($coupon)): ?>
+                      <p class="offer-rule"><?= e($customRule) ?></p>
+                    <?php endif; ?>
                     <div class="v2-list-tags">
                       <span><?= e(validity_label($coupon['ends_at'])) ?></span>
                       <?php if (coupon_shows_public_code($coupon)): ?>
@@ -189,6 +193,7 @@ $categoryHeroImage = category_hero_image($categoryHeroSlug) ?? 'assets/hero-cupo
     <footer class="site-footer">
       <strong>Oferto Cupons</strong>
       <span>Cupons, promoções e sorteios para economizar hoje.</span>
+      <p class="footer-disclaimer">As ofertas têm tempo limitado. Confira a validade, o código e as regras no site parceiro antes de finalizar sua compra.</p>
     </footer>
     <script src="/php-site.js?v=<?= asset_version('php-site.js') ?>"></script>
   </body>

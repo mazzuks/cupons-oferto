@@ -203,6 +203,7 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
     <footer class="site-footer">
       <strong>Oferto Cupons</strong>
       <span>Compras inteligentes, ofertas imperdíveis.</span>
+      <p class="footer-disclaimer">As ofertas têm tempo limitado. Confira a validade, o código e as regras no site parceiro antes de finalizar sua compra.</p>
     </footer>
     <script>
       document.addEventListener('click', async (event) => {

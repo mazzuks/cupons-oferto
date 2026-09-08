@@ -358,6 +358,33 @@ function category_hero_image(string $slug): ?string
     return is_file(__DIR__ . '/../' . $relativePath) ? $relativePath : null;
 }
 
+function coupon_has_generic_description(array $coupon): bool
+{
+    $description = trim((string) ($coupon['description'] ?? ''));
+    if ($description === '') {
+        return true;
+    }
+
+    $store = trim((string) ($coupon['store'] ?? ''));
+
+    return in_array($description, [
+        'Oferta disponivel na ' . $store . ' por tempo limitado.',
+        'Oferta disponível na ' . $store . ' por tempo limitado.',
+        'Oferta disponivel por tempo limitado.',
+        'Oferta disponível por tempo limitado.',
+    ], true);
+}
+
+function coupon_custom_rule(array $coupon): string
+{
+    $rules = trim((string) ($coupon['rules'] ?? ''));
+    if ($rules === '' || $rules === 'Confira as regras no site parceiro antes de finalizar.') {
+        return '';
+    }
+
+    return $rules;
+}
+
 function active_sweepstakes_count(?array $coupons = null): int
 {
     $items = $coupons ?? active_coupons();

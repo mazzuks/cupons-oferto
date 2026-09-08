@@ -111,6 +111,7 @@ function blog_anchor(string $value): string
     <footer class="site-footer">
       <strong>Oferto Cupons</strong>
       <span>Cupons, promoções, sorteios e dicas para economizar hoje.</span>
+      <p class="footer-disclaimer">As ofertas têm tempo limitado. Confira a validade, o código e as regras no site parceiro antes de finalizar sua compra.</p>
     </footer>
     <script src="/pwa.js?v=<?= asset_version('pwa.js') ?>"></script>
   </body>

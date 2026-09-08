@@ -166,6 +166,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     <footer class="site-footer">
       <strong>Oferto Sorteios</strong>
       <span>Promoções, sorteios e oportunidades para participar hoje.</span>
+      <p class="footer-disclaimer">As promoções e sorteios têm prazo de participação. Confira as regras no site parceiro antes de participar.</p>
     </footer>
     <script src="/php-site.js?v=<?= asset_version('php-site.js') ?>"></script>
     <script>

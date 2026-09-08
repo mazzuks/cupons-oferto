@@ -161,8 +161,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
         <section class="v2-section category-index" id="categorias">
           <div class="section-heading">
             <div>
-              <p class="section-kicker">Categorias</p>
-              <h2>Cupons por nicho</h2>
+              <h2>Categorias</h2>
             </div>
             <a class="text-action" href="/categorias/">Ver todas</a>
           </div>

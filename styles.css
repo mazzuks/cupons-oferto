@@ -2915,9 +2915,64 @@ h3 {
     padding-inline: 16px;
   }
 
-  .site-v2-compact .v2-list-card,
+  .site-v2-compact .v2-list-card {
+    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-areas: "logo content" "actions actions";
+    align-items: start;
+    gap: 10px 12px;
+    padding: 12px;
+  }
+
+  .site-v2-compact .v2-list-logo {
+    grid-area: logo;
+    padding: 6px;
+  }
+
+  .site-v2-compact .v2-list-content {
+    grid-area: content;
+    gap: 4px;
+  }
+
+  .site-v2-compact .v2-list-content h3 {
+    font-size: 17px;
+    line-height: 1.15;
+  }
+
+  .site-v2-compact .v2-list-content .offer-condition,
+  .site-v2-compact .v2-list-content .offer-rule {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 13px;
+  }
+
+  .site-v2-compact .v2-list-tags {
+    gap: 6px;
+  }
+
   .site-v2-compact .v2-list-actions {
-    grid-template-columns: 1fr;
+    grid-area: actions;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .site-v2-compact .v2-list-actions .copy-button,
+  .site-v2-compact .v2-list-actions .use-button {
+    flex: 1 1 130px;
+    min-height: 40px;
+    font-size: 13px;
+  }
+
+  .site-v2-compact .whatsapp-share-button {
+    flex: 0 0 40px;
+    min-height: 40px;
+    padding: 0;
+  }
+
+  .site-v2-compact .whatsapp-share-button span {
+    display: none;
   }
 
   .niche-grid {

@@ -678,7 +678,7 @@ h3 {
 }
 
 .site-v2-compact .inventory-band {
-  max-width: 1180px;
+  max-width: 1320px;
   margin-inline: auto;
 }
 
@@ -2064,7 +2064,7 @@ h3 {
 .site-v2-compact .v2-section,
 .site-v2-compact .v2-layout,
 .site-v2-compact .v2-guides-compact {
-  max-width: 1180px;
+  max-width: 1320px;
   margin-inline: auto;
   padding: 30px clamp(18px, 5vw, 72px);
 }

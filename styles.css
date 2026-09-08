@@ -677,6 +677,11 @@ h3 {
   background: var(--soft);
 }
 
+.site-v2-compact .inventory-band {
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
 .inventory-band-before-guides {
   padding-top: 0;
 }
@@ -2059,6 +2064,8 @@ h3 {
 .site-v2-compact .v2-section,
 .site-v2-compact .v2-layout,
 .site-v2-compact .v2-guides-compact {
+  max-width: 1180px;
+  margin-inline: auto;
   padding: 30px clamp(18px, 5vw, 72px);
 }
 
@@ -3031,54 +3038,6 @@ h3 {
 
   .site-v2-compact .v2-list-logo {
     aspect-ratio: 1.6 / 1;
-  }
-}
-
-@media (min-width: 1024px) {
-  .site-v2-compact .v2-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .site-v2-compact .v2-list-card {
-    grid-template-columns: 72px minmax(0, 1fr);
-    grid-template-areas: "logo content" "actions actions";
-    align-items: start;
-    gap: 10px 14px;
-    padding: 18px;
-  }
-
-  .site-v2-compact .v2-list-logo {
-    grid-area: logo;
-    padding: 8px;
-  }
-
-  .site-v2-compact .v2-list-content {
-    grid-area: content;
-  }
-
-  .site-v2-compact .v2-list-content h3 {
-    font-size: 19px;
-    line-height: 1.2;
-  }
-
-  .site-v2-compact .v2-list-content .offer-condition,
-  .site-v2-compact .v2-list-content .offer-rule {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-  }
-
-  .site-v2-compact .v2-list-actions {
-    grid-area: actions;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .site-v2-compact .v2-list-actions .copy-button,
-  .site-v2-compact .v2-list-actions .use-button {
-    flex: 1 1 140px;
   }
 }
 

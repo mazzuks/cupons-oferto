@@ -198,6 +198,7 @@ $howToUse = $hasCode
     <footer class="site-footer">
       <strong>Oferto Cupons</strong>
       <span>Cupons, promocoes e sorteios para economizar hoje.</span>
+      <p class="footer-disclaimer">As ofertas tem tempo limitado. Confira a validade, o codigo e as regras no site parceiro antes de finalizar sua compra.</p>
     </footer>
     <script src="/php-site.js?v=<?= asset_version('php-site.js') ?>"></script>
     <script src="/pwa.js?v=<?= asset_version('pwa.js') ?>"></script>

@@ -7,6 +7,7 @@
   --muted: #657181;
   --line: #dde5f0;
   --green: #00a019;
+  --whatsapp-green: #25d366;
   --red: #e34040;
   --yellow: #ffcb45;
   --paper: #ffffff;
@@ -1011,8 +1012,8 @@ h3 {
 
 .use-button {
   color: var(--paper);
-  background: var(--blue);
-  box-shadow: 0 10px 18px rgba(25, 64, 121, 0.2);
+  background: var(--whatsapp-green);
+  box-shadow: 0 10px 18px rgba(37, 211, 102, 0.28);
 }
 
 .coupon-body small {
@@ -1276,11 +1277,20 @@ h3 {
 
 .site-footer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 16px;
   padding: 26px clamp(18px, 5vw, 72px);
   color: var(--paper);
   background: var(--navy);
+}
+
+.site-footer .footer-disclaimer {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 @media (max-width: 1080px) {
@@ -2523,42 +2533,6 @@ h3 {
   min-height: 46px;
 }
 
-.site-v2-compact .whatsapp-share-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-height: 46px;
-  min-width: 0;
-  padding: 0 12px;
-  color: #ffffff;
-  background: #25d366;
-  border: 0;
-  border-radius: 999px;
-  box-shadow: 0 12px 24px rgba(37, 211, 102, 0.22);
-  font-size: 14px;
-  font-weight: 800;
-  line-height: 1.15;
-  text-decoration: none;
-  text-align: center;
-  transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
-}
-
-.site-v2-compact .whatsapp-share-button:hover,
-.site-v2-compact .whatsapp-share-button:focus-visible {
-  background: #1fb95a;
-  outline: 0;
-  box-shadow: 0 14px 28px rgba(37, 211, 102, 0.28);
-  transform: translateY(-1px);
-}
-
-.site-v2-compact .whatsapp-share-button svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
-  flex: 0 0 auto;
-}
-
 .offer-page {
   background: #f3f7fb;
 }
@@ -2915,9 +2889,54 @@ h3 {
     padding-inline: 16px;
   }
 
-  .site-v2-compact .v2-list-card,
+  .site-v2-compact .v2-list-card {
+    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-areas: "logo content" "actions actions";
+    align-items: start;
+    gap: 10px 12px;
+    padding: 12px;
+  }
+
+  .site-v2-compact .v2-list-logo {
+    grid-area: logo;
+    padding: 6px;
+  }
+
+  .site-v2-compact .v2-list-content {
+    grid-area: content;
+    gap: 4px;
+  }
+
+  .site-v2-compact .v2-list-content h3 {
+    font-size: 17px;
+    line-height: 1.15;
+  }
+
+  .site-v2-compact .v2-list-content .offer-condition,
+  .site-v2-compact .v2-list-content .offer-rule {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 13px;
+  }
+
+  .site-v2-compact .v2-list-tags {
+    gap: 6px;
+  }
+
   .site-v2-compact .v2-list-actions {
-    grid-template-columns: 1fr;
+    grid-area: actions;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .site-v2-compact .v2-list-actions .copy-button,
+  .site-v2-compact .v2-list-actions .use-button {
+    flex: 1 1 130px;
+    min-height: 40px;
+    font-size: 13px;
   }
 
   .niche-grid {

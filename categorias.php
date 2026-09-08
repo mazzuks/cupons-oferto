@@ -136,11 +136,7 @@ $categoryHeroImage = category_hero_image($categoryHeroSlug) ?? 'assets/hero-cupo
             </div>
             <div class="v2-list" id="coupon-grid">
               <?php foreach ($pageCoupons as $coupon): ?>
-                <?php
-                  $couponOfferUrl = 'https://cupons.oferto.digital/' . coupon_offer_url($coupon, 'categoria_' . ($selectedGroup['slug'] ?? 'nicho'));
-                  $couponDisplayTitle = coupon_display_title($coupon, 82);
-                  $couponShareText = rawurlencode('Olha essa oferta da ' . $coupon['store'] . ': ' . $couponDisplayTitle . '. Veja os detalhes e copie o cupom aqui: ' . $couponOfferUrl);
-                ?>
+                <?php $couponDisplayTitle = coupon_display_title($coupon, 82); ?>
                 <article class="coupon-card v2-list-card">
                   <div class="v2-list-logo">
                     <?= coupon_brand_image_markup($coupon) ?>
@@ -150,8 +146,12 @@ $categoryHeroImage = category_hero_image($categoryHeroSlug) ?? 'assets/hero-cupo
                       <span class="store"><?= e($coupon['store']) ?></span>
                     </div>
                     <h3><?= e($couponDisplayTitle) ?></h3>
-                    <p class="offer-condition"><?= e($coupon['description']) ?></p>
-                    <p class="offer-rule"><?= e(trim((string) ($coupon['rules'] ?? '')) !== '' ? $coupon['rules'] : 'Confira as regras no site parceiro antes de finalizar.') ?></p>
+                    <?php if (!coupon_has_generic_description($coupon)): ?>
+                      <p class="offer-condition"><?= e($coupon['description']) ?></p>
+                    <?php endif; ?>
+                    <?php if ($customRule = coupon_custom_rule($coupon)): ?>
+                      <p class="offer-rule"><?= e($customRule) ?></p>
+                    <?php endif; ?>
                     <div class="v2-list-tags">
                       <span><?= e(validity_label($coupon['ends_at'])) ?></span>
                       <?php if (coupon_shows_public_code($coupon)): ?>
@@ -166,12 +166,6 @@ $categoryHeroImage = category_hero_image($categoryHeroSlug) ?? 'assets/hero-cupo
                     <?php if (coupon_shows_rescue_button($coupon)): ?>
                       <a class="use-button" href="<?= e(coupon_go_url($coupon, 'categoria_cta')) ?>" target="_blank" rel="noopener"><?= e(coupon_cta_label($coupon)) ?></a>
                     <?php endif; ?>
-                    <a class="whatsapp-share-button" href="https://wa.me/?text=<?= e($couponShareText) ?>" target="_blank" rel="noopener">
-                      <svg viewBox="0 0 32 32" aria-hidden="true">
-                        <path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.6 28.8l6.6-1.5A12.7 12.7 0 1 0 16 3.2Zm0 2.4a10.3 10.3 0 0 1 8.8 15.7 10.4 10.4 0 0 1-13.9 3.7l-.4-.2-3.5.8.8-3.4-.2-.4A10.3 10.3 0 0 1 16 5.6Zm-4.1 5.2c-.3 0-.7.1-1 .5-.4.4-1.3 1.2-1.3 3s1.3 3.5 1.5 3.8c.2.2 2.5 4 6.2 5.4 3.1 1.2 3.7.9 4.4.9.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.7.2-1.8-.1-.2-.3-.3-.7-.5l-2.5-1.2c-.3-.1-.6-.2-.8.2-.2.3-.9 1.2-1.1 1.5-.2.2-.4.3-.8.1-.3-.2-1.4-.5-2.7-1.7-1-1-1.7-2.1-1.9-2.4-.2-.4 0-.6.2-.8l.5-.6c.2-.2.2-.4.3-.6.1-.2.1-.4 0-.6l-1.1-2.6c-.3-.6-.5-.6-.8-.6h-.8Z" />
-                      </svg>
-                      <span>Compartilhar</span>
-                    </a>
                   </div>
                 </article>
               <?php endforeach; ?>
@@ -189,6 +183,7 @@ $categoryHeroImage = category_hero_image($categoryHeroSlug) ?? 'assets/hero-cupo
     <footer class="site-footer">
       <strong>Oferto Cupons</strong>
       <span>Cupons, promoções e sorteios para economizar hoje.</span>
+      <p class="footer-disclaimer">As ofertas têm tempo limitado. Confira a validade, o código e as regras no site parceiro antes de finalizar sua compra.</p>
     </footer>
     <script src="/php-site.js?v=<?= asset_version('php-site.js') ?>"></script>
   </body>

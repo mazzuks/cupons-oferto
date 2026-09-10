@@ -2418,7 +2418,7 @@ h3 {
 
 .site-v2-compact .v2-list {
   display: grid;
-  gap: 14px;
+  gap: 24px;
 }
 
 .site-v2-compact .v2-list-card {
@@ -2435,22 +2435,22 @@ h3 {
 .site-v2-compact .v2-list-card::after {
   content: "";
   position: absolute;
-  top: 50%;
-  width: 32px;
-  height: 32px;
+  left: 50%;
+  width: 20px;
+  height: 20px;
   background: #f3f7fb;
   border: 1px solid var(--line);
   border-radius: 50%;
-  transform: translateY(-50%);
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
 .site-v2-compact .v2-list-card::before {
-  left: -16px;
+  top: -10px;
 }
 
 .site-v2-compact .v2-list-card::after {
-  right: -16px;
+  bottom: -10px;
 }
 
 .site-v2-compact .v2-list-logo {

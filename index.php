@@ -78,6 +78,7 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
           <p class="eyebrow">Cupons, promocoes e sorteios para hoje</p>
           <h1>Cupons Inteligentes, <span class="hero-highlight">compras imperdíveis.</span></h1>
           <p>Oferto Cupons junta oportunidades em um só lugar para voce gastar menos.</p>
+          <button type="button" class="use-button hero-chat-button" onclick="Typebot.open()">Falar com o assistente de cupons</button>
         </div>
       </section>
 

@@ -817,6 +817,7 @@ function render_chat_widget(): void
 {
     echo '<script type="module">';
     echo "import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js';";
+    echo 'window.Typebot = Typebot;';
     echo 'Typebot.initBubble({';
     echo 'typebot: "assistente-de-cupons-wpp-ep8o238",';
     echo 'theme: {';

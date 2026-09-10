@@ -1878,6 +1878,10 @@ h3 {
   line-height: 1.5;
 }
 
+.site-v2-compact .v2-compact-hero .hero-chat-button {
+  margin-top: 20px;
+}
+
 .site-v2-compact .v2-hero-points {
   display: flex;
   flex-wrap: wrap;

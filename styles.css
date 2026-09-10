@@ -1880,6 +1880,8 @@ h3 {
 
 .site-v2-compact .v2-compact-hero .hero-chat-button {
   margin-top: 20px;
+  border: none;
+  cursor: pointer;
 }
 
 .site-v2-compact .v2-hero-points {

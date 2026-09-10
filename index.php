@@ -311,5 +311,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
     </footer>
     <script src="php-site.js?v=<?= asset_version('php-site.js') ?>"></script>
     <script src="pwa.js?v=<?= asset_version('pwa.js') ?>"></script>
+    <?php render_chat_widget(); ?>
   </body>
 </html>

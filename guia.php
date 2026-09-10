@@ -224,6 +224,7 @@ function guide_coupon_matches(array $couponRefs, string $storeName = 'China in B
       });
     </script>
     <script src="pwa.js"></script>
+    <?php render_chat_widget(); ?>
   </body>
 </html>
 

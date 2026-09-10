@@ -191,5 +191,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       })();
     </script>
     <script src="/pwa.js?v=<?= asset_version('pwa.js') ?>"></script>
+    <?php render_chat_widget(); ?>
   </body>
 </html>

@@ -2418,7 +2418,7 @@ h3 {
 
 .site-v2-compact .v2-list {
   display: grid;
-  gap: 24px;
+  gap: 14px;
 }
 
 .site-v2-compact .v2-list-card {
@@ -2446,11 +2446,11 @@ h3 {
 }
 
 .site-v2-compact .v2-list-card::before {
-  top: -10px;
+  top: 0;
 }
 
 .site-v2-compact .v2-list-card::after {
-  bottom: -10px;
+  bottom: 0;
 }
 
 .site-v2-compact .v2-list-logo {

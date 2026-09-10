@@ -813,6 +813,20 @@ function render_ad_slot(string $slot, string $class = 'inventory-slot-wide'): vo
     echo '</div>';
 }
 
+function render_chat_widget(): void
+{
+    echo '<script type="module">';
+    echo "import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js';";
+    echo 'Typebot.initBubble({';
+    echo 'typebot: "assistente-de-cupons-wpp-ep8o238",';
+    echo 'theme: {';
+    echo 'button: { backgroundColor: "#1D1D1D" },';
+    echo 'chatWindow: { backgroundColor: "#F8F8F8" },';
+    echo '},';
+    echo '});';
+    echo '</script>';
+}
+
 function csrf_token(): string
 {
     if (empty($_SESSION['csrf_token'])) {

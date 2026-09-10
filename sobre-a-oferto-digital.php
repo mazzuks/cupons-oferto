@@ -97,5 +97,6 @@ $shareImage = 'https://cupons.oferto.digital/assets/og-cupons.png';
       <span>Cupons, promoções e sorteios para comprar melhor.</span>
       <p class="footer-disclaimer">As ofertas têm tempo limitado. Confira a validade, o código e as regras no site parceiro antes de finalizar sua compra.</p>
     </footer>
+    <?php render_chat_widget(); ?>
   </body>
 </html>

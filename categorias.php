@@ -186,5 +186,6 @@ $categoryHeroImage = category_hero_image($categoryHeroSlug) ?? 'assets/hero-cupo
       <p class="footer-disclaimer">As ofertas têm tempo limitado. Confira a validade, o código e as regras no site parceiro antes de finalizar sua compra.</p>
     </footer>
     <script src="/php-site.js?v=<?= asset_version('php-site.js') ?>"></script>
+    <?php render_chat_widget(); ?>
   </body>
 </html>

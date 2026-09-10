@@ -114,5 +114,6 @@ function blog_anchor(string $value): string
       <p class="footer-disclaimer">As ofertas têm tempo limitado. Confira a validade, o código e as regras no site parceiro antes de finalizar sua compra.</p>
     </footer>
     <script src="/pwa.js?v=<?= asset_version('pwa.js') ?>"></script>
+    <?php render_chat_widget(); ?>
   </body>
 </html>

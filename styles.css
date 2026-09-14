@@ -2429,28 +2429,22 @@ h3 {
   align-items: center;
   padding: 16px;
   background: var(--paper);
-}
-
-.site-v2-compact .v2-list-card::before,
-.site-v2-compact .v2-list-card::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 32px;
-  height: 32px;
-  background: #f3f7fb;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.site-v2-compact .v2-list-card::before {
-  left: -20px;
-}
-
-.site-v2-compact .v2-list-card::after {
-  right: -20px;
+  -webkit-mask-image:
+    radial-gradient(circle 10px at 0 0, transparent 99%, #000 100%),
+    radial-gradient(circle 10px at 100% 0, transparent 99%, #000 100%),
+    radial-gradient(circle 10px at 0 100%, transparent 99%, #000 100%),
+    radial-gradient(circle 10px at 100% 100%, transparent 99%, #000 100%);
+  mask-image:
+    radial-gradient(circle 10px at 0 0, transparent 99%, #000 100%),
+    radial-gradient(circle 10px at 100% 0, transparent 99%, #000 100%),
+    radial-gradient(circle 10px at 0 100%, transparent 99%, #000 100%),
+    radial-gradient(circle 10px at 100% 100%, transparent 99%, #000 100%);
+  -webkit-mask-size: 51% 51%;
+  mask-size: 51% 51%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: top left, top right, bottom left, bottom right;
+  mask-position: top left, top right, bottom left, bottom right;
 }
 
 .site-v2-compact .v2-list-logo {

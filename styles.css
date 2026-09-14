@@ -2430,15 +2430,15 @@ h3 {
   padding: 16px;
   background: var(--paper);
   -webkit-mask-image:
-    radial-gradient(circle 10px at 0 0, transparent 99%, #000 100%),
-    radial-gradient(circle 10px at 100% 0, transparent 99%, #000 100%),
-    radial-gradient(circle 10px at 0 100%, transparent 99%, #000 100%),
-    radial-gradient(circle 10px at 100% 100%, transparent 99%, #000 100%);
+    radial-gradient(circle 18px at 0 0, transparent 99%, #000 100%),
+    radial-gradient(circle 18px at 100% 0, transparent 99%, #000 100%),
+    radial-gradient(circle 18px at 0 100%, transparent 99%, #000 100%),
+    radial-gradient(circle 18px at 100% 100%, transparent 99%, #000 100%);
   mask-image:
-    radial-gradient(circle 10px at 0 0, transparent 99%, #000 100%),
-    radial-gradient(circle 10px at 100% 0, transparent 99%, #000 100%),
-    radial-gradient(circle 10px at 0 100%, transparent 99%, #000 100%),
-    radial-gradient(circle 10px at 100% 100%, transparent 99%, #000 100%);
+    radial-gradient(circle 18px at 0 0, transparent 99%, #000 100%),
+    radial-gradient(circle 18px at 100% 0, transparent 99%, #000 100%),
+    radial-gradient(circle 18px at 0 100%, transparent 99%, #000 100%),
+    radial-gradient(circle 18px at 100% 100%, transparent 99%, #000 100%);
   -webkit-mask-size: 51% 51%;
   mask-size: 51% 51%;
   -webkit-mask-repeat: no-repeat;
